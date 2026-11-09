@@ -88,7 +88,7 @@ html,body{overscroll-behavior-y:contain}
   <div class="tbar" id="tbar" hidden><b>선생님 바로가기</b><button data-j="1">1단계</button><button data-j="2">2단계</button><button data-j="3">3단계(선택)</button><button data-j="4">마무리</button></div>
   <header>
     <h1>원의 넓이 공식 완성</h1>
-    <p class="lead">피자 조각 마법에서 만든 공식에는 빈칸이 하나 남아 있었어요. 이제 원의 둘레를 구하는 방법을 알았으니, 그 빈칸을 채워 공식을 완성해 봐요.</p>
+    <p class="lead">피자 조각 마법에서 만든 공식에는 빈칸이 하나 남아 있었어요. 이제 원주를 구하는 방법을 알았으니, 그 빈칸을 채워 공식을 완성해 봐요.</p>
   </header>
 
   <nav class="steps" aria-label="단계">
@@ -103,7 +103,7 @@ html,body{overscroll-behavior-y:contain}
     <h2>빈칸을 채워 공식을 완성해요</h2>
     <div class="lines" id="lines"></div>
     <div class="q" id="qa">
-      <p>원의 둘레는 어떻게 구할 수 있었나요?</p>
+      <p>원주는 어떻게 구할 수 있었나요?</p>
       <div class="choices" id="ca"><button class="btn" data-v="r">반지름 × 3.14</button><button class="btn" data-v="d">지름 × 3.14</button><button class="btn" data-v="4">지름 × 4</button></div>
     </div>
     <div class="q" id="qb" hidden>
@@ -158,7 +158,7 @@ html,body{overscroll-behavior-y:contain}
       <p class="toast" id="toast3" role="status"></p>
       <div class="story" id="story3" hidden>
         <strong>아르키메데스가 말한 바로 그 직각삼각형</strong>
-        <p>밑변은 원의 둘레, 높이는 반지름인 직각삼각형이 되었어요. 넓이는 원의 둘레 × 반지름 ÷ 2로, 피자 조각 마법에서 직사각형으로 만든 공식과 똑같아요. 약 2200년 전 아르키메데스는 원이 이 직각삼각형과 넓이가 같다는 것을 말로 증명했고, 약 1800년 뒤 케플러가 그것을 눈에 보이게 만들었어요.</p>
+        <p>밑변은 원주, 높이는 반지름인 직각삼각형이 되었어요. 넓이는 원주 × 반지름 ÷ 2로, 피자 조각 마법에서 직사각형으로 만든 공식과 똑같아요. 약 2200년 전 아르키메데스는 원이 이 직각삼각형과 넓이가 같다는 것을 말로 증명했고, 약 1800년 뒤 케플러가 그것을 눈에 보이게 만들었어요.</p>
       </div>
       <div class="row"><button class="btn primary" id="next3" disabled>마무리하기</button></div>
     </div>
@@ -168,7 +168,7 @@ html,body{overscroll-behavior-y:contain}
   <section class="card" id="step4" hidden>
     <h2>원의 넓이 공식</h2>
     <p class="big">원의 넓이 = 반지름 × 반지름 × 3.14</p>
-    <p class="note">원의 둘레를 모르던 피자 조각 마법의 공식이, 이제는 반지름 하나만 알면 쓸 수 있는 공식이 되었어요.</p>
+    <p class="note">원주를 모르던 피자 조각 마법의 공식이, 이제는 반지름 하나만 알면 쓸 수 있는 공식이 되었어요.</p>
     <ol class="ask">
       <li>모눈 칸을 세어 구하는 방법과 공식으로 구하는 방법 중에서 어느 쪽이 더 편했나요? 왜 그런가요?</li>
       <li>지름만 알고 있을 때는 원의 넓이를 어떻게 구할 수 있을까요?</li>
@@ -198,18 +198,18 @@ function quiz(id,right,hints,toast,ok){
 
 /* ---------- 1단계: 공식 변형 ---------- */
 const tk=(t,c="")=>`<span class="tk ${c}">${t}</span>`;
-const L1=`<p class="fl"><small>피자 조각 마법에서 만든 공식</small>원의 넓이 = ${tk("원의 둘레","qm")} × 반지름 ÷ 2</p>`;
-const L2=`<p class="fl"><small>원의 둘레 자리에 지름 × 3.14를 넣으면</small>원의 넓이 = ${tk("지름 × 3.14","new")} × 반지름 ÷ 2</p>`;
+const L1=`<p class="fl"><small>피자 조각 마법에서 만든 공식</small>원의 넓이 = ${tk("원주","qm")} × 반지름 ÷ 2</p>`;
+const L2=`<p class="fl"><small>원주 자리에 지름 × 3.14를 넣으면</small>원의 넓이 = ${tk("지름 × 3.14","new")} × 반지름 ÷ 2</p>`;
 const L3=`<p class="fl"><small>지름 자리에 반지름 × 2를 넣으면</small>원의 넓이 = ${tk("반지름 × 2","new")} × 3.14 × 반지름 ÷ 2</p>`;
 const L4=`<p class="fl"><small>× 2와 ÷ 2는 서로 없어져요</small>원의 넓이 = 반지름 ${tk("× 2","gone")} × 3.14 × 반지름 ${tk("÷ 2","gone")}</p>`;
 const L5=`<p class="fl last"><small>곱하는 순서를 바꿔 정리하면</small>원의 넓이 = 반지름 × 반지름 × 3.14</p>`;
 function setLines(k){$("lines").innerHTML=[L1,L2,L3,L4,L5].slice(0,k).join("");}
 quiz("ca","d",{r:"원주율은 원주 ÷ 지름이었어요. 반지름이 아니라 지름의 몇 배였지요?","4":"정사각형으로 가뒀을 때 지름의 4배보다 짧았어요. 실제로 재어 보니 지름의 약 몇 배였나요?"},"toast1",
-  ()=>{setLines(2);$("toast1").textContent="맞아요! 원의 둘레 = 지름 × 3.14였지요. 빈칸에 넣었어요.";$("qb").hidden=false;});
+  ()=>{setLines(2);$("toast1").textContent="맞아요! 원주 = 지름 × 3.14였지요. 빈칸에 넣었어요.";$("qb").hidden=false;});
 quiz("cb","2",{"3":"지름은 원의 중심을 지나서 반지름 두 개가 이어진 길이예요.","4":"지름은 원의 중심을 지나서 반지름 두 개가 이어진 길이예요."},"toast1",
   ()=>{setLines(3);$("toast1").textContent="맞아요! 지름 = 반지름 × 2예요. 공식이 반지름만으로 바뀌어 가요.";$("qc").hidden=false;});
 quiz("cc","same",{x4:"예를 들어 5 × 2 ÷ 2를 계산해 보세요.",half:"예를 들어 5 × 2 ÷ 2를 계산해 보세요."},"toast1",
-  ()=>{setLines(5);$("toast1").textContent="맞아요! 5 × 2 ÷ 2 = 5처럼, 2를 곱하고 2로 나누면 처음 수 그대로예요. 공식이 이렇게 짧아졌어요. 이제 원의 둘레를 몰라도, 반지름 하나만 재면 넓이를 구할 수 있어요.";$("next1").disabled=false;done.add(1);});
+  ()=>{setLines(5);$("toast1").textContent="맞아요! 5 × 2 ÷ 2 = 5처럼, 2를 곱하고 2로 나누면 처음 수 그대로예요. 공식이 이렇게 짧아졌어요. 이제 원주를 몰라도, 반지름 하나만 재면 넓이를 구할 수 있어요.";$("next1").disabled=false;done.add(1);});
 $("next1").onclick=()=>show(2);
 
 /* ---------- 2단계: 비교 ---------- */
@@ -269,7 +269,7 @@ function drawK(){
     g+=`<line x1="${x0}" y1="${ty}" x2="${x0+kn*c}" y2="${ty}" stroke="var(--muted)" stroke-dasharray="6 5"/>`;
     const kx=(x0+c/2+(kn-1)*c)+(left-(x0+c/2+(kn-1)*c))*push;
     if(push>=.999){
-      g+=`<line x1="${x0}" y1="${KYB+14}" x2="${x0+kn*c}" y2="${KYB+14}" stroke="var(--rim)" stroke-width="3"/><text x="${x0+kn*c/2}" y="${KYB+30}" text-anchor="middle" style="fill:var(--rim)">밑변 = 원의 둘레</text>`
+      g+=`<line x1="${x0}" y1="${KYB+14}" x2="${x0+kn*c}" y2="${KYB+14}" stroke="var(--rim)" stroke-width="3"/><text x="${x0+kn*c/2}" y="${KYB+30}" text-anchor="middle" style="fill:var(--rim)">밑변 = 원주</text>`
         +`<line x1="${x0-10}" y1="${ty}" x2="${x0-10}" y2="${KYB}" stroke="var(--bad)" stroke-width="3"/><text x="${x0}" y="${ty-10}" style="fill:var(--bad)">높이 = 반지름</text>`;}
     else g+=`<circle class="knob" cx="${kx}" cy="${ty}" r="15" fill="var(--band)" stroke="var(--ink)" stroke-width="1.5"/>`;
   }

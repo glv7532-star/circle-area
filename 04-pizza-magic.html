@@ -145,7 +145,7 @@ html,body{overscroll-behavior-y:contain}
       <p>이 직사각형은 원 몇 개로 만들었나요?</p>
       <div class="choices" id="c3c"><button class="btn" data-v="1">1개</button><button class="btn" data-v="2">2개</button><button class="btn" data-v="4">4개</button></div>
     </div>
-    <p class="sent" id="sent3">직사각형의 넓이 = 가로 × 세로 = <span class="blank" id="bW">?</span> × <span class="blank" id="bH">?</span><br>원 하나의 넓이 = 원의 둘레 × 반지름 ÷ <span class="blank" id="bN">?</span></p>
+    <p class="sent" id="sent3">직사각형의 넓이 = 가로 × 세로 = <span class="blank" id="bW">?</span> × <span class="blank" id="bH">?</span><br>원 하나의 넓이 = <span id="cw">원의 둘레</span> × 반지름 ÷ <span class="blank" id="bN">?</span></p>
     <p class="toast" id="toast3" role="status"></p>
     <div class="row"><button class="btn primary" id="next3" disabled>공식 확인하기</button></div>
   </section>
@@ -153,14 +153,14 @@ html,body{overscroll-behavior-y:contain}
   <!-- 마무리 -->
   <section class="card" id="step4" hidden>
     <h2>공식이 거의 다 완성됐어요. 그런데…</h2>
-    <p class="formula">원의 넓이 = <span class="qm">원의 둘레</span> × 반지름 ÷ 2</p>
-    <p class="note">반지름은 자로 바로 잴 수 있어요. 그런데 원의 둘레는 굽은 선이라서 자로 바로 잴 수가 없어요. 원의 둘레를 모르면 이 공식을 쓸 수 없지요.</p>
+    <p class="formula">원의 넓이 = <span class="qm">원주</span> × 반지름 ÷ 2</p>
+    <p class="note">반지름은 자로 바로 잴 수 있어요. 그런데 원주는 굽은 선이라서 자로 바로 잴 수가 없어요. 원주를 모르면 이 공식을 쓸 수 없지요.</p>
     <ol class="ask">
       <li>종이로 자른 피자와 화면 속 피자는 무엇이 달랐나요? 조각을 끝없이 잘게 자르면 어떻게 될까요?</li>
       <li>원 하나만 잘라서 붙였다면 직사각형의 가로는 원의 어느 부분이 되었을까요?</li>
-      <li>원의 둘레는 어떻게 구할 수 있을까요? 우리가 아는 도형과 지름, 반지름만으로 구할 수 있을까요?</li>
+      <li>원주는 어떻게 구할 수 있을까요? 우리가 아는 도형과 지름, 반지름만으로 구할 수 있을까요?</li>
     </ol>
-    <p class="closing">남은 건 원의 둘레 하나!<br>다음 시간에는 아르키메데스와 함께 원의 둘레를 쫓아가요.</p>
+    <p class="closing">남은 건 원주 하나!<br>다음 시간에는 아르키메데스와 함께 원주를 쫓아가요.</p>
   </section>
 
   <button class="link" id="reset">처음부터 다시</button>
@@ -319,7 +319,7 @@ function quiz(id,right,hints,ok){
 quiz("c3a","r",{d:"조각 하나는 원의 중심에서 둘레까지예요. 그 길이는 지름의 절반이지요.",c:"원의 둘레는 조각의 굽은 쪽이에요. 세로는 뾰족한 끝에서 둘레까지의 길이예요."},
   ()=>{$("bH").textContent="반지름";$("bH").classList.add("fill");$("toast3").textContent="맞아요! 조각 하나는 원의 중심에서 둘레까지라서, 세로는 반지름이에요.";hiTop=true;drawDims();$("q3b").hidden=false;});
 quiz("c3b","c",{h:"원 하나만 잘랐다면 절반이 되었을 거예요. 위쪽에 노란 조각이 몇 개 모였나요? 노란 원의 조각 전부예요.",d:"지름은 곧은 선이에요. 위쪽 가장자리는 원의 둘레를 잘게 나눈 굽은 선들이 모인 거예요."},
-  ()=>{$("bW").textContent="원의 둘레";$("bW").classList.add("fill");$("toast3").textContent="맞아요! 노란 원의 둘레가 모두 위쪽에 모였으니, 가로는 원의 둘레 전체예요. 아래쪽에는 파란 원의 둘레가 모였고요.";$("q3c").hidden=false;});
+  ()=>{$("bW").textContent="원주";$("cw").textContent="원주";$("bW").classList.add("fill");$("toast3").textContent="맞아요! 노란 원의 둘레가 모두 위쪽에 모였으니, 가로는 원의 둘레 전체예요. 이렇게 원의 둘레를 원주라고 해요. 이제부터는 원주라고 부를게요.";$("q3c").hidden=false;});
 quiz("c3c","2",{"1":"노란 원과 파란 원을 함께 붙였어요.","4":"노란 원 하나, 파란 원 하나였어요."},
   ()=>{$("bN").textContent="2";$("bN").classList.add("fill");$("toast3").textContent="맞아요! 원 2개로 만든 직사각형이니, 원 하나의 넓이는 그 절반이에요.";$("next3").disabled=false;done.add(3);});
 $("next3").onclick=()=>{done.add(4);show(4);};
@@ -330,7 +330,7 @@ function resetAll(){
   madeOnce=false;$("move1").disabled=true;$("back1").disabled=true;$("q1").hidden=true;$("next1").disabled=true;$("next2").disabled=true;$("next3").disabled=true;
   ["c1","c3a","c3b","c3c"].forEach(id=>$(id).querySelectorAll(".btn").forEach(b=>{b.disabled=false;b.classList.remove("yes","no");}));
   $("q3b").hidden=true;$("q3c").hidden=true;
-  [["bW","?"],["bH","?"],["bN","?"]].forEach(([id,v])=>{$(id).textContent=v;$(id).classList.remove("fill");});
+  [["bW","?"],["bH","?"],["bN","?"],["cw","원의 둘레"]].forEach(([id,v])=>{$(id).textContent=v;$(id).classList.remove("fill");});
   ["toast1","toast2","toast3"].forEach(id=>{$(id).textContent="";$(id).className="toast";});
   $("more1").hidden=true;stageLabel();update2();show(1);
 }
@@ -349,7 +349,7 @@ $("tbar").onclick=e=>{const b=e.target.closest("button");if(!b)return;const j=b.
   if(j==="2"){show(2);update2();return;}
   n=MAXN;t=1;build();update2();done.add(2);$("next2").disabled=false;showDims=true;drawDims();
   if(j==="3"){show(3);return;}
-  hiTop=true;drawDims();$("bW").textContent="원의 둘레";$("bH").textContent="반지름";$("bN").textContent="2";["bW","bH","bN"].forEach(id=>$(id).classList.add("fill"));
+  hiTop=true;drawDims();$("bW").textContent="원주";$("cw").textContent="원주";$("bH").textContent="반지름";$("bN").textContent="2";["bW","bH","bN"].forEach(id=>$(id).classList.add("fill"));
   done.add(3);done.add(4);show(4);
 };
 
