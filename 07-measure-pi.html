@@ -120,10 +120,10 @@ html,body{overscroll-behavior-y:contain}
 
   <!-- 1단계 -->
   <section class="card" id="step1">
-    <h2>둥근 물건의 지름과 원주를 재요</h2>
+    <h2>둥근 물건의 지름과 원주를 재어요</h2>
     <ol class="tips">
-      <li><b>원주</b>: 실이나 종이띠를 물건 둘레에 한 바퀴 팽팽하게 감고, 겹치는 곳을 표시한 뒤 펴서 자로 재요.</li>
-      <li><b>지름</b>: 원의 중심을 지나도록, 가장 긴 곳을 자로 재요.</li>
+      <li><b>원주</b>: 실이나 종이띠를 물건 둘레에 한 바퀴 팽팽하게 감고, 겹치는 곳을 표시한 뒤 펴서 자로 재어요.</li>
+      <li><b>지름</b>: 원의 중심을 지나도록, 가장 긴 곳을 자로 재어요.</li>
       <li>동전처럼 <b>작은 것</b>부터 접시처럼 <b>큰 것</b>까지, 크기가 다른 물건을 4개 이상 재어 보세요.</li>
     </ol>
     <form class="form" id="form" novalidate>
@@ -227,7 +227,7 @@ function renderLog(){
   const tt=$("toast1");
   if(!rows.length){tt.textContent="";return;}
   const odd=rows.filter(r=>ratio(r)<2.8||ratio(r)>3.5).length;
-  if(odd){tt.className="toast bad";tt.textContent=`'?' 표시가 있는 물건은 원주÷지름이 다른 물건과 많이 달라요. 다시 재어 볼까요? 지름은 가장 긴 곳, 원주는 딱 한 바퀴만 재요.`;}
+  if(odd){tt.className="toast bad";tt.textContent=`'?' 표시가 있는 물건은 원주÷지름이 다른 물건과 많이 달라요. 다시 재어 볼까요? 지름은 가장 긴 곳, 원주는 딱 한 바퀴만 재어요.`;}
   else if(!ok){tt.className="toast";tt.textContent=`${rows.length}개를 기록했어요. ${4-rows.length}개 더 재어 보세요.`;}
   else if(spread<3){tt.className="toast";tt.textContent=`${rows.length}개를 기록했어요. 크기 차이가 더 나는 물건(아주 작은 것이나 아주 큰 것)도 재면 비교하기 좋아요.`;}
   else{tt.className="toast ok";tt.textContent=`${rows.length}개를 기록했어요. 원주÷지름을 쭉 살펴보세요. 무엇을 발견했나요?`;}

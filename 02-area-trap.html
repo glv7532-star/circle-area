@@ -158,7 +158,7 @@ html,body{overscroll-behavior-y:contain}
           <div class="meter edge"><span>둘레가 지나가는 칸</span><b id="cntEdge">0</b></div>
           <div class="meter"><span>세는 데 걸린 시간</span><b id="clock">0초</b></div>
         </div>
-        <div class="row"><button class="btn" id="clear1">모두 지우기</button><button class="btn primary" id="check1">다 셌어요</button></div>
+        <div class="row"><button class="btn" id="clear1">모두 지우기</button><button class="btn primary" id="check1">다 세었어요</button></div>
         <p class="toast" id="toast1" role="status"></p>
         <div id="after1" hidden style="display:flex;flex-direction:column;gap:12px">
           <p class="sent">원의 넓이는 <span class="blank fill">37</span>cm²보다 크고 <span class="blank fill">69</span>cm²보다 작아요.<br>정사각형으로 가둔 범위(32 ~ 64cm²)보다 좁아졌어요.</p>
@@ -175,7 +175,7 @@ html,body{overscroll-behavior-y:contain}
   <!-- 3단계 -->
   <section class="card" id="step3" hidden>
     <h2>칸을 더 작게 하면 더 정확해질까?</h2>
-    <p class="note">칸이 작을수록 원의 둘레에 걸친 부분이 줄어들어 더 정확해져요. 그런데 세야 할 칸은 어떻게 될까요?</p>
+    <p class="note">칸이 작을수록 원의 둘레에 걸친 부분이 줄어들어 더 정확해져요. 그런데 세어야 할 칸은 어떻게 될까요?</p>
     <div class="split">
       <div><svg class="fig paint" id="g2s" viewBox="0 0 400 422" role="img" aria-label="0.5cm 모눈 위의 원"></svg>
       <canvas class="fig" id="g2" width="800" height="844" role="img" aria-label="더 작은 모눈 위의 원" hidden></canvas></div>
@@ -196,7 +196,7 @@ html,body{overscroll-behavior-y:contain}
             <div class="meter edge"><span>둘레가 지나가는 칸</span><b id="cntEdge2">0</b></div>
             <div class="meter"><span>세는 데 걸린 시간</span><b id="clock2">0초</b></div>
           </div>
-          <div class="row"><button class="btn" id="clear2">모두 지우기</button><button class="btn primary" id="check2">다 셌어요</button></div>
+          <div class="row"><button class="btn" id="clear2">모두 지우기</button><button class="btn primary" id="check2">다 세었어요</button></div>
           <button class="link" id="giveup2" hidden>너무 오래 걸려요. 컴퓨터에게 맡길래요</button>
         </div>
         <div id="cnt2" hidden style="display:flex;flex-direction:column;gap:10px">
@@ -211,7 +211,7 @@ html,body{overscroll-behavior-y:contain}
       </div>
     </div>
     <div class="tablebox"><table>
-      <thead><tr><th>칸 한 변</th><th>세야 할 칸</th><th>원의 넓이 범위</th><th>반 칸씩 어림</th><th>반지름×반지름의</th><th>손으로 센다면</th></tr></thead>
+      <thead><tr><th>칸 한 변</th><th>세어야 할 칸</th><th>원의 넓이 범위</th><th>반 칸씩 어림</th><th>반지름×반지름의</th><th>손으로 센다면</th></tr></thead>
       <tbody id="tbl2"></tbody>
     </table></div>
     <p class="note" id="rateNote"></p>
@@ -329,7 +329,7 @@ function table2(){$("tbl2").innerHTML=SIZES.filter(([N])=>counted.has(N)).map(([
   $("rateNote").textContent=`'손으로 센다면'은 2단계에서 내가 한 칸을 세는 데 걸린 시간(한 칸에 약 ${rate.toFixed(1)}초)으로 어림한 거예요.`;}
 $("c2").onclick=e=>{const b=e.target.closest(".btn");if(!b||b.disabled)return;const tt=$("toast2");
   if(b.dataset.v==="4"){b.classList.add("yes");$("c2").querySelectorAll(".btn").forEach(x=>x.disabled=true);tt.className="toast ok";
-    tt.textContent="맞아요! 1cm 칸 하나에 0.5cm 칸이 가로 2개, 세로 2개, 모두 4개 들어가요. 세야 할 칸도 거의 4배가 돼요. 정말 그런지 직접 칠하며 세어 볼까요?";$("man2").hidden=false;}
+    tt.textContent="맞아요! 1cm 칸 하나에 0.5cm 칸이 가로 2개, 세로 2개, 모두 4개 들어가요. 세어야 할 칸도 거의 4배가 돼요. 정말 그런지 직접 칠하며 세어 볼까요?";$("man2").hidden=false;}
   else{b.classList.add("no");b.disabled=true;tt.className="toast bad";tt.textContent="1cm 칸 하나를 0.5cm 칸으로 나누면 가로로 몇 개, 세로로 몇 개가 들어갈까요?";}
 };
 /* ---------- 0.5cm 칸: 직접 칠하며 세기 ----------
@@ -356,7 +356,7 @@ function done05(byHand){
   if(byHand&&el2>0)rate=Math.min(10,Math.max(.5,(elapsed+el2)/(IN10+ED10+177+64)));
   counted.add(17);lv=1;table2();$("cnt2").hidden=false;$("smaller2").disabled=false;$("m2s").textContent="0.25cm";
   const tt=$("toast2");tt.className="toast ok";
-  tt.textContent=byHand?`정확해요! 세야 할 칸이 69칸에서 241칸이 되었어요. 세는 데 ${fmtT(el2)} 걸렸어요. 범위는 44.25~60.25cm²로 좁아졌지만 셀 칸이 훨씬 많아졌지요? 더 작은 칸은 컴퓨터에게 맡겨 봐요.`
+  tt.textContent=byHand?`정확해요! 세어야 할 칸이 69칸에서 241칸이 되었어요. 세는 데 ${fmtT(el2)} 걸렸어요. 범위는 44.25~60.25cm²로 좁아졌지만 셀 칸이 훨씬 많아졌지요? 더 작은 칸은 컴퓨터에게 맡겨 봐요.`
     :`0.5cm 칸은 241칸이에요. 범위는 44.25~60.25cm²로 좁아졌어요. 더 작은 칸은 컴퓨터에게 맡겨 봐요.`;
 }
 $("check2").onclick=()=>{
