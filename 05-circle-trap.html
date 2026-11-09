@@ -31,7 +31,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16p
 .wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
 h1{font-family:var(--display);font-weight:700;font-size:2.1rem;line-height:1.1;margin:0}
 .lead{margin:4px 0 0;color:var(--muted);font-size:.95rem;word-break:keep-all}
-.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
 .stepi{font-size:.9rem;padding:8px 6px;border:1px solid var(--line);background:var(--paper);color:var(--muted);border-radius:8px;text-align:center;word-break:keep-all;line-height:1.25}
 .stepi b{font-family:var(--display);font-size:1.15rem;display:block;line-height:1}
 .stepi[aria-current="step"]{border-color:var(--accent);background:var(--accent-bg);color:var(--ink)}
@@ -101,6 +101,15 @@ tr.hot td{background:var(--accent-bg)}
 .sumc .v{font-family:var(--display);font-size:1.7rem;line-height:1.15;font-variant-numeric:tabular-nums;word-break:keep-all}
 .sumc .d{font-size:.85rem;color:var(--muted);word-break:keep-all}
 .ask{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px;word-break:keep-all}
+.term{margin:0;padding:18px 16px;border-radius:14px;background:var(--accent-bg);border:2px solid var(--accent);text-align:center;display:flex;flex-direction:column;gap:6px;word-break:keep-all}
+.term b{font-family:var(--display);font-size:3rem;line-height:1;color:var(--accent)}
+.term span{font-size:1.15rem}
+.hanja{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin:0}
+.hanja span{background:var(--bg);border-radius:10px;padding:8px 14px;text-align:center;line-height:1.3}
+.hanja i{display:block;font-style:normal;font-family:var(--display);font-size:1.8rem}
+.hanja .new{outline:2px solid var(--accent)}
+.sent .blank.fill{color:var(--accent);border-color:var(--accent)}
+.ok{color:var(--ok)}
 .closing{margin:0;padding:14px 16px;border-radius:12px;background:var(--accent-bg);font-family:var(--display);font-size:1.4rem;line-height:1.4;text-align:center;word-break:keep-all}
 .tbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;border:1.5px dashed var(--accent);border-radius:10px;font-size:.85rem;color:var(--muted)}
 .tbar button{font:inherit;font-size:.85rem;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
@@ -114,7 +123,7 @@ html,body{overscroll-behavior-y:contain}
 </style>
 
 <div class="wrap">
-  <div class="tbar" id="tbar" hidden><b>선생님 바로가기</b><button data-j="1">1단계</button><button data-j="2">2단계</button><button data-j="3">3단계</button><button data-j="4">마무리</button></div>
+  <div class="tbar" id="tbar" hidden><b>선생님 바로가기</b><button data-j="1">1단계</button><button data-j="2">2단계</button><button data-j="3">3단계</button><button data-j="4">4단계</button><button data-j="5">마무리</button></div>
   <header>
     <h1>원 둘레 가두기 작전</h1>
     <p class="lead">원주(원의 둘레)는 굽은 선이라서 자로 바로 잴 수 없어요. 그래서 아르키메데스는 원을 곧은 선으로 된 정다각형 사이에 가두었어요. 안쪽 다각형보다는 길고, 바깥쪽 다각형보다는 짧을 테니까요.</p>
@@ -124,7 +133,8 @@ html,body{overscroll-behavior-y:contain}
     <div class="stepi" id="tab1" aria-current="step"><b>1</b>처음 가두기</div>
     <div class="stepi" id="tab2"><b>2</b>96각형까지</div>
     <div class="stepi" id="tab3"><b>3</b>더 멀리</div>
-    <div class="stepi" id="tab4"><b>4</b>마무리</div>
+    <div class="stepi" id="tab4"><b>4</b>새 이름 원주율</div>
+    <div class="stepi" id="tab5"><b>5</b>마무리</div>
   </nav>
 
   <!-- 1단계 -->
@@ -220,12 +230,25 @@ html,body{overscroll-behavior-y:contain}
       </div>
       <p class="toast" id="toast3" role="status"></p>
       <p class="reveal" id="reveal3" hidden></p>
-      <div class="row"><button class="btn primary" id="next3" disabled>마무리하기</button></div>
+      <div class="row"><button class="btn primary" id="next3" disabled>다음</button></div>
     </div>
   </section>
 
-  <!-- 마무리 -->
+  <!-- 용어 도입: 원주율 -->
   <section class="card" id="step4" hidden>
+    <h2>이 수에 이름을 붙여요</h2>
+    <p class="note">원주가 지름의 몇 배인지 나타내는 이 수는 앞으로 아주 많이 쓰게 될 수예요. 그런데 쓸 때마다 이렇게 길게 말해야 한다면 어떨까요? 수학자들은 긴 것을 싫어하지요. 그래서 짧은 이름을 붙였어요.</p>
+    <p class="term"><b>원주율</b><span>원주가 지름의 몇 배인지 나타내는 수를 <strong>원주율</strong>이라고 해요.</span></p>
+    <p class="hanja"><span><i>圓</i>둥글 원</span><span><i>周</i>둘레 주</span><span class="new"><i>率</i>비율 율</span></p>
+    <p class="note">원주율은 지난 시간에 배운 '원주'에 '비율 율'이 붙은 말이에요. 6학년 1학기에 배운 비율이 바로 이 '율'이에요. 지름에 대한 원주의 비율이라는 뜻이지요.</p>
+    <p class="sent"><span class="blank" id="f4w" style="font-family:var(--body);font-size:1.05rem">원주가 지름의 몇 배인지 나타내는 수</span> = 원주 ÷ 지름 = <span id="f4v">3.14159265</span>…</p>
+    <div class="row"><button class="btn" id="swap4">새 이름으로 바꿔 쓰기</button></div>
+    <p class="toast" id="toast4" role="status"></p>
+    <div class="row"><button class="btn primary" id="next4" disabled>마무리하기</button></div>
+  </section>
+
+  <!-- 마무리 -->
+  <section class="card" id="step5" hidden>
     <h2>원 둘레 가두기 작전 결과</h2>
     <div class="sum" id="sum4"></div>
     <ol class="ask">
@@ -248,10 +271,10 @@ const done=new Set();
 let cur=1;
 function show(n){
   cur=n;
-  for(const i of [1,2,3,4])$("step"+i).hidden=i!==n;
-  for(const i of [1,2,3,4]){const t=$("tab"+i);if(i===n)t.setAttribute("aria-current","step");else t.removeAttribute("aria-current");t.classList.toggle("done",i!==n&&done.has(i));}
+  for(const i of [1,2,3,4,5])$("step"+i).hidden=i!==n;
+  for(const i of [1,2,3,4,5]){const t=$("tab"+i);if(i===n)t.setAttribute("aria-current","step");else t.removeAttribute("aria-current");t.classList.toggle("done",i!==n&&done.has(i));}
   if(n===2)draw2();
-  if(n===4)renderSum();
+  if(n===5)renderSum();
   window.scrollTo({top:0,behavior:"smooth"});
 }
 
@@ -393,12 +416,17 @@ function after3(){
   const d=P-p,z=Math.ceil(-Math.log10(d))-1,ds=d.toFixed(z+2);
   t.textContent=`정${nf(n)}각형이에요. 두 값의 차이는 ${ds}쯤, 소수점 아래 0이 ${z}개나 이어질 만큼 작아졌지만 0은 아니에요.`+(n>=MAXN?" 여기가 이 화면의 끝이에요. 그래도 두 값은 여전히 달라요.":"");
   if(n>=GOAL&&$("reveal3").hidden){
-    $("reveal3").innerHTML=`${PRED[pred]||""}<br>변을 아무리 늘려도 두 값은 점점 가까워질 뿐, 딱 같아지지는 않아요. 아르키메데스는 끝내 정확한 값을 찾지 못했어요.<br>그 뒤로 <b>약 2000년</b> 동안 수학자들이 연구한 끝에, 이 수는 소수점 아래 숫자가 <b>규칙 없이 끝없이 이어진다</b>는 것이 밝혀졌어요. 그래서 우리는 적당한 곳에서 끊어 <b>3.14</b>로 써요. 원주가 지름의 몇 배인지 나타내는 이 수를 <b>원주율</b>이라고 해요.`;
+    $("reveal3").innerHTML=`${PRED[pred]||""}<br>변을 아무리 늘려도 두 값은 점점 가까워질 뿐, 딱 같아지지는 않아요. 아르키메데스는 끝내 정확한 값을 찾지 못했어요.<br>그 뒤로 <b>약 2000년</b> 동안 수학자들이 연구한 끝에, 이 수는 소수점 아래 숫자가 <b>규칙 없이 끝없이 이어진다</b>는 것이 밝혀졌어요. 그래서 우리는 적당한 곳에서 끊어 <b>3.14</b>로 써요.`;
     $("reveal3").hidden=false;$("next3").disabled=false;done.add(3);}
 }
 $("dbl3").onclick=()=>{if(n>=MAXN)return;doubleOnce();after3();};
 $("dbl3x5").onclick=()=>{for(let i=0;i<5&&n<MAXN;i++)doubleOnce();after3();};
-$("next3").onclick=()=>{done.add(4);show(4);};
+function prep4(){$("f4v").textContent=samePrefix(trunc(p,10),trunc(P,10));}
+$("next3").onclick=()=>{prep4();show(4);};
+function swap4(){const w=$("f4w");w.textContent="원주율";w.style.cssText="";w.classList.add("fill");$("swap4").disabled=true;
+  const t=$("toast4");t.textContent="훨씬 짧아졌지요? 이제부터는 이 수를 원주율이라고 부를게요. 원주율은 끝없이 이어지는 수라서 보통 3.14로 끊어 써요.";t.className="toast ok";$("next4").disabled=false;done.add(4);}
+$("swap4").onclick=swap4;
+$("next4").onclick=()=>{done.add(5);show(5);};
 
 /* ---------- 마무리 ---------- */
 function renderSum(){
@@ -415,6 +443,7 @@ function resetAll(){
   setup1();$("arch").hidden=true;$("next2").disabled=true;$("toast2").textContent="";$("toast2").className="toast";
   $("predOpts").querySelectorAll(".opt").forEach(x=>{x.setAttribute("aria-pressed","false");x.disabled=false;});
   $("play3").hidden=true;$("reveal3").hidden=true;$("next3").disabled=true;$("toast3").textContent="";
+  {const w=$("f4w");w.textContent="원주가 지름의 몇 배인지 나타내는 수";w.style.cssText="font-family:var(--body);font-size:1.05rem";w.classList.remove("fill");$("swap4").disabled=false;$("next4").disabled=true;$("toast4").textContent="";$("toast4").className="toast";}
   show(1);
 }
 let resetArm=0;
@@ -430,7 +459,7 @@ $("tbar").onclick=e=>{const b=e.target.closest("button");if(!b)return;const j=b.
   if(j==="1")return;
   finish1();if(j==="2"){show(2);return;}
   while(n<96)doubleOnce();show(2);$("archOurs").textContent=`${trunc(p,4)}배와 ${trunc(P,4)}배 사이`;$("arch").hidden=false;$("next2").disabled=false;done.add(2);if(j==="3"){show(3);draw3();return;}
-  show(3);$("predOpts").querySelector('[data-p="never"]').click();while(n<GOAL)doubleOnce();after3();done.add(4);show(4);
+  show(3);$("predOpts").querySelector('[data-p="never"]').click();while(n<GOAL)doubleOnce();after3();prep4();if(j==="4"){show(4);window.scrollTo(0,0);return;}swap4();done.add(5);show(5);
   window.scrollTo(0,0);
 };
 
