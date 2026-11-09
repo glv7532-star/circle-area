@@ -69,6 +69,8 @@ h1{font-family:var(--display);font-weight:700;font-size:2.1rem;line-height:1.1;m
 .stage{width:100%;height:auto;display:block;border-radius:12px;background:var(--bg);user-select:none;-webkit-user-select:none}
 .stage text{font-family:var(--body);fill:var(--ink);font-size:14px}
 .stage .knob{cursor:grab}
+/* 꼭짓점은 가로로만 움직여요. 처음부터 가로 밀기를 화면 스크롤에 넘기지 않아야 손가락으로 끌 때 끊기지 않아요. */
+#tri,#kst{touch-action:pan-y}
 .slider{display:flex;flex-direction:column;gap:4px}
 .slider input{width:100%;accent-color:var(--accent);height:32px}
 .slider label{font-size:.9rem;color:var(--muted);word-break:keep-all}
@@ -237,11 +239,11 @@ function drawTri(){
    +`<line x1="${apx}" y1="${ty}" x2="${apx}" y2="${by}" stroke="var(--bad)" stroke-width="2" stroke-dasharray="4 3"/>`
    +`<text x="${bx+TW/2}" y="${by+22}" text-anchor="middle">밑변 5cm</text><text x="${apx+8}" y="${by-TH/2}">높이 3cm</text>`
    +`<text x="20" y="22" style="fill:var(--accent)">넓이 = 5 × 3 ÷ 2 = 7.5cm²</text>`
-   +`<circle class="knob" cx="${apx}" cy="${ty}" r="14" fill="var(--band)" stroke="var(--ink)" stroke-width="1.5"/>`;
+   +`<circle class="knob" cx="${apx}" cy="${ty}" r="36" fill="transparent"/><circle class="knob" cx="${apx}" cy="${ty}" r="14" fill="var(--band)" stroke="var(--ink)" stroke-width="1.5"/>`;
 }
-$("tri").addEventListener("pointerdown",e=>{if(!e.target.classList.contains("knob"))return;e.preventDefault();dragT=true;$("tri").style.touchAction="none";try{$("tri").setPointerCapture(e.pointerId);}catch(_){}});
+$("tri").addEventListener("pointerdown",e=>{if(!e.target.classList.contains("knob"))return;e.preventDefault();dragT=true;try{$("tri").setPointerCapture(e.pointerId);}catch(_){}});
 $("tri").addEventListener("pointermove",e=>{if(!dragT)return;apx=Math.max(40,Math.min(520,svgPt($("tri"),e).x));drawTri();});
-const endT=()=>{dragT=false;$("tri").style.touchAction="";};
+const endT=()=>{dragT=false;};
 $("tri").addEventListener("pointerup",endT);$("tri").addEventListener("pointercancel",endT);
 quiz("c3a","same",{up:"넓이는 밑변 × 높이 ÷ 2예요. 꼭짓점을 옮길 때 밑변이나 높이가 바뀌었나요?",down:"넓이는 밑변 × 높이 ÷ 2예요. 꼭짓점을 옮길 때 밑변이나 높이가 바뀌었나요?"},"toast3",
   ()=>{$("toast3").textContent="맞아요! 밑변과 높이가 같으면 모양이 달라도 넓이는 같아요. 유클리드가 정리해 둔 이 성질을 케플러는 원에 써먹었어요.";$("kep").hidden=false;});
@@ -271,7 +273,7 @@ function drawK(){
     if(push>=.999){
       g+=`<line x1="${x0}" y1="${KYB+14}" x2="${x0+kn*c}" y2="${KYB+14}" stroke="var(--rim)" stroke-width="3"/><text x="${x0+kn*c/2}" y="${KYB+30}" text-anchor="middle" style="fill:var(--rim)">밑변 = 원주</text>`
         +`<line x1="${x0-10}" y1="${ty}" x2="${x0-10}" y2="${KYB}" stroke="var(--bad)" stroke-width="3"/><text x="${x0}" y="${ty-10}" style="fill:var(--bad)">높이 = 반지름</text>`;}
-    else g+=`<circle class="knob" cx="${kx}" cy="${ty}" r="15" fill="var(--band)" stroke="var(--ink)" stroke-width="1.5"/>`;
+    else g+=`<circle class="knob" cx="${kx}" cy="${ty}" r="36" fill="transparent"/><circle class="knob" cx="${kx}" cy="${ty}" r="15" fill="var(--band)" stroke="var(--ink)" stroke-width="1.5"/>`;
   }
   $("kst").innerHTML=g;
 }
@@ -282,9 +284,9 @@ $("unroll").onclick=()=>{if(kphase)return;kphase=1;$("unroll").disabled=true;con
 function setPush(v){push=Math.max(0,Math.min(1,v));if(push>.97)push=1;$("push").value=Math.round(push*100);drawK();
   if(push>=1&&$("story3").hidden){$("toast3").className="toast ok";$("toast3").textContent="꼭짓점을 모두 모았어요! 삼각형 하나하나는 밑변과 높이가 그대로라서 넓이도 그대로예요.";$("story3").hidden=false;$("next3").disabled=false;done.add(3);}}
 $("push").oninput=()=>setPush(+$("push").value/100);
-$("kst").addEventListener("pointerdown",e=>{if(kphase!==2||!e.target.classList.contains("knob"))return;e.preventDefault();dragK=true;$("kst").style.touchAction="none";try{$("kst").setPointerCapture(e.pointerId);}catch(_){}});
+$("kst").addEventListener("pointerdown",e=>{if(kphase!==2||!e.target.classList.contains("knob"))return;e.preventDefault();dragK=true;try{$("kst").setPointerCapture(e.pointerId);}catch(_){}});
 $("kst").addEventListener("pointermove",e=>{if(!dragK)return;const {c,x0}=geo(),start=x0+c/2+(kn-1)*c,x=svgPt($("kst"),e).x;setPush((start-x)/(start-x0));});
-const endK=()=>{dragK=false;$("kst").style.touchAction="";};
+const endK=()=>{dragK=false;};
 $("kst").addEventListener("pointerup",endK);$("kst").addEventListener("pointercancel",endK);
 $("next3").onclick=()=>{done.add(4);show(4);};
 
