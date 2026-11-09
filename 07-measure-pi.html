@@ -276,7 +276,9 @@ function drawChart(){
 $("scaleBtn").onclick=()=>{same=!same;$("scaleBtn").textContent=same?"실제 크기로 돌아가기":"크기를 똑같이 맞춰 보기";drawChart();};
 $("c2").onclick=e=>{const b=e.target.closest(".btn");if(!b||b.disabled)return;const tt=$("toast2");
   if(b.dataset.v==="same"){b.classList.add("yes");$("c2").querySelectorAll(".btn").forEach(x=>x.disabled=true);tt.className="toast ok";
-    tt.textContent="맞아요! 작은 동전도 큰 시계도 원주는 자기 자신을 3개와 조금 늘어놓은 길이, 지름의 약 3.14배예요. 원의 크기와 상관없이 원주÷지름은 언제나 일정해요. 지난 시간에 배운 원주율이 바로 이 수예요.";
+    const byD=rows.slice().sort((a,b)=>a.d-b.d),sm=byD[0],bg=byD[byD.length-1];
+    const who=sm.d<bg.d?`가장 작은 ${sm.name}(지름 ${sm.d}cm)도, 가장 큰 ${bg.name}(지름 ${bg.d}cm)도`:"우리가 잰 물건들은 모두";
+    tt.textContent=`맞아요! ${who} 원주는 자기 자신을 3개와 조금 늘어놓은 길이, 지름의 약 3.14배예요. 원의 크기와 상관없이 원주÷지름은 언제나 일정해요. 지난 시간에 배운 원주율이 바로 이 수예요.`;
     if(!same)$("scaleBtn").click();$("next2").disabled=false;done.add(2);}
   else{b.classList.add("no");b.disabled=true;tt.className="toast bad";tt.textContent="보라색 선 아래에 물건이 몇 개 들어가는지, 끝에 적힌 몇 배인지를 작은 물건부터 큰 물건까지 차례로 비교해 보세요.";}
 };
