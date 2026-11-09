@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>원의 넓이 공식 완성</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&display=swap">
+<style>
+/* Layout: same notebook page as the other circle-unit tools; step strip on top, one card per step. Formulas are set large in the display face. */
+:root{
+  --bg:#efe8d8; --paper:#fbf7ee; --ink:#2f3a2c; --muted:#6c7462; --line:#d8ceb6;
+  --accent:#2d5d7b; --accent-bg:#dde8ef; --ok:#2f7a3d; --bad:#b23a48;
+  --pa:#f2c26b; --pa-edge:#b06a1f; --pb:#a9cbe3; --rim:#7a3fa0; --band:#e9b44c; --strike:#b23a48;
+  --display:"Gaegu","Gowun Dodum",cursive; --body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141b26; --paper:#1f2836; --ink:#ece6d6; --muted:#a3a99c; --line:#334156;
+  --accent:#8cc0e0; --accent-bg:#1e3446; --ok:#7fd08c; --bad:#f08b97;
+  --pa:#8a6a2e; --pa-edge:#e6a65a; --pb:#2a4a63; --rim:#c9a0ef; --band:#c99a3c; --strike:#f08b97; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141b26; --paper:#1f2836; --ink:#ece6d6; --muted:#a3a99c; --line:#334156;
+  --accent:#8cc0e0; --accent-bg:#1e3446; --ok:#7fd08c; --bad:#f08b97;
+  --pa:#8a6a2e; --pa-edge:#e6a65a; --pb:#2a4a63; --rim:#c9a0ef; --band:#c99a3c; --strike:#f08b97; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1{font-family:var(--display);font-weight:700;font-size:2.1rem;line-height:1.1;margin:0}
+.lead{margin:4px 0 0;color:var(--muted);font-size:.95rem;word-break:keep-all}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.stepi{font-size:.9rem;padding:8px 6px;border:1px solid var(--line);background:var(--paper);color:var(--muted);border-radius:8px;text-align:center;word-break:keep-all;line-height:1.25}
+.stepi b{font-family:var(--display);font-size:1.15rem;display:block;line-height:1}
+.stepi[aria-current="step"]{border-color:var(--accent);background:var(--accent-bg);color:var(--ink)}
+.stepi.done{color:var(--ink)} .stepi.done b::after{content:" \2713";font-size:.9rem;color:var(--ok)}
+@media (max-width:480px){.stepi{font-size:.76rem;padding:7px 3px}}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px}
+.card h2{font-family:var(--display);font-size:1.5rem;margin:0;line-height:1.2}
+.card h3{font-family:var(--display);font-size:1.25rem;margin:0;line-height:1.2}
+.note{margin:0;color:var(--muted);font-size:.92rem;word-break:keep-all}
+.btn{font:inherit;font-size:1rem;padding:12px 10px;border-radius:10px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;word-break:keep-all;touch-action:manipulation}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+.btn.no{text-decoration:line-through;opacity:.5}
+.btn.yes{border-color:var(--ok);color:var(--ok);font-weight:700}
+.btn.on{border-color:var(--accent);background:var(--accent-bg)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,.link:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.row .btn{flex:1 1 150px}
+.toast{min-height:1.4em;margin:0;font-size:.95rem;color:var(--accent);word-break:keep-all}
+.toast.bad{color:var(--bad)} .toast.ok{color:var(--ok)}
+.q{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border-radius:12px;background:var(--bg)}
+.q p{margin:0;word-break:keep-all}
+.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.lines{display:flex;flex-direction:column;gap:8px}
+.fl{margin:0;padding:10px 14px;border-radius:12px;background:var(--bg);font-family:var(--display);font-size:1.55rem;line-height:1.5;word-break:keep-all}
+@media (max-width:480px){.fl{font-size:1.25rem}}
+.fl small{display:block;font-family:var(--body);font-size:.82rem;color:var(--muted);line-height:1.4}
+.fl.last{background:var(--accent-bg)}
+.tk{display:inline-block;padding:0 4px;border-radius:6px}
+.tk.qm{border:2.5px dashed var(--bad);color:var(--bad);padding:0 8px}
+.tk.new{background:var(--band);color:#2a2210}
+.tk.gone{text-decoration:line-through;text-decoration-color:var(--strike);text-decoration-thickness:3px;opacity:.55}
+.chart{width:100%;height:auto;display:block}
+.chart text{font-family:var(--body);fill:var(--muted);font-size:12px}
+.chart .lbl{fill:var(--ink);font-size:13px}
+.stage{width:100%;height:auto;display:block;border-radius:12px;background:var(--bg);user-select:none;-webkit-user-select:none}
+.stage text{font-family:var(--body);fill:var(--ink);font-size:14px}
+.stage .knob{cursor:grab}
+.slider{display:flex;flex-direction:column;gap:4px}
+.slider input{width:100%;accent-color:var(--accent);height:32px}
+.slider label{font-size:.9rem;color:var(--muted);word-break:keep-all}
+.story{display:flex;flex-direction:column;gap:6px;padding:14px;border-radius:12px;background:var(--accent-bg)}
+.story strong{font-family:var(--display);font-size:1.35rem;line-height:1.2;word-break:keep-all}
+.story p{margin:0;word-break:keep-all}
+.big{margin:0;padding:18px;border-radius:14px;background:var(--bg);font-family:var(--display);font-size:2rem;line-height:1.4;text-align:center;word-break:keep-all}
+.ask{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px;word-break:keep-all}
+.closing{margin:0;padding:14px 16px;border-radius:12px;background:var(--accent-bg);font-family:var(--display);font-size:1.4rem;line-height:1.4;text-align:center;word-break:keep-all}
+.tbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;border:1.5px dashed var(--accent);border-radius:10px;font-size:.85rem;color:var(--muted)}
+.tbar button{font:inherit;font-size:.85rem;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.link{background:none;border:none;color:var(--muted);text-decoration:underline;font:inherit;font-size:.88rem;cursor:pointer;padding:0;align-self:flex-start}
+html,body{overscroll-behavior-y:contain}
+</style>
+
+<div class="wrap">
+  <div class="tbar" id="tbar" hidden><b>선생님 바로가기</b><button data-j="1">1단계</button><button data-j="2">2단계</button><button data-j="3">3단계(선택)</button><button data-j="4">마무리</button></div>
+  <header>
+    <h1>원의 넓이 공식 완성</h1>
+    <p class="lead">피자 조각 마법에서 만든 공식에는 빈칸이 하나 남아 있었어요. 이제 원의 둘레를 구하는 방법을 알았으니, 그 빈칸을 채워 공식을 완성해 봐요.</p>
+  </header>
+
+  <nav class="steps" aria-label="단계">
+    <div class="stepi" id="tab1" aria-current="step"><b>1</b>빈칸 채우기</div>
+    <div class="stepi" id="tab2"><b>2</b>어림값과 비교</div>
+    <div class="stepi" id="tab3"><b>3</b>케플러의 방법 (선택)</div>
+    <div class="stepi" id="tab4"><b>4</b>마무리</div>
+  </nav>
+
+  <!-- 1단계 -->
+  <section class="card" id="step1">
+    <h2>빈칸을 채워 공식을 완성해요</h2>
+    <div class="lines" id="lines"></div>
+    <div class="q" id="qa">
+      <p>원의 둘레는 어떻게 구할 수 있었나요?</p>
+      <div class="choices" id="ca"><button class="btn" data-v="r">반지름 × 3.14</button><button class="btn" data-v="d">지름 × 3.14</button><button class="btn" data-v="4">지름 × 4</button></div>
+    </div>
+    <div class="q" id="qb" hidden>
+      <p>지름은 반지름의 몇 배인가요?</p>
+      <div class="choices" id="cb"><button class="btn" data-v="2">2배</button><button class="btn" data-v="3">3배</button><button class="btn" data-v="4">4배</button></div>
+    </div>
+    <div class="q" id="qc" hidden>
+      <p>어떤 수에 2를 곱한 다음 다시 2로 나누면 어떻게 될까요?</p>
+      <div class="choices" id="cc"><button class="btn" data-v="same">처음 수 그대로예요</button><button class="btn" data-v="x4">처음 수의 4배예요</button><button class="btn" data-v="half">처음 수의 절반이에요</button></div>
+    </div>
+    <p class="toast" id="toast1" role="status"></p>
+    <div class="row"><button class="btn primary" id="next1" disabled>공식으로 넓이 구해 보기</button></div>
+  </section>
+
+  <!-- 2단계 -->
+  <section class="card" id="step2" hidden>
+    <h2>넓이 가두기 작전의 원에 공식을 써 봐요</h2>
+    <p class="note">넓이 가두기 작전에서 칸을 세어 가뒀던 반지름 4cm 원이에요.</p>
+    <div class="q" id="q2">
+      <p>공식으로 구하면 이 원의 넓이는 몇 cm²일까요? 반지름 × 반지름 × 3.14를 계산해 보세요.</p>
+      <div class="choices" id="c2"><button class="btn" data-v="25.12">25.12cm²</button><button class="btn" data-v="50.24">50.24cm²</button><button class="btn" data-v="100.48">100.48cm²</button></div>
+    </div>
+    <p class="toast" id="toast2" role="status"></p>
+    <div id="cmp2" hidden style="display:flex;flex-direction:column;gap:12px">
+      <p class="note">지금까지 가둔 범위를 수직선 위에 나타냈어요. 보라색 선이 공식으로 구한 넓이예요.</p>
+      <svg class="chart" id="chart2" viewBox="0 0 560 230" role="img" aria-label="여러 방법으로 가둔 넓이 범위와 공식으로 구한 넓이"></svg>
+      <div class="story">
+        <strong>13,149칸을 세는 대신, 곱셈 세 번으로</strong>
+        <p>가장 작은 칸으로 세려면 13,149칸을 세어야 했어요. 그래도 원의 넓이를 딱 하나로 정하지 못했지요. 공식은 반지름만 재면 곱셈 세 번으로 끝나요. 아르키메데스부터 2000년 넘게 이어진 수학자들의 노력 덕분에, 우리는 이 긴 일을 한 줄로 끝낼 수 있어요.</p>
+      </div>
+      <div class="row"><button class="btn" id="go3">선택활동: 케플러의 방법</button><button class="btn primary" id="next2">마무리하기</button></div>
+    </div>
+  </section>
+
+  <!-- 3단계 (선택) -->
+  <section class="card" id="step3" hidden>
+    <h2>케플러의 방법: 원을 직각삼각형으로</h2>
+    <p class="note">약 400년 전 독일의 수학자 케플러는 포도주 통의 부피를 계산하다가, 원을 아주 가는 삼각형으로 잘게 나눠 생각했어요. 먼저 5학년 때 배운 것 하나를 떠올려 봐요.</p>
+    <h3>밑변과 높이가 같으면?</h3>
+    <svg class="stage" id="tri" viewBox="0 0 560 210" role="img" aria-label="꼭짓점을 옮길 수 있는 삼각형"></svg>
+    <p class="note">노란 점을 손가락으로 끌어 꼭짓점을 옮겨 보세요. 꼭짓점은 점선 위로만 움직여요.</p>
+    <div class="q" id="q3a">
+      <p>꼭짓점을 옮겨도 밑변과 높이는 그대로예요. 그럼 삼각형의 넓이는 어떻게 될까요?</p>
+      <div class="choices" id="c3a"><button class="btn" data-v="up">커져요</button><button class="btn" data-v="same">그대로예요</button><button class="btn" data-v="down">작아져요</button></div>
+    </div>
+    <div id="kep" hidden style="display:flex;flex-direction:column;gap:12px">
+      <h3>원을 가는 삼각형으로 나눠 펼쳐요</h3>
+      <div class="row" id="nRow"><span class="note" style="flex:0 0 auto">몇 조각으로 나눌까요?</span><button class="btn on" data-n="8">8조각</button><button class="btn" data-n="16">16조각</button><button class="btn" data-n="32">32조각</button></div>
+      <svg class="stage" id="kst" viewBox="0 0 560 330" role="img" aria-label="원을 삼각형으로 나눠 펼치고 꼭짓점을 모으는 무대"></svg>
+      <div class="row"><button class="btn primary" id="unroll">삼각형 펼치기</button></div>
+      <div class="slider" id="pushBox" hidden><label for="push">노란 점을 왼쪽 끝까지 끌거나, 막대를 밀어 모든 꼭짓점을 왼쪽으로 모아 보세요.</label><input type="range" id="push" min="0" max="100" value="0"></div>
+      <p class="toast" id="toast3" role="status"></p>
+      <div class="story" id="story3" hidden>
+        <strong>아르키메데스가 말한 바로 그 직각삼각형</strong>
+        <p>밑변은 원의 둘레, 높이는 반지름인 직각삼각형이 되었어요. 넓이는 원의 둘레 × 반지름 ÷ 2로, 피자 조각 마법에서 직사각형으로 만든 공식과 똑같아요. 약 2200년 전 아르키메데스는 원이 이 직각삼각형과 넓이가 같다는 것을 말로 증명했고, 약 1800년 뒤 케플러가 그것을 눈에 보이게 만들었어요.</p>
+      </div>
+      <div class="row"><button class="btn primary" id="next3" disabled>마무리하기</button></div>
+    </div>
+  </section>
+
+  <!-- 마무리 -->
+  <section class="card" id="step4" hidden>
+    <h2>원의 넓이 공식</h2>
+    <p class="big">원의 넓이 = 반지름 × 반지름 × 3.14</p>
+    <p class="note">원의 둘레를 모르던 피자 조각 마법의 공식이, 이제는 반지름 하나만 알면 쓸 수 있는 공식이 되었어요.</p>
+    <ol class="ask">
+      <li>모눈 칸을 세어 구하는 방법과 공식으로 구하는 방법 중에서 어느 쪽이 더 편했나요? 왜 그런가요?</li>
+      <li>지름만 알고 있을 때는 원의 넓이를 어떻게 구할 수 있을까요?</li>
+      <li>이번 단원에서 만난 수학자(유클리드, 아르키메데스, 케플러) 중 한 명을 골라 고맙다는 한마디를 전해 보세요.</li>
+    </ol>
+    <p class="closing">수학자들이 긴 것과 복잡한 것을 싫어한 덕분에,<br>우리는 반지름 하나로 원의 넓이를 구할 수 있어요. 고마워요, 수학자들!</p>
+  </section>
+
+  <button class="link" id="reset">처음부터 다시</button>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const done=new Set();
+function show(k){
+  for(const i of [1,2,3,4])$("step"+i).hidden=i!==k;
+  for(const i of [1,2,3,4]){const e=$("tab"+i);if(i===k)e.setAttribute("aria-current","step");else e.removeAttribute("aria-current");e.classList.toggle("done",i!==k&&done.has(i));}
+  if(k===3){drawTri();buildK();}
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function quiz(id,right,hints,toast,ok){
+  $(id).onclick=e=>{const b=e.target.closest(".btn");if(!b||b.disabled)return;const tt=$(toast);
+    if(b.dataset.v===right){b.classList.add("yes");$(id).querySelectorAll(".btn").forEach(x=>x.disabled=true);tt.className="toast ok";ok();}
+    else{b.classList.add("no");b.disabled=true;tt.className="toast bad";tt.textContent=hints[b.dataset.v];}};
+}
+
+/* ---------- 1단계: 공식 변형 ---------- */
+const tk=(t,c="")=>`<span class="tk ${c}">${t}</span>`;
+const L1=`<p class="fl"><small>피자 조각 마법에서 만든 공식</small>원의 넓이 = ${tk("원의 둘레","qm")} × 반지름 ÷ 2</p>`;
+const L2=`<p class="fl"><small>원의 둘레 자리에 지름 × 3.14를 넣으면</small>원의 넓이 = ${tk("지름 × 3.14","new")} × 반지름 ÷ 2</p>`;
+const L3=`<p class="fl"><small>지름 자리에 반지름 × 2를 넣으면</small>원의 넓이 = ${tk("반지름 × 2","new")} × 3.14 × 반지름 ÷ 2</p>`;
+const L4=`<p class="fl"><small>× 2와 ÷ 2는 서로 없어져요</small>원의 넓이 = 반지름 ${tk("× 2","gone")} × 3.14 × 반지름 ${tk("÷ 2","gone")}</p>`;
+const L5=`<p class="fl last"><small>곱하는 순서를 바꿔 정리하면</small>원의 넓이 = 반지름 × 반지름 × 3.14</p>`;
+function setLines(k){$("lines").innerHTML=[L1,L2,L3,L4,L5].slice(0,k).join("");}
+quiz("ca","d",{r:"원주율은 원주 ÷ 지름이었어요. 반지름이 아니라 지름의 몇 배였지요?","4":"정사각형으로 가뒀을 때 지름의 4배보다 짧았어요. 실제로 재어 보니 지름의 약 몇 배였나요?"},"toast1",
+  ()=>{setLines(2);$("toast1").textContent="맞아요! 원의 둘레 = 지름 × 3.14였지요. 빈칸에 넣었어요.";$("qb").hidden=false;});
+quiz("cb","2",{"3":"지름은 원의 중심을 지나서 반지름 두 개가 이어진 길이예요.","4":"지름은 원의 중심을 지나서 반지름 두 개가 이어진 길이예요."},"toast1",
+  ()=>{setLines(3);$("toast1").textContent="맞아요! 지름 = 반지름 × 2예요. 공식이 반지름만으로 바뀌어 가요.";$("qc").hidden=false;});
+quiz("cc","same",{x4:"예를 들어 5 × 2 ÷ 2를 계산해 보세요.",half:"예를 들어 5 × 2 ÷ 2를 계산해 보세요."},"toast1",
+  ()=>{setLines(5);$("toast1").textContent="맞아요! 5 × 2 ÷ 2 = 5처럼, 2를 곱하고 2로 나누면 처음 수 그대로예요. 공식이 이렇게 짧아졌어요. 이제 원의 둘레를 몰라도, 반지름 하나만 재면 넓이를 구할 수 있어요.";$("next1").disabled=false;done.add(1);});
+$("next1").onclick=()=>show(2);
+
+/* ---------- 2단계: 비교 ---------- */
+const RANGES=[["정사각형 2개","32 ~ 64",32,64],["모눈 1cm 칸","37 ~ 69",37,69],["모눈 0.25cm 칸","46.81 ~ 54.81",46.8125,54.8125],["모눈 0.0625cm 칸","49.36 ~ 51.36",49.36328125,51.36328125]];
+function drawCmp(){
+  const L=150,Wd=380,lo=30,hi=70,X=v=>L+(v-lo)/(hi-lo)*Wd;let g="";
+  for(let v=lo;v<=hi;v+=10){g+=`<line x1="${X(v)}" y1="14" x2="${X(v)}" y2="190" stroke="var(--line)"/><text x="${X(v)}" y="208" text-anchor="middle">${v}</text>`;}
+  g+=`<text x="${L+Wd}" y="224" text-anchor="end">넓이 (cm²)</text>`;
+  RANGES.forEach(([nm,tx,a,b],i)=>{const y=24+i*42;g+=`<text class="lbl" x="0" y="${y+14}">${nm}</text><rect x="${X(a)}" y="${y}" width="${X(b)-X(a)}" height="20" rx="4" fill="var(--pb)" stroke="var(--accent)"/><text x="${X(b)+6}" y="${y+14}">${tx}</text>`;});
+  g+=`<line x1="${X(50.24)}" y1="10" x2="${X(50.24)}" y2="192" stroke="var(--rim)" stroke-width="3"/><text x="${X(50.24)}" y="10" text-anchor="middle" style="fill:var(--rim)">공식 50.24</text>`;
+  $("chart2").innerHTML=g;
+}
+quiz("c2","50.24",{"25.12":"반지름 × 반지름 × 3.14예요. 4 × 4를 먼저 계산해 보세요.","100.48":"지름이 아니라 반지름을 두 번 곱해요. 4 × 4 × 3.14를 계산해 보세요."},"toast2",
+  ()=>{$("toast2").textContent="맞아요! 4 × 4 × 3.14 = 50.24cm²예요. 칸을 세어 가둔 범위와 비교해 볼까요?";drawCmp();$("cmp2").hidden=false;done.add(2);});
+$("go3").onclick=()=>show(3);
+$("next2").onclick=()=>{done.add(4);show(4);};
+
+/* ---------- 3단계: 밑변·높이가 같은 삼각형 ---------- */
+const TB=[180,170],TW=200,TH=120;let apx=280,dragT=false;
+function svgPt(sv,e){const p=sv.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(sv.getScreenCTM().inverse());}
+function drawTri(){
+  const [bx,by]=TB,ty=by-TH;
+  $("tri").innerHTML=`<line x1="20" y1="${ty}" x2="540" y2="${ty}" stroke="var(--muted)" stroke-dasharray="6 5"/><line x1="20" y1="${by}" x2="540" y2="${by}" stroke="var(--line)"/>`
+   +`<polygon points="${bx},${by} ${bx+TW},${by} ${apx},${ty}" fill="var(--pa)" stroke="var(--pa-edge)" stroke-width="2"/>`
+   +`<line x1="${apx}" y1="${ty}" x2="${apx}" y2="${by}" stroke="var(--bad)" stroke-width="2" stroke-dasharray="4 3"/>`
+   +`<text x="${bx+TW/2}" y="${by+22}" text-anchor="middle">밑변 5cm</text><text x="${apx+8}" y="${by-TH/2}">높이 3cm</text>`
+   +`<text x="20" y="22" style="fill:var(--accent)">넓이 = 5 × 3 ÷ 2 = 7.5cm²</text>`
+   +`<circle class="knob" cx="${apx}" cy="${ty}" r="14" fill="var(--band)" stroke="var(--ink)" stroke-width="1.5"/>`;
+}
+$("tri").addEventListener("pointerdown",e=>{if(!e.target.classList.contains("knob"))return;e.preventDefault();dragT=true;$("tri").style.touchAction="none";try{$("tri").setPointerCapture(e.pointerId);}catch(_){}});
+$("tri").addEventListener("pointermove",e=>{if(!dragT)return;apx=Math.max(40,Math.min(520,svgPt($("tri"),e).x));drawTri();});
+const endT=()=>{dragT=false;$("tri").style.touchAction="";};
+$("tri").addEventListener("pointerup",endT);$("tri").addEventListener("pointercancel",endT);
+quiz("c3a","same",{up:"넓이는 밑변 × 높이 ÷ 2예요. 꼭짓점을 옮길 때 밑변이나 높이가 바뀌었나요?",down:"넓이는 밑변 × 높이 ÷ 2예요. 꼭짓점을 옮길 때 밑변이나 높이가 바뀌었나요?"},"toast3",
+  ()=>{$("toast3").textContent="맞아요! 밑변과 높이가 같으면 모양이 달라도 넓이는 같아요. 유클리드가 정리해 둔 이 성질을 케플러는 원에 써먹었어요.";$("kep").hidden=false;});
+
+/* ---------- 3단계: 케플러 ---------- */
+const KR=80,KCX=280,KCY=100,KW=560,KYB=300;let kn=8,kt=0,kphase=0,push=0,kanim=0,dragK=false;
+function geo(){const h=Math.PI/kn,c=2*KR*Math.sin(h),ht=KR*Math.cos(h),x0=(KW-kn*c)/2;return {h,c,ht,x0};}
+function buildK(){cancelAnimationFrame(kanim);kphase=0;kt=0;push=0;$("push").value=0;$("pushBox").hidden=true;$("unroll").disabled=false;$("story3").hidden=true;drawK();}
+function drawK(){
+  const {h,c,ht,x0}=geo();let g="";
+  if(kphase<2){
+    /* 원 속 삼각형(꼭짓점은 원의 중심)에서 펼친 자리로 날아가요 */
+    g+=`<circle cx="${KCX}" cy="${KCY}" r="${KR}" fill="none" stroke="var(--rim)" stroke-width="2" stroke-dasharray="5 5"/>`;
+    const e=kt<.5?2*kt*kt:1-(-2*kt+2)**2/2;
+    for(let k=0;k<kn;k++){
+      const ph=2*Math.PI*k/kn,a0=ph+Math.PI,ang=a0+(Math.round(a0/(2*Math.PI))*2*Math.PI-a0)*e;
+      const fx=KCX,fy=KCY,tx=x0+c/2+k*c,ty=KYB-ht,x=fx+(tx-fx)*e,y=fy+(ty-fy)*e;
+      const pts=[[0,0],[-KR*Math.sin(h),ht],[KR*Math.sin(h),ht]].map(([px,py])=>{const ca=Math.cos(ang),sa=Math.sin(ang);return `${(x+px*ca-py*sa).toFixed(2)},${(y+px*sa+py*ca).toFixed(2)}`;}).join(" ");
+      g+=`<polygon points="${pts}" fill="var(${k%2?"--pb":"--pa"})" stroke="var(--pa-edge)" stroke-width=".8"/>`;}
+  }else{
+    /* 펼친 뒤: 밑변은 그대로, 꼭짓점만 왼쪽 끝으로 밀어요 */
+    const ty=KYB-ht,left=x0;
+    for(let k=0;k<kn;k++){const xc=x0+c/2+k*c,ax=xc+(left-xc)*push;
+      g+=`<polygon points="${(x0+k*c).toFixed(2)},${KYB} ${(x0+(k+1)*c).toFixed(2)},${KYB} ${ax.toFixed(2)},${ty.toFixed(2)}" fill="var(${k%2?"--pb":"--pa"})" stroke="var(--pa-edge)" stroke-width=".8"/>`;}
+    g+=`<line x1="${x0}" y1="${ty}" x2="${x0+kn*c}" y2="${ty}" stroke="var(--muted)" stroke-dasharray="6 5"/>`;
+    const kx=(x0+c/2+(kn-1)*c)+(left-(x0+c/2+(kn-1)*c))*push;
+    if(push>=.999){
+      g+=`<line x1="${x0}" y1="${KYB+14}" x2="${x0+kn*c}" y2="${KYB+14}" stroke="var(--rim)" stroke-width="3"/><text x="${x0+kn*c/2}" y="${KYB+30}" text-anchor="middle" style="fill:var(--rim)">밑변 = 원의 둘레</text>`
+        +`<line x1="${x0-10}" y1="${ty}" x2="${x0-10}" y2="${KYB}" stroke="var(--bad)" stroke-width="3"/><text x="${x0}" y="${ty-10}" style="fill:var(--bad)">높이 = 반지름</text>`;}
+    else g+=`<circle class="knob" cx="${kx}" cy="${ty}" r="15" fill="var(--band)" stroke="var(--ink)" stroke-width="1.5"/>`;
+  }
+  $("kst").innerHTML=g;
+}
+$("nRow").onclick=e=>{const b=e.target.closest(".btn");if(!b)return;kn=+b.dataset.n;$("nRow").querySelectorAll(".btn").forEach(x=>x.classList.toggle("on",x===b));$("toast3").textContent="";buildK();};
+$("unroll").onclick=()=>{if(kphase)return;kphase=1;$("unroll").disabled=true;const t0=performance.now(),ms=reduce?0:1600;
+  const f=now=>{kt=ms?Math.min(1,(now-t0)/ms):1;drawK();if(kt<1)kanim=requestAnimationFrame(f);else{kphase=2;drawK();$("pushBox").hidden=false;$("toast3").className="toast";$("toast3").textContent="삼각형들을 펼쳤어요. 모든 삼각형의 높이는 반지름과 거의 같아요. 이제 꼭짓점을 왼쪽으로 모아 볼까요?";}};
+  kanim=requestAnimationFrame(f);};
+function setPush(v){push=Math.max(0,Math.min(1,v));if(push>.97)push=1;$("push").value=Math.round(push*100);drawK();
+  if(push>=1&&$("story3").hidden){$("toast3").className="toast ok";$("toast3").textContent="꼭짓점을 모두 모았어요! 삼각형 하나하나는 밑변과 높이가 그대로라서 넓이도 그대로예요.";$("story3").hidden=false;$("next3").disabled=false;done.add(3);}}
+$("push").oninput=()=>setPush(+$("push").value/100);
+$("kst").addEventListener("pointerdown",e=>{if(kphase!==2||!e.target.classList.contains("knob"))return;e.preventDefault();dragK=true;$("kst").style.touchAction="none";try{$("kst").setPointerCapture(e.pointerId);}catch(_){}});
+$("kst").addEventListener("pointermove",e=>{if(!dragK)return;const {c,x0}=geo(),start=x0+c/2+(kn-1)*c,x=svgPt($("kst"),e).x;setPush((start-x)/(start-x0));});
+const endK=()=>{dragK=false;$("kst").style.touchAction="";};
+$("kst").addEventListener("pointerup",endK);$("kst").addEventListener("pointercancel",endK);
+$("next3").onclick=()=>{done.add(4);show(4);};
+
+/* ---------- 처음부터 ---------- */
+function resetAll(){
+  done.clear();setLines(1);
+  ["ca","cb","cc","c2","c3a"].forEach(id=>$(id).querySelectorAll(".btn").forEach(b=>{b.disabled=false;b.classList.remove("yes","no");}));
+  $("qb").hidden=true;$("qc").hidden=true;$("next1").disabled=true;$("cmp2").hidden=true;$("kep").hidden=true;$("next3").disabled=true;
+  ["toast1","toast2","toast3"].forEach(id=>{$(id).textContent="";$(id).className="toast";});
+  apx=280;kn=8;$("nRow").querySelectorAll(".btn").forEach(x=>x.classList.toggle("on",x.dataset.n==="8"));buildK();show(1);
+}
+let resetArm=0;
+$("reset").onclick=()=>{
+  if(Date.now()-resetArm>4000){resetArm=Date.now();$("reset").textContent="정말 처음부터 할까요? 한 번 더 누르세요";setTimeout(()=>{$("reset").textContent="처음부터 다시";},4000);return;}
+  resetArm=0;$("reset").textContent="처음부터 다시";resetAll();
+};
+
+/* 선생님 바로가기: 학생용 주소(github.io)에서는 ?teacher 를 붙였을 때만 보여요. 버튼을 대신 누르지 않고 상태를 바로 맞춰요. */
+if(!/github\.io$/.test(location.hostname)||/teacher/.test(location.search))$("tbar").hidden=false;
+$("tbar").onclick=e=>{const b=e.target.closest("button");if(!b)return;const j=b.dataset.j;resetAll();
+  if(j==="1")return;
+  setLines(5);["ca","cb","cc"].forEach(id=>$(id).querySelectorAll(".btn").forEach(x=>x.disabled=true));$("qb").hidden=false;$("qc").hidden=false;$("next1").disabled=false;done.add(1);
+  if(j==="2"){show(2);return;}
+  $("c2").querySelectorAll(".btn").forEach(x=>x.disabled=true);drawCmp();$("cmp2").hidden=false;done.add(2);
+  if(j==="3"){show(3);return;}
+  done.add(4);show(4);
+};
+
+resetAll();
+/* 수업 중 실수로 새로 고침하거나 나가지 않도록 */
+let touched=false;document.addEventListener("pointerdown",()=>{touched=true;},{once:true,capture:true});
+window.addEventListener("beforeunload",e=>{if(touched){e.preventDefault();e.returnValue="";}});
+</script>
+
+</html>

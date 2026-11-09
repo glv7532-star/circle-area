@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>원의 넓이를 찾아서</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&display=swap">
+<style>
+:root{--bg:#efe8d8;--paper:#fbf7ee;--ink:#2f3a2c;--muted:#6c7462;--line:#d8ceb6;--accent:#2d5d7b;--accent-bg:#dde8ef;
+  --display:"Gaegu","Gowun Dodum",cursive;--body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+@media (prefers-color-scheme: dark){:root{--bg:#141b26;--paper:#1f2836;--ink:#ece6d6;--muted:#a3a99c;--line:#334156;--accent:#8cc0e0;--accent-bg:#1e3446;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 40px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1{font-family:var(--display);font-size:2.3rem;line-height:1.1;margin:0}
+.lead{margin:4px 0 0;color:var(--muted);word-break:keep-all}
+ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+a{display:grid;grid-template-columns:4.2em 1fr;gap:12px;align-items:center;padding:14px 16px;border-radius:14px;border:1px solid var(--line);background:var(--paper);color:var(--ink);text-decoration:none}
+a:hover,a:focus-visible{border-color:var(--accent);background:var(--accent-bg);outline:none}
+.no{font-family:var(--display);font-size:1.3rem;color:var(--accent);line-height:1.1}
+.t{font-family:var(--display);font-size:1.45rem;line-height:1.15;display:block}
+.d{font-size:.9rem;color:var(--muted);word-break:keep-all}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>원의 넓이를 찾아서</h1>
+    <p class="lead">유클리드에서 아르키메데스까지, 수학자들이 걸어간 길을 따라 원의 둘레와 넓이를 찾아가는 6학년 수학 체험 프로그램이에요.</p>
+  </header>
+  <ol>
+    <li><a href="01-euclid-gift.html"><span class="no">1차시</span><span><span class="t">유클리드의 선물</span><span class="d">5학년 다각형 넓이 복습, 굽은 선으로 된 원이라는 문제</span></span></a></li>
+    <li><a href="02-area-trap.html"><span class="no">2·3차시</span><span><span class="t">넓이 가두기 작전</span><span class="d">정사각형 2개와 모눈 칸으로 원의 넓이를 가두기</span></span></a></li>
+    <li><a href="04-pizza-magic.html"><span class="no">4차시</span><span><span class="t">피자 조각 마법</span><span class="d">원 2개를 잘라 붙여 직사각형 만들기, 남은 수수께끼 '원의 둘레'</span></span></a></li>
+    <li><a href="05-circle-trap.html"><span class="no">5·6차시</span><span><span class="t">원 둘레 가두기 작전</span><span class="d">정다각형으로 원의 둘레를 가두며 96각형까지, 원주율</span></span></a></li>
+    <li><a href="07-measure-pi.html"><span class="no">7차시</span><span><span class="t">정말 3.14일까?</span><span class="d">둥근 물건을 재어 원주 ÷ 지름 확인하기</span></span></a></li>
+    <li><a href="08-roll-wheel.html"><span class="no">8차시</span><span><span class="t">굴러라 바퀴</span><span class="d">바퀴를 굴려 원주 구하기, 거꾸로 지름 구하기</span></span></a></li>
+    <li><a href="09-formula-done.html"><span class="no">9차시</span><span><span class="t">원의 넓이 공식 완성</span><span class="d">빈칸을 채워 반지름 × 반지름 × 3.14, 케플러의 방법</span></span></a></li>
+    <li><a href="10-area-missions.html"><span class="no">10차시</span><span><span class="t">원의 넓이 미션</span><span class="d">기본 미션 10개와 도전 미션 10개</span></span></a></li>
+  </ol>
+</div>
+</body>
+</html>

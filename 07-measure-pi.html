@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>정말 3.14일까?</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&display=swap">
+<style>
+/* Layout: same notebook page as the other circle-unit tools; step strip on top, one card per step. The measurement log is the centre of the page. */
+:root{
+  --bg:#efe8d8; --paper:#fbf7ee; --ink:#2f3a2c; --muted:#6c7462; --line:#d8ceb6;
+  --accent:#2d5d7b; --accent-bg:#dde8ef; --ok:#2f7a3d; --bad:#b23a48; --bad-bg:#f7e3e3;
+  --dot:#b06a1f; --dot2:#d99a52; --guide:#7a3fa0; --band:#e9b44c;
+  --display:"Gaegu","Gowun Dodum",cursive; --body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141b26; --paper:#1f2836; --ink:#ece6d6; --muted:#a3a99c; --line:#334156;
+  --accent:#8cc0e0; --accent-bg:#1e3446; --ok:#7fd08c; --bad:#f08b97; --bad-bg:#3a2329;
+  --dot:#e6a65a; --dot2:#a8713a; --guide:#c9a0ef; --band:#c99a3c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141b26; --paper:#1f2836; --ink:#ece6d6; --muted:#a3a99c; --line:#334156;
+  --accent:#8cc0e0; --accent-bg:#1e3446; --ok:#7fd08c; --bad:#f08b97; --bad-bg:#3a2329;
+  --dot:#e6a65a; --dot2:#a8713a; --guide:#c9a0ef; --band:#c99a3c; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1{font-family:var(--display);font-weight:700;font-size:2.1rem;line-height:1.1;margin:0}
+.lead{margin:4px 0 0;color:var(--muted);font-size:.95rem;word-break:keep-all}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.stepi{font-size:.9rem;padding:8px 6px;border:1px solid var(--line);background:var(--paper);color:var(--muted);border-radius:8px;text-align:center;word-break:keep-all;line-height:1.25}
+.stepi b{font-family:var(--display);font-size:1.15rem;display:block;line-height:1}
+.stepi[aria-current="step"]{border-color:var(--accent);background:var(--accent-bg);color:var(--ink)}
+.stepi.done{color:var(--ink)} .stepi.done b::after{content:" \2713";font-size:.9rem;color:var(--ok)}
+@media (max-width:480px){.stepi{font-size:.76rem;padding:7px 3px}}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px}
+.card h2{font-family:var(--display);font-size:1.5rem;margin:0;line-height:1.2}
+.card h3{font-family:var(--display);font-size:1.25rem;margin:0;line-height:1.2}
+.note{margin:0;color:var(--muted);font-size:.92rem;word-break:keep-all}
+.btn{font:inherit;font-size:1rem;padding:12px 10px;border-radius:10px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;word-break:keep-all;touch-action:manipulation}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+.btn.no{text-decoration:line-through;opacity:.5}
+.btn.yes{border-color:var(--ok);color:var(--ok);font-weight:700}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,.link:focus-visible,.opt:focus-visible,.del:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.row .btn{flex:1 1 150px}
+.toast{min-height:1.4em;margin:0;font-size:.95rem;color:var(--accent);word-break:keep-all}
+.toast.bad{color:var(--bad)} .toast.ok{color:var(--ok)}
+.tips{margin:0;padding:12px 14px 12px 2.2em;border-radius:12px;background:var(--bg);display:flex;flex-direction:column;gap:4px;word-break:keep-all;font-size:.95rem}
+.form{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr) auto;gap:8px;align-items:end}
+@media (max-width:620px){.form{grid-template-columns:1fr 1fr}.form .f-name{grid-column:1/-1}.form .btn{grid-column:1/-1}}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label{font-size:.88rem;color:var(--muted)}
+.field input{font:inherit;padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);width:100%;min-width:0}
+.field input:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+.field input.err{border-color:var(--bad)}
+.errmsg{margin:0;font-size:13px;color:var(--bad);min-height:1.2em}
+.tablebox{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.95rem;font-variant-numeric:tabular-nums}
+th,td{text-align:right;padding:8px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+th:first-child,td:first-child{text-align:left;white-space:normal;word-break:keep-all}
+th{color:var(--muted);font-weight:400}
+td.ratio{font-family:var(--display);font-size:1.3rem}
+td.warn{color:var(--bad)}
+.del{font:inherit;font-size:.85rem;padding:4px 10px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--muted);cursor:pointer}
+.ex{font-size:.75rem;color:var(--muted);margin-left:4px}
+.empty{padding:22px 14px;border:1.5px dashed var(--line);border-radius:12px;text-align:center;color:var(--muted);word-break:keep-all}
+.chart{width:100%;height:auto;display:block}
+.chart text{font-family:var(--body);fill:var(--muted);font-size:12px}
+.chart .lbl{fill:var(--ink);font-size:14px}
+.chart .num{fill:var(--ink);font-size:13px;font-family:var(--display)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:.88rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:4px}
+.legend i{width:16px;height:12px;border-radius:2px;display:inline-block}
+.q{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border-radius:12px;background:var(--bg)}
+.q p{margin:0;word-break:keep-all}
+.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{font:inherit;text-align:left;padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;word-break:keep-all}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-bg)}
+.opt.wrongpick{border-color:var(--bad);background:var(--bad-bg)}
+.opt:disabled{cursor:default}
+.fb{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.fb li{padding:8px 12px;border-radius:10px;background:var(--bg);word-break:keep-all;font-size:.95rem}
+.fb li.x{background:var(--bad-bg)}
+.stat{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.stat{grid-template-columns:1fr}}
+.st{background:var(--bg);border-radius:10px;padding:8px 12px}
+.st span{display:block;font-size:.82rem;color:var(--muted)}
+.st b{font-family:var(--display);font-size:1.7rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.story{display:flex;flex-direction:column;gap:6px;padding:14px;border-radius:12px;background:var(--accent-bg)}
+.story strong{font-family:var(--display);font-size:1.35rem;line-height:1.2;word-break:keep-all}
+.story p{margin:0;word-break:keep-all}
+.formula{margin:0;padding:14px;border-radius:14px;background:var(--bg);font-family:var(--display);font-size:1.6rem;line-height:1.5;text-align:center;word-break:keep-all}
+.ask{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px;word-break:keep-all}
+.closing{margin:0;padding:14px 16px;border-radius:12px;background:var(--accent-bg);font-family:var(--display);font-size:1.4rem;line-height:1.4;text-align:center;word-break:keep-all}
+.tbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;border:1.5px dashed var(--accent);border-radius:10px;font-size:.85rem;color:var(--muted)}
+.tbar button{font:inherit;font-size:.85rem;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.link{background:none;border:none;color:var(--muted);text-decoration:underline;font:inherit;font-size:.88rem;cursor:pointer;padding:0;align-self:flex-start}
+html,body{overscroll-behavior-y:contain}
+</style>
+
+<div class="wrap">
+  <div class="tbar" id="tbar" hidden><b>선생님 바로가기</b><button data-j="ex">예시 기록 넣기</button><button data-j="1">1단계</button><button data-j="2">2단계</button><button data-j="3">3단계</button><button data-j="4">마무리</button></div>
+  <header>
+    <h1>정말 3.14일까?</h1>
+    <p class="lead">아르키메데스는 계산으로 원의 둘레가 지름의 약 3.14배라는 것을 밝혔어요. 정말 그런지, 우리 주변의 둥근 물건을 직접 재어 확인해 봐요.</p>
+  </header>
+
+  <nav class="steps" aria-label="단계">
+    <div class="stepi" id="tab1" aria-current="step"><b>1</b>재고 기록하기</div>
+    <div class="stepi" id="tab2"><b>2</b>크기가 달라도?</div>
+    <div class="stepi" id="tab3"><b>3</b>왜 딱 3.14가 아닐까?</div>
+    <div class="stepi" id="tab4"><b>4</b>마무리</div>
+  </nav>
+
+  <!-- 1단계 -->
+  <section class="card" id="step1">
+    <h2>둥근 물건의 지름과 원주를 재요</h2>
+    <ol class="tips">
+      <li><b>원주</b>: 실이나 종이띠를 물건 둘레에 한 바퀴 팽팽하게 감고, 겹치는 곳을 표시한 뒤 펴서 자로 재요.</li>
+      <li><b>지름</b>: 원의 중심을 지나도록, 가장 긴 곳을 자로 재요.</li>
+      <li>동전처럼 <b>작은 것</b>부터 접시처럼 <b>큰 것</b>까지, 크기가 다른 물건을 4개 이상 재어 보세요.</li>
+    </ol>
+    <form class="form" id="form" novalidate>
+      <div class="field f-name"><label for="fName">물건 이름</label><input id="fName" type="text" maxlength="14" placeholder="예: 음료 캔" autocomplete="off"></div>
+      <div class="field"><label for="fD">지름 (cm)</label><input id="fD" type="text" inputmode="decimal" placeholder="예: 6.6" autocomplete="off"></div>
+      <div class="field"><label for="fC">원주 (cm)</label><input id="fC" type="text" inputmode="decimal" placeholder="예: 20.9" autocomplete="off"></div>
+      <button class="btn primary" type="submit" id="add">기록하기</button>
+    </form>
+    <p class="errmsg" id="err" role="alert"></p>
+    <div id="logBox"></div>
+    <p class="toast" id="toast1" role="status"></p>
+    <div class="row"><button class="btn primary" id="next1" disabled>크기가 달라도 같을까?</button></div>
+  </section>
+
+  <!-- 2단계 -->
+  <section class="card" id="step2" hidden>
+    <h2>크기가 달라도 원주÷지름은 같을까?</h2>
+    <p class="note">보라색 선은 물건의 원주를 곧게 펼친 길이예요. 그 아래에 같은 물건을 중심이 한 줄이 되도록 나란히 놓았어요. 원주는 물건 몇 개를 늘어놓은 길이와 같을까요? 작은 물건부터 큰 물건까지 차례로 보세요.</p>
+    <div class="legend"><span><i style="background:var(--guide)"></i>곧게 펼친 원주</span><span><i style="background:var(--dot)"></i><i style="background:var(--dot2)"></i>나란히 놓은 물건 (하나의 폭이 지름)</span></div>
+    <svg class="chart" id="chart" viewBox="0 0 520 200" role="img" aria-label="펼친 원주와 나란히 놓은 물건 그림"></svg>
+    <div class="row"><button class="btn" id="scaleBtn">크기를 똑같이 맞춰 보기</button></div>
+    <div class="q" id="q2">
+      <p>작은 물건과 큰 물건의 원주÷지름을 비교해 보세요. 어떤가요?</p>
+      <div class="choices" id="c2"><button class="btn" data-v="up">큰 원일수록 커져요</button><button class="btn" data-v="same">크기와 상관없이 거의 같아요</button><button class="btn" data-v="down">작은 원일수록 커져요</button></div>
+    </div>
+    <p class="toast" id="toast2" role="status"></p>
+    <div class="row"><button class="btn primary" id="next2" disabled>그런데 왜 딱 3.14가 아닐까?</button></div>
+  </section>
+
+  <!-- 3단계 -->
+  <section class="card" id="step3" hidden>
+    <h2>왜 딱 3.14가 나오지 않을까?</h2>
+    <div class="stat" id="stat3"></div>
+    <div class="q">
+      <p>우리가 잰 값이 딱 3.14가 아닌 까닭은 무엇일까요? <b>맞다고 생각하는 것을 모두</b> 고르세요.</p>
+      <div class="opts" id="o3" role="group" aria-label="까닭 고르기">
+        <button class="opt" data-k="string" aria-pressed="false">실이 늘어나거나 비뚤게 감겼다</button>
+        <button class="opt" data-k="dia" aria-pressed="false">지름을 가장 긴 곳(중심을 지나는 곳)에서 재지 못했다</button>
+        <button class="opt" data-k="ruler" aria-pressed="false">자의 눈금 사이를 어림해서 읽었다</button>
+        <button class="opt" data-k="shape" aria-pressed="false">물건이 완전히 동그랗지 않다</button>
+        <button class="opt" data-k="diff" aria-pressed="false">물건마다 원주율이 원래 다르다</button>
+      </div>
+      <div class="row"><button class="btn primary" id="check3" disabled>확인하기</button></div>
+    </div>
+    <ul class="fb" id="fb3"></ul>
+    <div class="story" id="story3" hidden>
+      <strong>그래서 아르키메데스는 재지 않고 계산했어요</strong>
+      <p>자로 재면 아무리 조심해도 조금씩 어긋나요. 이것을 <b>오차</b>라고 해요. 아르키메데스는 오차 없이 원주율을 알아내려고, 원을 정다각형 사이에 가두고 계산으로 범위를 좁혀 갔어요. 우리가 잰 값들이 3.14 근처에 모여 있는 것은, 아르키메데스가 계산한 값이 실제 물건에서도 맞는다는 뜻이에요.</p>
+    </div>
+    <div class="row"><button class="btn primary" id="next3" disabled>원주를 구하는 방법 정리하기</button></div>
+  </section>
+
+  <!-- 마무리 -->
+  <section class="card" id="step4" hidden>
+    <h2>지름만 알면 원주를 구할 수 있어요</h2>
+    <p class="formula">원주율 = 원주 ÷ 지름 ≒ 3.14<br>원주 = 지름 × 3.14</p>
+    <p class="note">내가 잰 원주와, 지름 × 3.14로 계산한 원주를 비교해 보세요.</p>
+    <div class="tablebox"><table>
+      <thead><tr><th>물건</th><th>지름</th><th>잰 원주</th><th>지름 × 3.14</th><th>차이</th></tr></thead>
+      <tbody id="tbl4"></tbody>
+    </table></div>
+    <ol class="ask">
+      <li>잰 원주와 지름 × 3.14는 얼마나 차이 났나요? 차이가 가장 큰 물건은 무엇이고, 왜 그랬을까요?</li>
+      <li>원주를 직접 재기 어려운 물건(운동장 트랙, 대관람차)은 어떻게 원주를 구할 수 있을까요?</li>
+      <li>피자 조각 마법에서 빈칸으로 남았던 '원의 둘레' 자리에 이제 무엇을 넣을 수 있을까요?</li>
+    </ol>
+    <p class="closing">아르키메데스가 계산으로 찾은 수,<br>우리 손으로 재어 봐도 3.14 근처였어요!</p>
+  </section>
+
+  <button class="link" id="reset">처음부터 다시</button>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const PI=3.14,KEY="circle-measure-v1";
+const done=new Set();
+let rows=[];
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function save(){try{localStorage.setItem(KEY,JSON.stringify(rows));}catch(_){}}
+function load(){try{const v=JSON.parse(localStorage.getItem(KEY)||"[]");if(Array.isArray(v))rows=v.filter(r=>r&&r.d>0&&r.c>0&&typeof r.name==="string");}catch(_){rows=[];}}
+const ratio=r=>r.c/r.d;
+const f2=v=>(Math.round(v*100)/100).toFixed(2);
+const num=s=>{const v=parseFloat(String(s).replace(",",".").trim());return isFinite(v)?v:NaN;};
+
+function show(k){
+  for(const i of [1,2,3,4])$("step"+i).hidden=i!==k;
+  for(const i of [1,2,3,4]){const e=$("tab"+i);if(i===k)e.setAttribute("aria-current","step");else e.removeAttribute("aria-current");e.classList.toggle("done",i!==k&&done.has(i));}
+  if(k===2)drawChart();if(k===3)renderStat();if(k===4)renderTbl4();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* ---------- 1단계: 기록 ---------- */
+function renderLog(){
+  const box=$("logBox");
+  if(!rows.length){box.innerHTML=`<div class="empty">아직 기록이 없어요. 위에 물건 이름, 지름, 원주를 적고 '기록하기'를 눌러 보세요.<br>원주 ÷ 지름이 저절로 계산돼요.</div>`;}
+  else box.innerHTML=`<div class="tablebox"><table><thead><tr><th>물건</th><th>지름 (cm)</th><th>원주 (cm)</th><th>원주 ÷ 지름</th><th></th></tr></thead><tbody>`
+    +rows.map((r,i)=>{const q=ratio(r),w=q<2.8||q>3.5;return `<tr><td>${esc(r.name)}${r.ex?'<span class="ex">(예시)</span>':""}</td><td>${r.d}</td><td>${r.c}</td><td class="ratio${w?" warn":""}">${f2(q)}${w?" ?":""}</td><td><button class="del" data-i="${i}" aria-label="${esc(r.name)} 기록 지우기">지우기</button></td></tr>`;}).join("")
+    +`</tbody></table></div>`;
+  const ok=rows.length>=4,ds=rows.map(r=>r.d),spread=rows.length?Math.max(...ds)/Math.min(...ds):1;
+  $("next1").disabled=!ok;
+  const tt=$("toast1");
+  if(!rows.length){tt.textContent="";return;}
+  const odd=rows.filter(r=>ratio(r)<2.8||ratio(r)>3.5).length;
+  if(odd){tt.className="toast bad";tt.textContent=`'?' 표시가 있는 물건은 원주÷지름이 다른 물건과 많이 달라요. 다시 재어 볼까요? 지름은 가장 긴 곳, 원주는 딱 한 바퀴만 재요.`;}
+  else if(!ok){tt.className="toast";tt.textContent=`${rows.length}개를 기록했어요. ${4-rows.length}개 더 재어 보세요.`;}
+  else if(spread<3){tt.className="toast";tt.textContent=`${rows.length}개를 기록했어요. 크기 차이가 더 나는 물건(아주 작은 것이나 아주 큰 것)도 재면 비교하기 좋아요.`;}
+  else{tt.className="toast ok";tt.textContent=`${rows.length}개를 기록했어요. 원주÷지름을 쭉 살펴보세요. 무엇을 발견했나요?`;}
+}
+function clearErr(){$("err").textContent="";["fName","fD","fC"].forEach(i=>$(i).classList.remove("err"));}
+["fName","fD","fC"].forEach(i=>$(i).addEventListener("input",clearErr));
+$("form").addEventListener("submit",e=>{
+  e.preventDefault();clearErr();
+  const name=$("fName").value.trim(),d=num($("fD").value),c=num($("fC").value),bad=(id,m)=>{$(id).classList.add("err");$("err").textContent=m;$(id).focus();};
+  if(!name)return bad("fName","물건 이름을 적어 주세요.");
+  if(!(d>0))return bad("fD","지름을 cm 단위의 수로 적어 주세요. 예: 6.6");
+  if(!(c>0))return bad("fC","원주를 cm 단위의 수로 적어 주세요. 예: 20.9");
+  if(c<=d)return bad("fC","원주는 지름보다 길어야 해요. 지름과 원주를 바꿔 적지 않았는지 확인해 보세요.");
+  if(d>500||c>2000)return bad("fD","값이 너무 커요. cm 단위로 적었는지 확인해 보세요.");
+  rows.push({name,d:+d.toFixed(2),c:+c.toFixed(2)});save();
+  $("fName").value="";$("fD").value="";$("fC").value="";$("fName").focus();renderLog();
+});
+$("logBox").addEventListener("click",e=>{const b=e.target.closest(".del");if(!b)return;rows.splice(+b.dataset.i,1);save();renderLog();});
+$("next1").onclick=()=>{done.add(1);show(2);};
+
+/* ---------- 2단계: 그래프 ---------- */
+let same=false;
+function drawChart(){
+  /* 좌표평면 대신: 원주를 곧게 펼친 선 아래에, 같은 원을 중심이 일직선이 되게 나란히 놓아요.
+     원 3개와 조금이 펼친 원주와 길이가 같다는 것이 보여요. */
+  const X0=160,SW=290,list=rows.slice().sort((a,b)=>a.d-b.d),maxC=Math.max(...list.map(r=>r.c));
+  let g="",y=8;
+  list.forEach((r,k)=>{const Lpx=same?SW:SW*r.c/maxC,dp=Lpx/ratio(r),rad=dp/2,full=Math.floor(ratio(r)+1e-9);
+    const top=y,rowH=Math.max(52,dp+28),cy=top+16+rad;
+    g+=`<text class="lbl" x="0" y="${top+16}">${esc(r.name)}</text><text x="0" y="${top+34}">지름 ${r.d}cm</text><text x="0" y="${top+50}">원주 ${r.c}cm</text>`;
+    g+=`<rect x="${X0}" y="${top+4}" width="${Lpx.toFixed(2)}" height="6" rx="3" fill="var(--guide)"/>`;
+    g+=`<clipPath id="cl${k}"><rect x="${X0}" y="${top}" width="${Lpx.toFixed(2)}" height="${rowH}"/></clipPath><g clip-path="url(#cl${k})">`;
+    for(let i=0;i<=full;i++){const cx=X0+rad+i*dp;
+      g+=`<circle cx="${cx.toFixed(2)}" cy="${cy.toFixed(2)}" r="${rad.toFixed(2)}" fill="var(${i%2?"--dot2":"--dot"})" stroke="var(--ink)" stroke-width="1"/>`;
+      if(dp>=22)g+=`<line x1="${(cx-rad).toFixed(2)}" y1="${cy.toFixed(2)}" x2="${(cx+rad).toFixed(2)}" y2="${cy.toFixed(2)}" stroke="#fff" stroke-width="1.2" stroke-dasharray="3 3"/>`;
+      if(dp>=26&&i<full)g+=`<text class="num" x="${cx.toFixed(2)}" y="${(cy-5).toFixed(2)}" text-anchor="middle" style="fill:#fff">${i+1}</text>`;}
+    g+=`</g>`;
+    /* 잘린 4번째 원의 나머지는 점선으로 */
+    const cx4=X0+rad+full*dp;g+=`<circle cx="${cx4.toFixed(2)}" cy="${cy.toFixed(2)}" r="${rad.toFixed(2)}" fill="none" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 3" clip-path="url(#co${k})"/>`;
+    g+=`<clipPath id="co${k}"><rect x="${(X0+Lpx).toFixed(2)}" y="${top}" width="${dp.toFixed(2)}" height="${rowH}"/></clipPath>`;
+    g+=`<line x1="${(X0+Lpx).toFixed(2)}" y1="${top}" x2="${(X0+Lpx).toFixed(2)}" y2="${(cy+rad+4).toFixed(2)}" stroke="var(--guide)" stroke-width="1.5"/>`;
+    g+=`<text class="num" x="${(X0+Lpx+6).toFixed(2)}" y="${top+11}">${f2(ratio(r))}배</text>`;
+    y+=rowH+12;});
+  $("chart").setAttribute("viewBox",`0 0 540 ${y}`);$("chart").innerHTML=g;
+}
+$("scaleBtn").onclick=()=>{same=!same;$("scaleBtn").textContent=same?"실제 크기로 돌아가기":"크기를 똑같이 맞춰 보기";drawChart();};
+$("c2").onclick=e=>{const b=e.target.closest(".btn");if(!b||b.disabled)return;const tt=$("toast2");
+  if(b.dataset.v==="same"){b.classList.add("yes");$("c2").querySelectorAll(".btn").forEach(x=>x.disabled=true);tt.className="toast ok";
+    tt.textContent="맞아요! 작은 동전도 큰 시계도 원주는 자기 자신을 3개와 조금 늘어놓은 길이, 지름의 약 3.14배예요. 이렇게 원의 크기와 상관없이 언제나 일정한 원주÷지름의 값을 원주율이라고 해요.";
+    if(!same)$("scaleBtn").click();$("next2").disabled=false;done.add(2);}
+  else{b.classList.add("no");b.disabled=true;tt.className="toast bad";tt.textContent="보라색 선 아래에 물건이 몇 개 들어가는지, 끝에 적힌 몇 배인지를 작은 물건부터 큰 물건까지 차례로 비교해 보세요.";}
+};
+$("next2").onclick=()=>show(3);
+
+/* ---------- 3단계: 오차 ---------- */
+function renderStat(){
+  const qs=rows.map(ratio),avg=qs.reduce((a,b)=>a+b,0)/qs.length;
+  $("stat3").innerHTML=`<div class="st"><span>가장 작은 값</span><b>${f2(Math.min(...qs))}</b></div><div class="st"><span>가장 큰 값</span><b>${f2(Math.max(...qs))}</b></div><div class="st"><span>모두의 평균</span><b>${f2(avg)}</b></div>`;
+}
+const FB={string:"맞아요. 실이 늘어나거나 비스듬히 감기면 원주가 실제보다 길게 재어져요.",dia:"맞아요. 중심을 지나지 않으면 지름이 실제보다 짧게 재어져서 원주÷지름이 커져요.",ruler:"맞아요. 눈금 사이를 어림하면 0.1cm쯤은 쉽게 달라져요.",shape:"맞아요. 컵이나 테이프처럼 실제 물건은 완전한 원이 아닐 때가 많아요.",diff:"이건 아니에요. 2단계에서 보았듯 크기가 달라도 원주÷지름은 거의 같았어요. 모든 원의 원주율은 똑같아요."};
+let picks=new Set();
+$("o3").onclick=e=>{const b=e.target.closest(".opt");if(!b||b.disabled)return;const k=b.dataset.k;picks.has(k)?picks.delete(k):picks.add(k);b.setAttribute("aria-pressed",picks.has(k)?"true":"false");$("check3").disabled=!picks.size;};
+$("check3").onclick=()=>{if(!picks.size)return;
+  $("o3").querySelectorAll(".opt").forEach(b=>{b.disabled=true;if(b.dataset.k==="diff"&&picks.has("diff"))b.classList.add("wrongpick");});
+  const miss=["string","dia","ruler","shape"].filter(k=>!picks.has(k)).length;
+  $("fb3").innerHTML=[...picks].map(k=>`<li class="${k==="diff"?"x":""}">${FB[k]}</li>`).join("")+(miss?`<li>고르지 않은 것 중에도 까닭이 ${miss}가지 더 있어요. 무엇일지 친구와 이야기해 보세요.</li>`:"");
+  $("check3").disabled=true;$("story3").hidden=false;$("next3").disabled=false;done.add(3);};
+$("next3").onclick=()=>{done.add(4);show(4);};
+
+/* ---------- 마무리 ---------- */
+function renderTbl4(){
+  $("tbl4").innerHTML=rows.map(r=>{const calc=r.d*PI,diff=r.c-calc;return `<tr><td>${esc(r.name)}</td><td>${r.d}cm</td><td>${r.c}cm</td><td>${+calc.toFixed(2)}cm</td><td>${diff>=0?"+":""}${+diff.toFixed(2)}cm</td></tr>`;}).join("");
+}
+
+/* ---------- 처음부터 ---------- */
+function resetSteps(){
+  done.clear();same=false;picks=new Set();$("scaleBtn").textContent="크기를 똑같이 맞춰 보기";
+  $("c2").querySelectorAll(".btn").forEach(b=>{b.disabled=false;b.classList.remove("yes","no");});
+  $("o3").querySelectorAll(".opt").forEach(b=>{b.disabled=false;b.setAttribute("aria-pressed","false");b.classList.remove("wrongpick");});
+  $("check3").disabled=true;$("fb3").innerHTML="";$("story3").hidden=true;$("next2").disabled=true;$("next3").disabled=true;
+  ["toast2"].forEach(id=>{$(id).textContent="";$(id).className="toast";});
+}
+let resetArm=0;
+$("reset").onclick=()=>{
+  if(Date.now()-resetArm>4000){resetArm=Date.now();$("reset").textContent="기록도 모두 지워져요. 정말 처음부터 할까요? 한 번 더 누르세요";setTimeout(()=>{$("reset").textContent="처음부터 다시";},4000);return;}
+  resetArm=0;$("reset").textContent="처음부터 다시";rows=[];save();clearErr();resetSteps();renderLog();show(1);
+};
+
+/* 선생님 바로가기: 학생용 주소(github.io)에서는 ?teacher 를 붙였을 때만 보여요. */
+if(!/github\.io$/.test(location.hostname)||/teacher/.test(location.search))$("tbar").hidden=false;
+const EX=[["500원 동전",2.65,8.3],["음료 캔",6.6,20.9],["머그컵",8.2,25.6],["테이프",11,34.8],["접시",21,66.5],["벽시계",30,94.6]];
+$("tbar").onclick=e=>{const b=e.target.closest("button");if(!b)return;const j=b.dataset.j;
+  if(j==="ex"||rows.length<4){rows=EX.map(([name,d,c])=>({name,d,c,ex:true}));save();renderLog();}
+  if(j==="ex"){show(1);return;}
+  resetSteps();if(j==="1"){show(1);return;}
+  done.add(1);if(j==="2"){show(2);return;}
+  $("c2").querySelector('[data-v="same"]').click();if(j==="3"){show(3);return;}
+  ["string","dia"].forEach(k=>$("o3").querySelector(`[data-k="${k}"]`).click());$("check3").click();show(4);
+};
+
+load();renderLog();show(1);
+/* 수업 중 실수로 새로 고침하거나 나가지 않도록 (기록은 이 태블릿에 저장되지만, 그래도 조심해요) */
+let touched=false;document.addEventListener("pointerdown",()=>{touched=true;},{once:true,capture:true});
+window.addEventListener("beforeunload",e=>{if(touched){e.preventDefault();e.returnValue="";}});
+</script>
+
+</html>

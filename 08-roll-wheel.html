@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>굴러라 바퀴</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&display=swap">
+<style>
+/* Layout: same notebook page as the other circle-unit tools; step strip on top, one card per step. A ruler-and-wheel stage sits at the top of steps 1 and 2. */
+:root{
+  --bg:#efe8d8; --paper:#fbf7ee; --ink:#2f3a2c; --muted:#6c7462; --line:#d8ceb6;
+  --accent:#2d5d7b; --accent-bg:#dde8ef; --ok:#2f7a3d; --bad:#b23a48;
+  --wheel:#f2c26b; --wheel-edge:#b06a1f; --rim:#7a3fa0; --flag:#b23a48; --band:#e9b44c;
+  --display:"Gaegu","Gowun Dodum",cursive; --body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141b26; --paper:#1f2836; --ink:#ece6d6; --muted:#a3a99c; --line:#334156;
+  --accent:#8cc0e0; --accent-bg:#1e3446; --ok:#7fd08c; --bad:#f08b97;
+  --wheel:#8a6a2e; --wheel-edge:#e6a65a; --rim:#c9a0ef; --flag:#f08b97; --band:#c99a3c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141b26; --paper:#1f2836; --ink:#ece6d6; --muted:#a3a99c; --line:#334156;
+  --accent:#8cc0e0; --accent-bg:#1e3446; --ok:#7fd08c; --bad:#f08b97;
+  --wheel:#8a6a2e; --wheel-edge:#e6a65a; --rim:#c9a0ef; --flag:#f08b97; --band:#c99a3c; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1{font-family:var(--display);font-weight:700;font-size:2.1rem;line-height:1.1;margin:0}
+.lead{margin:4px 0 0;color:var(--muted);font-size:.95rem;word-break:keep-all}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.stepi{font-size:.9rem;padding:8px 6px;border:1px solid var(--line);background:var(--paper);color:var(--muted);border-radius:8px;text-align:center;word-break:keep-all;line-height:1.25}
+.stepi b{font-family:var(--display);font-size:1.15rem;display:block;line-height:1}
+.stepi[aria-current="step"]{border-color:var(--accent);background:var(--accent-bg);color:var(--ink)}
+.stepi.done{color:var(--ink)} .stepi.done b::after{content:" \2713";font-size:.9rem;color:var(--ok)}
+@media (max-width:480px){.stepi{font-size:.76rem;padding:7px 3px}}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px}
+.card h2{font-family:var(--display);font-size:1.5rem;margin:0;line-height:1.2}
+.note{margin:0;color:var(--muted);font-size:.92rem;word-break:keep-all}
+.btn{font:inherit;font-size:1rem;padding:12px 10px;border-radius:10px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;word-break:keep-all;touch-action:manipulation}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+.btn.on{border-color:var(--accent);background:var(--accent-bg)}
+.btn.no{text-decoration:line-through;opacity:.5}
+.btn.yes{border-color:var(--ok);color:var(--ok);font-weight:700}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,.link:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.row .btn{flex:1 1 140px}
+.toast{min-height:1.4em;margin:0;font-size:.95rem;color:var(--accent);word-break:keep-all}
+.toast.bad{color:var(--bad)} .toast.ok{color:var(--ok)}
+.stage{width:100%;height:auto;display:block;border-radius:12px;background:var(--bg)}
+.stage text{font-family:var(--body);fill:var(--muted);font-size:12px}
+.stage .big{fill:var(--ink);font-size:15px}
+.q{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border-radius:12px;background:var(--bg)}
+.q p{margin:0;word-break:keep-all}
+.ans{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ans input{font:inherit;font-size:1.1rem;padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);width:9em}
+.ans input:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+.ans input.err{border-color:var(--bad)}
+.ans .u{font-size:1.05rem}
+.ans .btn{flex:0 0 auto;padding:10px 18px}
+.errmsg{margin:0;font-size:13px;color:var(--bad);min-height:1.2em}
+.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.slider{display:flex;flex-direction:column;gap:4px}
+.slider input{width:100%;accent-color:var(--accent);height:32px}
+.slider label{font-size:.95rem;word-break:keep-all}
+.slider label b{font-family:var(--display);font-size:1.4rem}
+.rec{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;font-size:.95rem;font-variant-numeric:tabular-nums}
+.rec li{padding:6px 12px;border-radius:8px;background:var(--bg)}
+.prob{display:grid;grid-template-columns:88px minmax(0,1fr);gap:14px;align-items:start}
+.prob svg{width:88px;height:88px}
+.prob p{margin:0;word-break:keep-all;font-size:1.05rem}
+.dots{display:flex;gap:8px;justify-content:center}
+.dots i{width:12px;height:12px;border-radius:50%;background:var(--line);display:block}
+.dots i.done{background:var(--ok)} .dots i.on{background:var(--accent);transform:scale(1.25)}
+.formula{margin:0;padding:14px;border-radius:14px;background:var(--bg);font-family:var(--display);font-size:1.6rem;line-height:1.5;text-align:center;word-break:keep-all}
+.ask{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px;word-break:keep-all}
+.closing{margin:0;padding:14px 16px;border-radius:12px;background:var(--accent-bg);font-family:var(--display);font-size:1.4rem;line-height:1.4;text-align:center;word-break:keep-all}
+.tbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;border:1.5px dashed var(--accent);border-radius:10px;font-size:.85rem;color:var(--muted)}
+.tbar button{font:inherit;font-size:.85rem;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.link{background:none;border:none;color:var(--muted);text-decoration:underline;font:inherit;font-size:.88rem;cursor:pointer;padding:0;align-self:flex-start}
+html,body{overscroll-behavior-y:contain}
+</style>
+
+<div class="wrap">
+  <div class="tbar" id="tbar" hidden><b>선생님 바로가기</b><button data-j="1">1단계</button><button data-j="2">2단계</button><button data-j="3">3단계</button><button data-j="4">마무리</button></div>
+  <header>
+    <h1>굴러라 바퀴</h1>
+    <p class="lead">바퀴가 한 바퀴 굴러가면, 바퀴의 둘레가 땅에 한 번 쭉 펼쳐져요. 그러니까 한 바퀴 굴러간 거리가 바로 원주예요. 원주는 지름 × 3.14였지요. 바퀴를 굴려서 확인해 봐요.</p>
+  </header>
+
+  <nav class="steps" aria-label="단계">
+    <div class="stepi" id="tab1" aria-current="step"><b>1</b>바퀴 굴리기</div>
+    <div class="stepi" id="tab2"><b>2</b>깃발에 멈추기</div>
+    <div class="stepi" id="tab3"><b>3</b>생활 속 문제</div>
+    <div class="stepi" id="tab4"><b>4</b>마무리</div>
+  </nav>
+
+  <svg class="stage" id="stage" viewBox="0 0 560 230" role="img" aria-label="자 위를 굴러가는 바퀴"></svg>
+
+  <!-- 1단계 -->
+  <section class="card" id="step1">
+    <h2>한 바퀴 굴러가면 몇 cm를 갈까요?</h2>
+    <div class="row" id="dRow"><span class="note" style="flex:0 0 auto">바퀴의 지름</span><button class="btn on" data-d="10">10cm</button><button class="btn" data-d="20">20cm</button><button class="btn" data-d="30">30cm</button></div>
+    <div class="q">
+      <p id="p1">지름이 <b>10cm</b>인 바퀴가 한 바퀴 굴러가면 몇 cm를 갈지 먼저 계산해 보세요.</p>
+      <form class="ans" id="f1" novalidate><input id="in1" type="text" inputmode="decimal" autocomplete="off" aria-label="예상한 거리"><span class="u">cm</span><button class="btn primary" type="submit" id="roll1">굴려 보기</button></form>
+      <p class="errmsg" id="err1" role="alert"></p>
+    </div>
+    <p class="toast" id="toast1" role="status"></p>
+    <ul class="rec" id="rec1"></ul>
+    <div class="row"><button class="btn primary" id="next1" disabled>거꾸로 해 보기</button></div>
+  </section>
+
+  <!-- 2단계 -->
+  <section class="card" id="step2" hidden>
+    <h2>깃발에 딱 멈추는 바퀴를 찾아요</h2>
+    <p class="note">바퀴가 한 바퀴만 굴러서 빨간 깃발에 딱 멈추게 하고 싶어요. 지름이 몇 cm인 바퀴를 골라야 할까요? 막대로 지름을 정하고 굴려 보세요.</p>
+    <div class="slider"><label for="dsl">바퀴의 지름: <b id="dslv">10</b>cm</label><input type="range" id="dsl" min="5" max="30" step="1" value="10"></div>
+    <div class="row"><button class="btn primary" id="roll2">굴려 보기</button></div>
+    <p class="toast" id="toast2" role="status"></p>
+    <ul class="rec" id="rec2"></ul>
+    <div class="q" id="q2" hidden>
+      <p>여러 번 굴려 보지 않고 한 번에 지름을 구하는 방법은 없을까요? 깃발까지의 거리가 <b id="tgt2"></b>cm일 때 알맞은 계산을 고르세요.</p>
+      <div class="choices" id="c2"></div>
+    </div>
+    <div class="row"><button class="btn primary" id="next2" disabled>생활 속 문제 풀기</button></div>
+  </section>
+
+  <!-- 3단계 -->
+  <section class="card" id="step3" hidden>
+    <h2>생활 속 원주 문제</h2>
+    <div class="dots" id="dots3"></div>
+    <div class="prob"><svg id="pic3" viewBox="0 0 88 88" aria-hidden="true"></svg><p id="txt3"></p></div>
+    <form class="ans" id="f3" novalidate><input id="in3" type="text" inputmode="decimal" autocomplete="off" aria-label="답"><span class="u" id="u3">cm</span><button class="btn primary" type="submit">확인하기</button></form>
+    <p class="errmsg" id="err3" role="alert"></p>
+    <p class="toast" id="toast3" role="status"></p>
+    <div class="row"><button class="btn primary" id="nextp" hidden>다음 문제</button><button class="btn primary" id="next3" hidden>마무리하기</button></div>
+  </section>
+
+  <!-- 마무리 -->
+  <section class="card" id="step4" hidden>
+    <h2>지름만 알면 원주를 구할 수 있어요</h2>
+    <p class="formula">원주 = 지름 × 3.14<br>지름 = 원주 ÷ 3.14</p>
+    <ol class="ask">
+      <li>바퀴가 한 바퀴 굴러간 거리는 바퀴의 어느 부분의 길이와 같았나요?</li>
+      <li>원주를 알고 있을 때 지름은 어떻게 구했나요?</li>
+      <li>우리 주변에서 원주를 구해 보고 싶은 물건을 하나 찾아보세요.</li>
+    </ol>
+    <p class="closing">원주를 직접 재지 않아도,<br>지름만 알면 계산으로 구할 수 있어요!</p>
+  </section>
+
+  <button class="link" id="reset">처음부터 다시</button>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const PI=3.14,done=new Set();
+const num=s=>{const v=parseFloat(String(s).replace(",",".").trim());return isFinite(v)?v:NaN;};
+const near=(a,b)=>Math.abs(a-b)<0.005+1e-9*Math.abs(b);
+const fx=v=>+v.toFixed(2);
+function show(k){
+  for(const i of [1,2,3,4])$("step"+i).hidden=i!==k;
+  for(const i of [1,2,3,4]){const e=$("tab"+i);if(i===k)e.setAttribute("aria-current","step");else e.removeAttribute("aria-current");e.classList.toggle("done",i!==k&&done.has(i));}
+  $("stage").hidden=k>=3;
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* ---------- 무대: 1cm = 4.4px 자 위를 바퀴가 굴러가요 ---------- */
+const X0=50,K=4.4,GY=180;let anim=0,rolling=false,flag=null;
+function wheelSVG(d,s,trace,endMark){
+  const r=d/2*K,cx=X0+s*K,cy=GY-r,th=s/(d/2);
+  let g=`<line x1="20" y1="${GY}" x2="545" y2="${GY}" stroke="var(--ink)" stroke-width="2"/>`;
+  for(let c=0;c<=110;c+=1){const x=X0+c*K;if(x>545)break;const big=c%10===0,mid=c%5===0;g+=`<line x1="${x}" y1="${GY}" x2="${x}" y2="${GY+(big?14:mid?9:5)}" stroke="var(--muted)" stroke-width="${big?1.4:.7}"/>`;if(big)g+=`<text x="${x}" y="${GY+28}" text-anchor="middle">${c}</text>`;}
+  g+=`<text x="545" y="${GY+44}" text-anchor="end">(cm)</text>`;
+  if(flag!=null){const fxp=X0+flag*K;g+=`<line x1="${fxp}" y1="${GY}" x2="${fxp}" y2="${GY-150}" stroke="var(--flag)" stroke-width="2.5"/><path d="M${fxp} ${GY-150} L${fxp+30} ${GY-140} L${fxp} ${GY-130}Z" fill="var(--flag)"/><text class="big" x="${fxp+4}" y="${GY-156}" style="fill:var(--flag)">${flag}cm</text>`;}
+  if(trace.length>1)g+=`<polyline points="${trace.join(" ")}" fill="none" stroke="var(--rim)" stroke-width="2" stroke-dasharray="4 3"/>`;
+  if(endMark!=null){const ex=X0+endMark*K;g+=`<line x1="${X0}" y1="${GY-4}" x2="${ex}" y2="${GY-4}" stroke="var(--band)" stroke-width="6"/><text class="big" x="${(X0+ex)/2}" y="${GY-12}" text-anchor="middle">${fx(endMark)}cm</text>`;}
+  g+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="var(--wheel)" stroke="var(--wheel-edge)" stroke-width="3"/>`;
+  for(let i=0;i<4;i++){const a=th+i*Math.PI/2;g+=`<line x1="${cx}" y1="${cy}" x2="${cx-Math.sin(a)*r*.85}" y2="${cy+Math.cos(a)*r*.85}" stroke="var(--wheel-edge)" stroke-width="1.5"/>`;}
+  g+=`<circle cx="${cx}" cy="${cy}" r="3" fill="var(--wheel-edge)"/><circle cx="${cx-Math.sin(th)*r}" cy="${cy+Math.cos(th)*r}" r="6" fill="var(--flag)" stroke="#fff" stroke-width="1.5"/>`;
+  $("stage").innerHTML=g;
+}
+function roll(d,cb){
+  if(rolling)return;rolling=true;cancelAnimationFrame(anim);const C=d*PI,t0=performance.now(),ms=reduce?0:2600,trace=[];
+  const f=now=>{const k=ms?Math.min(1,(now-t0)/ms):1,s=C*k,th=s/(d/2),r=d/2*K,cx=X0+s*K,cy=GY-r;
+    trace.push(`${(cx-Math.sin(th)*r).toFixed(1)},${(cy+Math.cos(th)*r).toFixed(1)}`);
+    wheelSVG(d,s,trace,k>=1?C:null);if(k<1)anim=requestAnimationFrame(f);else{rolling=false;cb&&cb(C);}};
+  anim=requestAnimationFrame(f);
+}
+
+/* ---------- 1단계 ---------- */
+let d1=10,ok1=new Set();
+$("dRow").onclick=e=>{const b=e.target.closest(".btn");if(!b||rolling)return;d1=+b.dataset.d;$("dRow").querySelectorAll(".btn").forEach(x=>x.classList.toggle("on",x===b));
+  $("p1").innerHTML=`지름이 <b>${d1}cm</b>인 바퀴가 한 바퀴 굴러가면 몇 cm를 갈지 먼저 계산해 보세요.`;$("in1").value="";$("err1").textContent="";$("toast1").textContent="";wheelSVG(d1,0,[],null);};
+$("in1").addEventListener("input",()=>{$("err1").textContent="";$("in1").classList.remove("err");});
+$("f1").addEventListener("submit",e=>{e.preventDefault();if(rolling)return;
+  const v=num($("in1").value);if(!(v>0)){$("in1").classList.add("err");$("err1").textContent="예상한 거리를 수로 적어야 굴릴 수 있어요.";$("in1").focus();return;}
+  $("toast1").className="toast";$("toast1").textContent="굴러가는 중…";
+  roll(d1,C=>{const tt=$("toast1"),hit=near(v,C);
+    if(hit){ok1.add(d1);tt.className="toast ok";tt.textContent=`딱 맞았어요! ${d1} × 3.14 = ${fx(C)}cm를 굴러갔어요. 보라색 점선은 빨간 점이 지나간 길이에요.`;}
+    else if(near(v,d1/2*PI)){tt.className="toast bad";tt.textContent=`실제로는 ${fx(C)}cm를 갔어요. 반지름에 3.14를 곱하지 않았나요? 원주는 지름 × 3.14예요.`;}
+    else{tt.className="toast bad";tt.textContent=`실제로는 ${fx(C)}cm를 갔어요. 원주 = 지름 × 3.14로 다시 계산해 보세요.`;}
+    $("rec1").insertAdjacentHTML("beforeend",`<li>지름 ${d1}cm: 예상 ${v}cm → 실제 ${fx(C)}cm ${hit?"✓":""}</li>`);
+    if(ok1.size>=2&&$("next1").disabled){$("next1").disabled=false;done.add(1);tt.textContent+=" 두 가지 바퀴를 맞혔어요. 다음 단계로 가 봐요!";}
+    else if(hit&&ok1.size<2)tt.textContent+=" 다른 지름의 바퀴도 계산해서 굴려 보세요.";});
+});
+$("next1").onclick=()=>{show(2);setup2();};
+
+/* ---------- 2단계 ---------- */
+const TGTS=[[47.1,15],[62.8,20],[78.5,25],[31.4,10]];let tgt=TGTS[0],tries=0,solved2=false;
+function setup2(){tgt=TGTS[Math.floor(Math.random()*3)];flag=tgt[0];tries=0;solved2=false;$("rec2").innerHTML="";$("q2").hidden=true;$("toast2").textContent="";$("dsl").value=10;$("dslv").textContent=10;$("dsl").disabled=false;wheelSVG(10,0,[],null);
+  $("tgt2").textContent=tgt[0];
+  const opts=[[`${tgt[0]} × 3.14`,"mul"],[`${tgt[0]} ÷ 3.14`,"div"],[`${tgt[0]} − 3.14`,"sub"]];
+  $("c2").innerHTML=opts.map(([t,v])=>`<button class="btn" data-v="${v}">${t}</button>`).join("");}
+$("dsl").oninput=()=>{if(rolling)return;$("dslv").textContent=$("dsl").value;wheelSVG(+$("dsl").value,0,[],null);};
+$("roll2").onclick=()=>{if(rolling)return;const d=+$("dsl").value;$("dsl").disabled=true;
+  roll(d,C=>{$("dsl").disabled=false;tries++;const tt=$("toast2"),diff=fx(C-tgt[0]);
+    $("rec2").insertAdjacentHTML("beforeend",`<li>지름 ${d}cm → ${fx(C)}cm ${diff===0?"딱 멈췄어요! ✓":diff>0?"(깃발을 지나쳤어요)":"(깃발에 못 미쳤어요)"}</li>`);
+    if(diff===0){tt.className="toast ok";tt.textContent=solved2?`맞아요! ${tgt[0]} ÷ 3.14 = ${tgt[1]}, 지름 ${tgt[1]}cm 바퀴가 깃발에 딱 멈췄어요.`:`찾았어요! 지름 ${d}cm 바퀴가 깃발에 딱 멈췄어요.`;
+      if(!solved2)$("q2").hidden=false;}
+    else{tt.className="toast bad";tt.textContent=diff>0?"깃발을 지나쳤어요. 지름을 줄여 보세요.":"깃발에 못 미쳤어요. 지름을 늘려 보세요.";if(tries>=2)$("q2").hidden=false;}});
+};
+$("c2").onclick=e=>{const b=e.target.closest(".btn");if(!b||b.disabled)return;const tt=$("toast2");
+  if(b.dataset.v==="div"){b.classList.add("yes");$("c2").querySelectorAll(".btn").forEach(x=>x.disabled=true);solved2=true;tt.className="toast ok";
+    tt.textContent=`맞아요! 원주 = 지름 × 3.14이니까, 거꾸로 지름 = 원주 ÷ 3.14예요. ${tgt[0]} ÷ 3.14 = ${tgt[1]}이니 지름을 ${tgt[1]}cm로 맞추고 굴려서 확인해 보세요.`;$("next2").disabled=false;done.add(2);}
+  else{b.classList.add("no");b.disabled=true;tt.className="toast bad";tt.textContent=b.dataset.v==="mul"?"곱하면 깃발보다 훨씬 먼 거리가 나와요. 지름 × 3.14 = 원주였으니, 거꾸로 하려면?":"3.14를 빼는 것은 원주와 지름의 관계가 아니에요. 지름 × 3.14 = 원주를 거꾸로 생각해 보세요.";}};
+$("next2").onclick=()=>{show(3);setup3(0);};
+
+/* ---------- 3단계: 생활 문제 ---------- */
+const PICS={
+  bike:`<circle cx="24" cy="58" r="20" fill="none" stroke="var(--ink)" stroke-width="4"/><circle cx="66" cy="58" r="20" fill="none" stroke="var(--ink)" stroke-width="4"/><path d="M24 58 L42 34 L66 58 M42 34 L58 34 M38 28 L48 28" fill="none" stroke="var(--wheel-edge)" stroke-width="4" stroke-linecap="round"/>`,
+  bed:`<ellipse cx="44" cy="54" rx="38" ry="20" fill="var(--wheel)" stroke="var(--wheel-edge)" stroke-width="3" stroke-dasharray="6 4"/>${[[30,48,"#d64550"],[44,58,"#7a3fa0"],[58,48,"#d64550"],[38,40,"#e9b44c"],[52,40,"#e9b44c"]].map(([x,y,c])=>`<line x1="${x}" y1="${y}" x2="${x}" y2="${y+10}" stroke="#4f9a45" stroke-width="2"/><circle cx="${x}" cy="${y}" r="5" fill="${c}"/>`).join("")}`,
+  hoop:`<ellipse cx="44" cy="46" rx="36" ry="36" fill="none" stroke="var(--rim)" stroke-width="7"/><ellipse cx="44" cy="46" rx="36" ry="36" fill="none" stroke="var(--band)" stroke-width="7" stroke-dasharray="8 10"/>`
+};
+const PROBS=[
+  {pic:"bike",unit:"cm",ans:1884,txt:"지름이 60cm인 자전거 바퀴가 10바퀴 굴러가면, 자전거는 몇 cm를 갈까요?",
+   hints:[[188.4,"그건 한 바퀴만 굴러간 거리예요. 10바퀴를 굴러갔어요."],[942,"반지름이 아니라 지름에 3.14를 곱해요. 바퀴의 지름은 60cm예요."]],
+   gen:"먼저 한 바퀴 굴러간 거리(지름 × 3.14)를 구하고, 10바퀴만큼 곱해 보세요.",ok:"맞아요! 60 × 3.14 = 188.4cm, 10바퀴면 1884cm예요."},
+  {pic:"bed",unit:"m",ans:18.84,txt:"반지름이 3m인 원 모양 화단 둘레에 울타리를 치려고 해요. 울타리는 몇 m가 필요할까요?",
+   hints:[[9.42,"반지름 3m에 3.14를 곱했나요? 반지름이 3m이면 지름은 몇 m일까요?"]],
+   gen:"울타리의 길이는 화단의 원주예요. 반지름으로 지름을 먼저 구해 보세요.",ok:"맞아요! 지름은 3 × 2 = 6m, 원주는 6 × 3.14 = 18.84m예요."},
+  {pic:"hoop",unit:"cm",ans:80,txt:"훌라후프의 둘레를 재었더니 251.2cm였어요. 이 훌라후프의 지름은 몇 cm일까요?",
+   hints:[[788.77,"둘레에 3.14를 곱하면 더 커져요. 원주를 알 때 지름은 어떻게 구했나요?"],[40,"그건 반지름이에요. 문제에서는 지름을 물었어요."]],
+   gen:"지름 = 원주 ÷ 3.14였어요.",ok:"맞아요! 251.2 ÷ 3.14 = 80cm예요."}
+];
+let pi3=0;
+function setup3(i){pi3=i;const p=PROBS[i];$("pic3").innerHTML=PICS[p.pic];$("txt3").textContent=p.txt;$("u3").textContent=p.unit;
+  $("in3").value="";$("in3").disabled=false;$("err3").textContent="";$("toast3").textContent="";$("nextp").hidden=true;$("next3").hidden=true;
+  $("dots3").innerHTML=PROBS.map((_,k)=>`<i class="${k<i?"done":k===i?"on":""}"></i>`).join("");}
+$("in3").addEventListener("input",()=>{$("err3").textContent="";$("in3").classList.remove("err");});
+$("f3").addEventListener("submit",e=>{e.preventDefault();if($("in3").disabled)return;const p=PROBS[pi3],v=num($("in3").value),tt=$("toast3");
+  if(isNaN(v)){$("in3").classList.add("err");$("err3").textContent="답을 수로 적어 주세요.";$("in3").focus();return;}
+  if(near(v,p.ans)){tt.className="toast ok";tt.textContent=p.ok;$("in3").disabled=true;$("dots3").children[pi3].className="done";
+    if(pi3<PROBS.length-1)$("nextp").hidden=false;else{$("next3").hidden=false;done.add(3);}return;}
+  const h=p.hints.find(([w])=>Math.abs(v-w)<0.02);tt.className="toast bad";tt.textContent=h?h[1]:p.gen;});
+$("nextp").onclick=()=>setup3(pi3+1);
+$("next3").onclick=()=>{done.add(4);show(4);};
+
+/* ---------- 처음부터 ---------- */
+function resetAll(){
+  cancelAnimationFrame(anim);rolling=false;done.clear();flag=null;d1=10;ok1=new Set();
+  $("dRow").querySelectorAll(".btn").forEach(x=>x.classList.toggle("on",x.dataset.d==="10"));
+  $("p1").innerHTML=`지름이 <b>10cm</b>인 바퀴가 한 바퀴 굴러가면 몇 cm를 갈지 먼저 계산해 보세요.`;
+  $("in1").value="";$("err1").textContent="";$("rec1").innerHTML="";$("next1").disabled=true;$("next2").disabled=true;
+  ["toast1","toast2","toast3"].forEach(id=>{$(id).textContent="";$(id).className="toast";});
+  wheelSVG(10,0,[],null);show(1);
+}
+let resetArm=0;
+$("reset").onclick=()=>{
+  if(Date.now()-resetArm>4000){resetArm=Date.now();$("reset").textContent="정말 처음부터 할까요? 한 번 더 누르세요";setTimeout(()=>{$("reset").textContent="처음부터 다시";},4000);return;}
+  resetArm=0;$("reset").textContent="처음부터 다시";resetAll();
+};
+
+/* 선생님 바로가기: 학생용 주소(github.io)에서는 ?teacher 를 붙였을 때만 보여요. 버튼을 대신 누르지 않고 상태를 바로 맞춰요. */
+if(!/github\.io$/.test(location.hostname)||/teacher/.test(location.search))$("tbar").hidden=false;
+$("tbar").onclick=e=>{const b=e.target.closest("button");if(!b)return;const j=b.dataset.j;resetAll();
+  if(j==="1")return;
+  ok1=new Set([10,20]);$("rec1").innerHTML=`<li>지름 10cm: 예상 31.4cm → 실제 31.4cm ✓ (예시)</li><li>지름 20cm: 예상 62.8cm → 실제 62.8cm ✓ (예시)</li>`;$("next1").disabled=false;done.add(1);
+  show(2);setup2();if(j==="2")return;
+  $("q2").hidden=false;$("c2").querySelectorAll(".btn").forEach(x=>x.disabled=true);$("next2").disabled=false;done.add(2);
+  if(j==="3"){show(3);setup3(0);return;}
+  done.add(3);done.add(4);show(4);
+};
+
+resetAll();
+/* 수업 중 실수로 새로 고침하거나 나가지 않도록 */
+let touched=false;document.addEventListener("pointerdown",()=>{touched=true;},{once:true,capture:true});
+window.addEventListener("beforeunload",e=>{if(touched){e.preventDefault();e.returnValue="";}});
+</script>
+
+</html>

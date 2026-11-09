@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>넓이 가두기 작전</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&display=swap">
+<style>
+/* Layout: same notebook page as 원 둘레 가두기 작전 and 피자 조각 마법; step strip on top, figure left and panel right on a tablet, stacked on a phone. */
+:root{
+  --bg:#efe8d8; --paper:#fbf7ee; --ink:#2f3a2c; --muted:#6c7462; --line:#d8ceb6;
+  --accent:#2d5d7b; --accent-bg:#dde8ef; --ok:#2f7a3d; --bad:#b23a48;
+  --in:#9cc3e0; --in-ink:#2d5d7b; --edge:#f2c94c; --edge-ink:#8a6410; --cell:#ffffff; --grid:#c9bfa6;
+  --sq:#b06a1f; --sq-bg:#f3dfc2; --rim:#7a3fa0;
+  --display:"Gaegu","Gowun Dodum",cursive; --body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141b26; --paper:#1f2836; --ink:#ece6d6; --muted:#a3a99c; --line:#334156;
+  --accent:#8cc0e0; --accent-bg:#1e3446; --ok:#7fd08c; --bad:#f08b97;
+  --in:#2f5b7d; --in-ink:#8cc0e0; --edge:#8a6a2e; --edge-ink:#f2c94c; --cell:#2a3546; --grid:#3f4d63;
+  --sq:#e6a65a; --sq-bg:#3a2c1c; --rim:#c9a0ef; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141b26; --paper:#1f2836; --ink:#ece6d6; --muted:#a3a99c; --line:#334156;
+  --accent:#8cc0e0; --accent-bg:#1e3446; --ok:#7fd08c; --bad:#f08b97;
+  --in:#2f5b7d; --in-ink:#8cc0e0; --edge:#8a6a2e; --edge-ink:#f2c94c; --cell:#2a3546; --grid:#3f4d63;
+  --sq:#e6a65a; --sq-bg:#3a2c1c; --rim:#c9a0ef; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1{font-family:var(--display);font-weight:700;font-size:2.1rem;line-height:1.1;margin:0}
+.lead{margin:4px 0 0;color:var(--muted);font-size:.95rem;word-break:keep-all}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.stepi{font-size:.9rem;padding:8px 6px;border:1px solid var(--line);background:var(--paper);color:var(--muted);border-radius:8px;text-align:center;word-break:keep-all;line-height:1.25}
+.stepi b{font-family:var(--display);font-size:1.15rem;display:block;line-height:1}
+.stepi[aria-current="step"]{border-color:var(--accent);background:var(--accent-bg);color:var(--ink)}
+.stepi.done{color:var(--ink)} .stepi.done b::after{content:" \2713";font-size:.9rem;color:var(--ok)}
+@media (max-width:480px){.stepi{font-size:.76rem;padding:7px 3px}}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px}
+.card h2{font-family:var(--display);font-size:1.5rem;margin:0;line-height:1.2}
+.note{margin:0;color:var(--muted);font-size:.92rem;word-break:keep-all}
+.btn{font:inherit;font-size:1rem;padding:12px 10px;border-radius:10px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;word-break:keep-all;touch-action:manipulation}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+.btn.no{text-decoration:line-through;opacity:.5}
+.btn.yes{border-color:var(--ok);color:var(--ok);font-weight:700}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,.link:focus-visible,.sw:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.row .btn{flex:1 1 150px}
+.toast{min-height:1.4em;margin:0;font-size:.95rem;color:var(--accent);word-break:keep-all}
+.toast.bad{color:var(--bad)} .toast.ok{color:var(--ok)}
+.split{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:720px){.split{grid-template-columns:1fr}}
+.fig{width:100%;max-width:440px;height:auto;display:block;margin:0 auto;user-select:none;-webkit-user-select:none}
+.fig text{font-family:var(--body);fill:var(--muted);font-size:13px}
+.fig.paint{touch-action:none}
+.fig rect.c{fill:var(--cell);stroke:var(--grid);stroke-width:1}
+.fig rect.c.v1{fill:var(--in)} .fig rect.c.v2{fill:var(--edge)}
+.fig rect.c.wrong{stroke:var(--bad);stroke-width:3}
+.side{display:flex;flex-direction:column;gap:12px;min-width:0}
+.palette{display:flex;flex-wrap:wrap;gap:8px}
+.sw{display:flex;align-items:center;gap:8px;font:inherit;font-size:.95rem;padding:8px 12px 8px 8px;border-radius:999px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;word-break:keep-all}
+.sw span{width:24px;height:24px;border-radius:6px;border:1px solid var(--grid);display:inline-block;flex:none}
+.sw[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-bg)}
+.meters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.meter{background:var(--bg);border-radius:10px;padding:8px 10px}
+.meter span{display:block;font-size:.8rem;color:var(--muted);word-break:keep-all}
+.meter b{font-family:var(--display);font-size:1.6rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.meter.in b{color:var(--in-ink)} .meter.edge b{color:var(--edge-ink)}
+.q{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border-radius:12px;background:var(--bg)}
+.q p{margin:0;word-break:keep-all}
+.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sent{margin:0;padding:12px 14px;border-radius:12px;background:var(--accent-bg);font-size:1.05rem;line-height:1.9;word-break:keep-all}
+.blank{display:inline-block;min-width:2.4em;text-align:center;border-bottom:2px solid var(--ink);font-family:var(--display);font-size:1.4rem;line-height:1;padding:0 4px;font-variant-numeric:tabular-nums}
+.blank.fill{color:var(--accent);border-color:var(--accent)}
+.tablebox{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.92rem;font-variant-numeric:tabular-nums}
+th,td{text-align:right;padding:6px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--muted);font-weight:400}
+tr.hot td{background:var(--accent-bg)}
+.sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+@media (max-width:620px){.sum{grid-template-columns:1fr}}
+.sumc{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--bg);display:flex;flex-direction:column;gap:4px}
+.sumc .k{font-size:.88rem;color:var(--muted);word-break:keep-all}
+.sumc .v{font-family:var(--display);font-size:1.6rem;line-height:1.15;font-variant-numeric:tabular-nums;word-break:keep-all}
+.sumc .d{font-size:.85rem;color:var(--muted);word-break:keep-all}
+.ratio{display:flex;flex-direction:column;gap:6px;padding:14px;border-radius:12px;background:var(--sq-bg);border:2px solid var(--sq)}
+.ratio strong{font-family:var(--display);font-size:1.35rem;line-height:1.2;word-break:keep-all}
+.ratio p{margin:0;word-break:keep-all}
+.ask{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px;word-break:keep-all}
+.closing{margin:0;padding:14px 16px;border-radius:12px;background:var(--accent-bg);font-family:var(--display);font-size:1.4rem;line-height:1.4;text-align:center;word-break:keep-all}
+.tbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;border:1.5px dashed var(--accent);border-radius:10px;font-size:.85rem;color:var(--muted)}
+.tbar button{font:inherit;font-size:.85rem;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.link{background:none;border:none;color:var(--muted);text-decoration:underline;font:inherit;font-size:.88rem;cursor:pointer;padding:0;align-self:flex-start}
+html,body{overscroll-behavior-y:contain}
+</style>
+
+<div class="wrap">
+  <div class="tbar" id="tbar" hidden><b>선생님 바로가기</b><button data-j="1">1단계</button><button data-j="2">2단계</button><button data-j="3">3단계</button><button data-j="4">마무리</button></div>
+  <header>
+    <h1>넓이 가두기 작전</h1>
+    <p class="lead">유클리드가 정리해 준 넓이 공식은 곧은 선으로 된 도형에만 쓸 수 있어요. 굽은 선으로 된 원의 넓이는 어떻게 구할까요? 우리가 이미 아는 것으로 원의 넓이를 가둬 봐요.</p>
+  </header>
+
+  <nav class="steps" aria-label="단계">
+    <div class="stepi" id="tab1" aria-current="step"><b>1</b>정사각형 가두기</div>
+    <div class="stepi" id="tab2"><b>2</b>모눈 세기</div>
+    <div class="stepi" id="tab3"><b>3</b>더 작은 칸</div>
+    <div class="stepi" id="tab4"><b>4</b>마무리</div>
+  </nav>
+
+  <!-- 1단계 -->
+  <section class="card" id="step1">
+    <h2>정사각형 2개로 원을 가둬요</h2>
+    <p class="note">반지름이 4cm인 원이에요. 먼저 5학년 때 배운 공식으로 원을 가둬 봐요. 원 안쪽에는 꼭짓점이 원에 닿는 정사각형, 바깥쪽에는 원을 꼭 감싸는 정사각형이 있어요.</p>
+    <div class="split">
+      <svg class="fig" id="g3" viewBox="-200 -200 400 400" role="img" aria-label="원과 안쪽, 바깥쪽 정사각형"></svg>
+      <div class="side">
+        <div class="q" id="q3a">
+          <p>안쪽 정사각형은 두 대각선이 모두 <b>지름(8cm)</b>이에요. 마름모 넓이 구하는 방법(대각선 × 대각선 ÷ 2)을 쓰면 넓이는?</p>
+          <div class="choices" id="c3a"><button class="btn" data-v="16">16cm²</button><button class="btn" data-v="32">32cm²</button><button class="btn" data-v="64">64cm²</button></div>
+        </div>
+        <div class="q" id="q3b" hidden>
+          <p>바깥쪽 정사각형은 한 변이 <b>지름(8cm)</b>이에요. 넓이는?</p>
+          <div class="choices" id="c3b"><button class="btn" data-v="32">32cm²</button><button class="btn" data-v="64">64cm²</button><button class="btn" data-v="128">128cm²</button></div>
+        </div>
+        <p class="sent">원의 넓이는 <span class="blank" id="b3a">?</span>cm²보다 크고 <span class="blank" id="b3b">?</span>cm²보다 작아요.</p>
+        <p class="toast" id="toast3" role="status"></p>
+      </div>
+    </div>
+    <div class="ratio" id="ratio3" hidden>
+      <strong>반지름을 한 변으로 하는 정사각형과 비교해 봐요</strong>
+      <p>반지름 × 반지름 = 4 × 4 = 16cm²예요. 32cm²와 64cm²는 이 넓이의 몇 배일까요?</p>
+      <p class="sent" style="background:var(--paper)">원의 넓이는 반지름 × 반지름의 <span class="blank fill">2</span>배보다 크고 <span class="blank fill">4</span>배보다 작아요.</p>
+      <p>계산 두 번으로 금방 가뒀지만, 범위가 너무 넓어요. 원의 넓이가 35cm²쯤인지 60cm²쯤인지도 알 수 없지요. 더 정확하게 가둘 방법은 없을까요?</p>
+    </div>
+    <div class="row"><button class="btn primary" id="next3" disabled>모눈 칸으로 더 정확하게</button></div>
+  </section>
+
+  <!-- 2단계 -->
+  <section class="card" id="step2" hidden>
+    <h2>모눈 칸을 직접 세어 더 정확하게 가둬요</h2>
+    <p class="note">같은 원을 1cm 모눈 위에 그렸어요. 넓이가 1cm²인 칸이 몇 개 들어가는지 세어 봐요. 보라색 선이 원의 둘레예요. 색을 고르고 칸을 누르거나 손가락으로 쓸어서 칠해 보세요.</p>
+    <div class="split">
+      <svg class="fig paint" id="g1" viewBox="0 0 400 422" role="img" aria-label="1cm 모눈 위의 원"></svg>
+      <div class="side">
+        <div class="palette" id="pal" role="group" aria-label="칠할 색">
+          <button class="sw" data-v="1" aria-pressed="true"><span style="background:var(--in)"></span>원 안에 완전히 들어간 칸</button>
+          <button class="sw" data-v="2" aria-pressed="false"><span style="background:var(--edge)"></span>원의 둘레가 지나가는 칸</button>
+          <button class="sw" data-v="0" aria-pressed="false"><span style="background:var(--cell)"></span>지우개</button>
+        </div>
+        <div class="meters">
+          <div class="meter in"><span>완전히 들어간 칸</span><b id="cntIn">0</b></div>
+          <div class="meter edge"><span>둘레가 지나가는 칸</span><b id="cntEdge">0</b></div>
+          <div class="meter"><span>세는 데 걸린 시간</span><b id="clock">0초</b></div>
+        </div>
+        <div class="row"><button class="btn" id="clear1">모두 지우기</button><button class="btn primary" id="check1">다 셌어요</button></div>
+        <p class="toast" id="toast1" role="status"></p>
+        <div id="after1" hidden style="display:flex;flex-direction:column;gap:12px">
+          <p class="sent">원의 넓이는 <span class="blank fill">37</span>cm²보다 크고 <span class="blank fill">69</span>cm²보다 작아요.<br>정사각형으로 가둔 범위(32 ~ 64cm²)보다 좁아졌어요.</p>
+          <div class="q" id="q1">
+            <p>둘레가 지나가는 칸은 대충 반 칸씩만 원 안에 있어요. 반 칸(0.5cm²)씩으로 치면, 원의 넓이는 약 몇 cm²일까요?</p>
+            <div class="choices" id="c1"><button class="btn" data-v="45">약 45cm²</button><button class="btn" data-v="53">약 53cm²</button><button class="btn" data-v="69">약 69cm²</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row"><button class="btn primary" id="next1" disabled>칸을 더 작게 하면?</button></div>
+  </section>
+
+  <!-- 3단계 -->
+  <section class="card" id="step3" hidden>
+    <h2>칸을 더 작게 하면 더 정확해질까?</h2>
+    <p class="note">칸이 작을수록 원의 둘레에 걸친 부분이 줄어들어 더 정확해져요. 그런데 세야 할 칸은 어떻게 될까요?</p>
+    <div class="split">
+      <canvas class="fig" id="g2" width="800" height="844" role="img" aria-label="더 작은 모눈 위의 원"></canvas>
+      <div class="side">
+        <div class="q" id="q2">
+          <p>칸 한 변의 길이를 1cm에서 <b>0.5cm</b>로 줄이면, 같은 곳에 들어가는 칸은 몇 배가 될까요?</p>
+          <div class="choices" id="c2"><button class="btn" data-v="2">2배</button><button class="btn" data-v="4">4배</button><button class="btn" data-v="8">8배</button></div>
+        </div>
+        <div id="cnt2" hidden style="display:flex;flex-direction:column;gap:10px">
+          <div class="meters">
+            <div class="meter"><span>칸 한 변</span><b id="m2s">0.5cm</b></div>
+            <div class="meter in"><span>완전히 들어간 칸</span><b id="m2in">0</b></div>
+            <div class="meter edge"><span>둘레가 지나가는 칸</span><b id="m2edge">0</b></div>
+          </div>
+          <div class="row"><button class="btn primary" id="count2">컴퓨터가 대신 세기</button><button class="btn" id="smaller2" disabled>칸을 더 작게</button></div>
+        </div>
+        <p class="toast" id="toast2" role="status"></p>
+      </div>
+    </div>
+    <div class="tablebox"><table>
+      <thead><tr><th>칸 한 변</th><th>세야 할 칸</th><th>원의 넓이 범위</th><th>반 칸씩 어림</th><th>반지름×반지름의</th><th>손으로 센다면</th></tr></thead>
+      <tbody id="tbl2"></tbody>
+    </table></div>
+    <p class="note" id="rateNote"></p>
+    <div class="row"><button class="btn primary" id="next2" disabled>세 방법 비교하기</button></div>
+  </section>
+
+  <!-- 마무리 -->
+  <section class="card" id="step4" hidden>
+    <h2>어떤 방법이 좋을까?</h2>
+    <div class="sum" id="sum4"></div>
+    <ol class="ask">
+      <li>모눈 칸을 직접 셀 때 어떤 점이 힘들었나요?</li>
+      <li>칸을 아주아주 작게 하면 어떻게 될까요? 그렇게 세는 것이 좋은 방법일까요?</li>
+      <li>빠르면서도 정확하게 원의 넓이를 구하려면 무엇이 필요할까요?</li>
+    </ol>
+    <p class="closing">수학자들은 긴 것과 복잡한 것을 싫어해요.<br>빠르고 정확한 방법, 원의 넓이 공식을 찾아 떠나요!</p>
+    <p class="note">다음 시간에는 원을 피자처럼 잘라서, 우리가 아는 도형으로 바꿔 봐요.</p>
+  </section>
+
+  <button class="link" id="reset">처음부터 다시</button>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const done=new Set();
+let cur=1;
+function show(k){
+  cur=k;
+  for(const i of [1,2,3,4])$("step"+i).hidden=i!==k;
+  for(const i of [1,2,3,4]){const e=$("tab"+i);if(i===k)e.setAttribute("aria-current","step");else e.removeAttribute("aria-current");e.classList.toggle("done",i!==k&&done.has(i));}
+  if(k===4)renderSum();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* ---------- 모눈: 반지름 4cm 원, 중심은 가운데 칸의 한가운데 ----------
+   이렇게 놓으면 원의 둘레가 모눈의 꼭짓점 가까이를 지나지 않아서, 칸마다 들어갔는지 걸쳤는지가 또렷해요.
+   완전히 들어간 칸: 중심에서 가장 먼 꼭짓점이 원 안
+   둘레가 지나가는 칸: 가장 가까운 점은 원 안인데, 가장 먼 꼭짓점은 원 밖 */
+const RAD=4,PX=42,CX=200,CY=200;
+function truth(N,s){const a=[];for(let j=0;j<N;j++)for(let i=0;i<N;i++){const x0=-N*s/2+i*s,y0=-N*s/2+j*s,x1=x0+s,y1=y0+s;
+  const fx=Math.max(Math.abs(x0),Math.abs(x1)),fy=Math.max(Math.abs(y0),Math.abs(y1));
+  const nx=(x0<=0&&x1>=0)?0:Math.min(Math.abs(x0),Math.abs(x1)),ny=(y0<=0&&y1>=0)?0:Math.min(Math.abs(y0),Math.abs(y1));
+  const df=Math.hypot(fx,fy),dn=Math.hypot(nx,ny);a.push(df<=RAD?1:(dn<RAD?2:0));}return a;}
+function counts(T){let a=0,b=0;T.forEach(v=>{if(v===1)a++;else if(v===2)b++;});return [a,b];}
+function gridSVG(N,s,cells){
+  const c=s*PX,L=CX-N*c/2,T=CY-N*c/2;let g="";
+  for(let j=0;j<N;j++)for(let i=0;i<N;i++){const k=j*N+i;g+=`<rect class="c ${cells&&cells[k]?"v"+cells[k]:""}" data-k="${k}" x="${(L+i*c).toFixed(2)}" y="${(T+j*c).toFixed(2)}" width="${c.toFixed(2)}" height="${c.toFixed(2)}"/>`;}
+  g+=`<circle cx="${CX}" cy="${CY}" r="${RAD*PX}" fill="none" stroke="var(--rim)" stroke-width="2.4" pointer-events="none"/>`;
+  g+=`<circle cx="${CX}" cy="${CY}" r="3.5" fill="var(--ink)" pointer-events="none"/>`;
+  g+=`<line x1="${CX}" y1="${CY}" x2="${CX+RAD*PX}" y2="${CY}" stroke="var(--ink)" stroke-width="1.6" stroke-dasharray="5 4" pointer-events="none"/>`;
+  g+=`<text x="${CX+RAD*PX/2}" y="${CY-6}" text-anchor="middle" style="fill:var(--ink)">반지름 4cm</text>`;
+  g+=`<text x="${CX}" y="${T+N*c+24}" text-anchor="middle">한 칸은 가로 ${s}cm, 세로 ${s}cm</text>`;
+  return g;
+}
+
+/* ---------- 1단계: 직접 칠하며 세기 ---------- */
+const T10=truth(9,1),[IN10,ED10]=counts(T10);
+let s1=new Array(81).fill(0),brush=1,painting=false,pval=0,t0=0,elapsed=0,tick=0,solved1=false;
+function draw1(){$("g1").innerHTML=gridSVG(9,1,s1);upd1();}
+function upd1(){
+  const rs=$("g1").querySelectorAll("rect.c");rs.forEach((r,k)=>{r.setAttribute("class","c"+(s1[k]?" v"+s1[k]:""));});
+  const [a,b]=counts(s1);$("cntIn").textContent=a;$("cntEdge").textContent=b;
+}
+const fmtT=sec=>sec>=3600?`${Math.floor(sec/3600)}시간 ${Math.round(sec%3600/60)}분`:sec>=60?`${Math.floor(sec/60)}분 ${Math.round(sec%60)}초`:`${Math.round(sec)}초`;
+function startClock(){if(t0||solved1)return;t0=Date.now();tick=setInterval(()=>{elapsed=(Date.now()-t0)/1000;$("clock").textContent=fmtT(elapsed);},500);}
+function stopClock(){clearInterval(tick);if(t0)elapsed=(Date.now()-t0)/1000;$("clock").textContent=fmtT(elapsed);}
+function paintAt(el){if(!el||!el.classList||!el.classList.contains("c")||solved1)return;const k=+el.dataset.k;if(s1[k]!==pval){s1[k]=pval;el.setAttribute("class","c"+(pval?" v"+pval:""));const [a,b]=counts(s1);$("cntIn").textContent=a;$("cntEdge").textContent=b;}}
+$("g1").addEventListener("pointerdown",e=>{const el=e.target;if(!el.classList.contains("c")||solved1)return;e.preventDefault();startClock();
+  $("g1").querySelectorAll(".wrong").forEach(x=>x.classList.remove("wrong"));
+  const k=+el.dataset.k;pval=(brush&&s1[k]===brush)?0:brush;painting=true;paintAt(el);});
+$("g1").addEventListener("pointermove",e=>{if(!painting)return;paintAt(document.elementFromPoint(e.clientX,e.clientY));});
+addEventListener("pointerup",()=>{painting=false;});addEventListener("pointercancel",()=>{painting=false;});
+$("pal").onclick=e=>{const b=e.target.closest(".sw");if(!b)return;brush=+b.dataset.v;$("pal").querySelectorAll(".sw").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));};
+$("clear1").onclick=()=>{if(solved1)return;s1.fill(0);draw1();$("toast1").textContent="";};
+$("check1").onclick=()=>{
+  if(solved1)return;const wrong=[];T10.forEach((v,k)=>{if(s1[k]!==v)wrong.push(k);});
+  const rs=$("g1").querySelectorAll("rect.c"),tt=$("toast1");
+  if(!wrong.length){solved1=true;stopClock();tt.className="toast ok";
+    tt.textContent=`정확해요! 세는 데 ${fmtT(elapsed)} 걸렸어요.`;$("check1").disabled=true;$("clear1").disabled=true;$("after1").hidden=false;return;}
+  wrong.forEach(k=>rs[k].classList.add("wrong"));tt.className="toast bad";
+  const miss=wrong.filter(k=>T10[k]&&!s1[k]).length,extra=wrong.filter(k=>!T10[k]&&s1[k]).length,mix=wrong.length-miss-extra;
+  const parts=[];if(miss)parts.push(`아직 안 칠한 칸 ${miss}개`);if(extra)parts.push(`원 밖인데 칠한 칸 ${extra}개`);if(mix)parts.push(`색이 바뀐 칸 ${mix}개`);
+  tt.textContent=`빨간 테두리 칸을 다시 보세요. (${parts.join(", ")}) 둘레가 칸을 조금이라도 지나가면 노란색이에요.`;
+};
+$("c1").onclick=e=>{const b=e.target.closest(".btn");if(!b||b.disabled)return;const tt=$("toast1");
+  if(b.dataset.v==="53"){b.classList.add("yes");$("c1").querySelectorAll(".btn").forEach(x=>x.disabled=true);tt.className="toast ok";
+    tt.textContent="맞아요! 37 + 32 ÷ 2 = 53이에요. 원의 넓이는 약 53cm², 반지름 × 반지름(16cm²)의 약 3.3배쯤 되겠네요.";$("next1").disabled=false;done.add(2);}
+  else{b.classList.add("no");b.disabled=true;tt.className="toast bad";tt.textContent=b.dataset.v==="69"?"69는 둘레가 지나가는 칸을 모두 한 칸씩 센 값이에요. 반 칸씩이면 더 작아져요.":"완전히 들어간 37칸에, 둘레가 지나가는 32칸의 절반을 더해 보세요.";}
+};
+$("next1").onclick=()=>{counted.add(9);table2();show(3);draw2(17,.5,null);};
+
+/* ---------- 2단계: 더 작은 칸 ---------- */
+const SIZES=[[9,1],[17,.5],[33,.25],[65,.125],[129,.0625]],LAST=SIZES.length-1;
+let rate=2,lv=1,counting=0,counted=new Set();
+/* 칸이 아주 많아지므로 2단계 그림은 캔버스로 그려요 */
+function draw2(N,s,cells){
+  const cv=$("g2"),x=cv.getContext("2d"),cs=getComputedStyle(document.documentElement),col=v=>cs.getPropertyValue(v).trim();
+  x.setTransform(2,0,0,2,0,0);x.clearRect(0,0,400,422);
+  const c=s*PX,L=CX-N*c/2,T=CY-N*c/2,fill=[col("--cell"),col("--in"),col("--edge")];
+  x.fillStyle=fill[0];x.fillRect(L,T,N*c,N*c);
+  if(cells)for(let k=0;k<cells.length;k++){if(!cells[k])continue;x.fillStyle=fill[cells[k]];x.fillRect(L+(k%N)*c,T+Math.floor(k/N)*c,c+.3,c+.3);}
+  if(c>=4){x.strokeStyle=col("--grid");x.lineWidth=c>=10?1:.5;x.beginPath();
+    for(let i=0;i<=N;i++){x.moveTo(L+i*c,T);x.lineTo(L+i*c,T+N*c);x.moveTo(L,T+i*c);x.lineTo(L+N*c,T+i*c);}x.stroke();}
+  else{x.strokeStyle=col("--grid");x.lineWidth=1;x.strokeRect(L,T,N*c,N*c);}
+  x.strokeStyle=col("--rim");x.lineWidth=2.4;x.beginPath();x.arc(CX,CY,RAD*PX,0,Math.PI*2);x.stroke();
+  x.fillStyle=col("--ink");x.beginPath();x.arc(CX,CY,3.5,0,Math.PI*2);x.fill();
+  x.strokeStyle=col("--ink");x.lineWidth=1.6;x.setLineDash([5,4]);x.beginPath();x.moveTo(CX,CY);x.lineTo(CX+RAD*PX,CY);x.stroke();x.setLineDash([]);
+  x.font='13px "Gowun Dodum", sans-serif';x.textAlign="center";x.fillText("반지름 4cm",CX+RAD*PX/2,CY-6);
+  x.fillStyle=col("--muted");x.fillText(c>=4?`한 칸은 가로 ${s}cm, 세로 ${s}cm`:`한 칸은 가로 ${s}cm, 세로 ${s}cm (너무 작아서 선을 그릴 수 없어요)`,CX,T+N*c+24);
+}
+function rowOf(N,s){const [a,b]=counts(truth(N,s));const whole=a+b,lo=a*s*s,hi=(a+b)*s*s,mid=(a+b/2)*s*s;
+  return `<tr class="${counted.has(N)&&N===SIZES[lv][0]?"hot":""}"><td>${s}cm</td><td>${whole.toLocaleString("ko-KR")}개</td><td>${+lo.toFixed(2)} ~ ${+hi.toFixed(2)}cm²</td><td>약 ${+mid.toFixed(1)}cm²</td><td>약 ${(mid/16).toFixed(2)}배</td><td>약 ${fmtT(whole*rate)}</td></tr>`;}
+function table2(){$("tbl2").innerHTML=SIZES.filter(([N])=>counted.has(N)).map(([N,s])=>rowOf(N,s)).join("");
+  $("rateNote").textContent=`'손으로 센다면'은 2단계에서 내가 한 칸을 세는 데 걸린 시간(한 칸에 약 ${rate.toFixed(1)}초)으로 어림한 거예요.`;}
+$("c2").onclick=e=>{const b=e.target.closest(".btn");if(!b||b.disabled)return;const tt=$("toast2");
+  if(b.dataset.v==="4"){b.classList.add("yes");$("c2").querySelectorAll(".btn").forEach(x=>x.disabled=true);tt.className="toast ok";
+    tt.textContent="맞아요! 1cm 칸 하나에 0.5cm 칸이 가로 2개, 세로 2개, 모두 4개 들어가요. 세야 할 칸도 거의 4배가 돼요.";$("cnt2").hidden=false;}
+  else{b.classList.add("no");b.disabled=true;tt.className="toast bad";tt.textContent="1cm 칸 하나를 0.5cm 칸으로 나누면 가로로 몇 개, 세로로 몇 개가 들어갈까요?";}
+};
+function runCount(){
+  const [N,s]=SIZES[lv],T=truth(N,s),cells=new Array(N*N).fill(0);draw2(N,s,cells);
+  const order=[];T.forEach((v,k)=>{if(v)order.push(k);});
+  $("m2s").textContent=s+"cm";$("count2").disabled=true;$("smaller2").disabled=true;
+  let i=0,a=0,b=0;const total=order.length,dur=reduce?0:4000+lv*1000,st=performance.now();
+  $("toast2").className="toast";$("toast2").textContent="컴퓨터가 칸을 하나씩 세고 있어요…";
+  const step=now=>{const want=dur?Math.min(total,Math.ceil(total*(now-st)/dur)):total;
+    for(;i<want;i++){const k=order[i];cells[k]=T[k];T[k]===1?a++:b++;}draw2(N,s,cells);
+    $("m2in").textContent=a.toLocaleString("ko-KR");$("m2edge").textContent=b.toLocaleString("ko-KR");
+    if(i<total)counting=requestAnimationFrame(step);else finishCount(N,s,a,b);};
+  counting=requestAnimationFrame(step);
+}
+function finishCount(N,s,a,b){
+  counted.add(N);table2();const whole=a+b,tt=$("toast2");tt.className="toast ok";
+  const [lo,hi]=[+(a*s*s).toFixed(2),+((a+b)*s*s).toFixed(2)];
+  if(lv===1)tt.textContent=`세야 할 칸이 69칸에서 ${whole.toLocaleString("ko-KR")}칸이 되었어요! 범위는 ${lo}~${hi}cm²로 좁아졌지만 셀 칸이 훨씬 많아졌어요.`;
+  else if(lv<LAST)tt.textContent=`이번엔 ${whole.toLocaleString("ko-KR")}칸! 범위는 ${lo}~${hi}cm²로 더 좁아졌어요. 손으로 센다면 ${fmtT(whole*rate)}쯤 걸려요.`;
+  else tt.textContent=`${whole.toLocaleString("ko-KR")}칸! 범위는 ${lo}~${hi}cm²로 아주 좁아졌지만, 손으로 센다면 ${fmtT(whole*rate)}이나 걸려요. 그래도 원의 넓이를 딱 하나로 정하지는 못했어요.`;
+  $("smaller2").disabled=lv>=LAST;if(lv>=2){$("next2").disabled=false;done.add(3);}
+}
+$("count2").onclick=runCount;
+$("smaller2").onclick=()=>{if(lv>=LAST)return;lv++;$("m2in").textContent=0;$("m2edge").textContent=0;runCount();};
+$("next2").onclick=()=>{done.add(4);show(4);};
+
+/* ---------- 3단계: 정사각형 2개 ---------- */
+const RR=150;
+function draw3(st){
+  let g="";
+  g+=`<rect x="${-RR}" y="${-RR}" width="${2*RR}" height="${2*RR}" fill="${st>=2?"var(--sq-bg)":"none"}" stroke="var(--sq)" stroke-width="3"/>`;
+  g+=`<circle cx="0" cy="0" r="${RR}" fill="var(--paper)" stroke="var(--rim)" stroke-width="2.4"/>`;
+  g+=`<polygon points="0,${-RR} ${RR},0 0,${RR} ${-RR},0" fill="${st>=1?"var(--in)":"none"}" stroke="var(--in-ink)" stroke-width="3"/>`;
+  g+=`<line x1="${-RR}" y1="0" x2="${RR}" y2="0" stroke="var(--in-ink)" stroke-width="1.6" stroke-dasharray="6 5"/><line x1="0" y1="${-RR}" x2="0" y2="${RR}" stroke="var(--in-ink)" stroke-width="1.6" stroke-dasharray="6 5"/>`;
+  g+=`<text x="${RR/2}" y="-8" text-anchor="middle" style="fill:var(--ink)">지름 8cm</text>`;
+  g+=`<text x="0" y="${RR+28}" text-anchor="middle" style="fill:var(--sq)">한 변 = 지름 8cm</text>`;
+  $("g3").innerHTML=g;
+}
+function quiz3(id,right,hints,ok){$(id).onclick=e=>{const b=e.target.closest(".btn");if(!b||b.disabled)return;const tt=$("toast3");
+  if(b.dataset.v===right){b.classList.add("yes");$(id).querySelectorAll(".btn").forEach(x=>x.disabled=true);tt.className="toast ok";ok();}
+  else{b.classList.add("no");b.disabled=true;tt.className="toast bad";tt.textContent=hints[b.dataset.v];}};}
+quiz3("c3a","32",{"16":"대각선 × 대각선 ÷ 2예요. 8 × 8 ÷ 2를 계산해 보세요.","64":"마름모는 대각선 × 대각선을 한 다음 2로 나눠야 해요."},
+  ()=>{draw3(1);$("b3a").textContent="32";$("b3a").classList.add("fill");$("toast3").textContent="맞아요! 8 × 8 ÷ 2 = 32cm²예요. 원은 이것보다 넓어요.";$("q3b").hidden=false;});
+quiz3("c3b","64",{"32":"한 변이 8cm인 정사각형이에요. 8 × 8을 계산해 보세요.","128":"정사각형 넓이는 한 변 × 한 변이에요."},
+  ()=>{draw3(2);$("b3b").textContent="64";$("b3b").classList.add("fill");$("toast3").textContent="맞아요! 8 × 8 = 64cm²예요. 계산 두 번으로 금방 가뒀어요. 그런데 범위가 꽤 넓지요?";$("ratio3").hidden=false;$("next3").disabled=false;done.add(1);});
+$("next3").onclick=()=>{show(2);};
+
+/* ---------- 마무리 ---------- */
+function renderSum(){
+  const c=(k,v,d)=>`<div class="sumc"><span class="k">${k}</span><span class="v">${v}</span><span class="d">${d}</span></div>`;
+  $("sum4").innerHTML=c("정사각형 2개로 가두기","32 ~ 64cm²","계산 두 번이면 끝나지만 범위가 넓어요.")
+    +c("모눈 1cm 칸 (직접 셈)","37 ~ 69cm²",`69칸을 세는 데 ${elapsed?fmtT(elapsed):"한참"} 걸렸어요.`)
+    +(()=>{const f=SIZES.filter(([N])=>counted.has(N)).pop()||SIZES[2],[N,sz]=f,[a,b]=counts(truth(N,sz));
+      return c(`모눈 ${sz}cm 칸 (컴퓨터가 셈)`,`${+(a*sz*sz).toFixed(2)} ~ ${+((a+b)*sz*sz).toFixed(2)}cm²`,`정확하지만 ${(a+b).toLocaleString("ko-KR")}칸을 손으로 세면 약 ${fmtT((a+b)*rate)} 걸려요.`);})()
+    ;
+}
+
+/* ---------- 처음부터 ---------- */
+function resetAll(){
+  cancelAnimationFrame(counting);clearInterval(tick);done.clear();
+  s1.fill(0);brush=1;t0=0;elapsed=0;solved1=false;rate=2;lv=1;counted=new Set();
+  $("pal").querySelectorAll(".sw").forEach(x=>x.setAttribute("aria-pressed",x.dataset.v==="1"?"true":"false"));
+  $("clock").textContent="0초";$("check1").disabled=false;$("clear1").disabled=false;$("after1").hidden=true;$("next1").disabled=true;
+  ["c1","c2","c3a","c3b"].forEach(id=>$(id).querySelectorAll(".btn").forEach(b=>{b.disabled=false;b.classList.remove("yes","no");}));
+  $("cnt2").hidden=true;$("count2").disabled=false;$("smaller2").disabled=true;$("next2").disabled=true;$("m2in").textContent=0;$("m2edge").textContent=0;$("tbl2").innerHTML="";$("rateNote").textContent="";
+  $("q3b").hidden=true;$("ratio3").hidden=true;$("next3").disabled=true;
+  [["b3a","?"],["b3b","?"]].forEach(([id,v])=>{$(id).textContent=v;$(id).classList.remove("fill");});
+  ["toast1","toast2","toast3"].forEach(id=>{$(id).textContent="";$(id).className="toast";});
+  draw1();draw3(0);show(1);
+}
+/* 1단계를 마치면 한 칸 세는 데 걸린 시간을 기록해 둬요 */
+const _check=$("check1").onclick;$("check1").onclick=()=>{_check();if(solved1&&elapsed>0)rate=Math.min(10,Math.max(.5,elapsed/(IN10+ED10)));};
+
+let resetArm=0;
+$("reset").onclick=()=>{
+  if(Date.now()-resetArm>4000){resetArm=Date.now();$("reset").textContent="정말 처음부터 할까요? 한 번 더 누르세요";setTimeout(()=>{$("reset").textContent="처음부터 다시";},4000);return;}
+  resetArm=0;$("reset").textContent="처음부터 다시";resetAll();
+};
+
+/* 선생님 바로가기: 학생용 주소(github.io)에서는 ?teacher 를 붙였을 때만 보여요.
+   버튼을 대신 누르지 않고 상태를 바로 맞춰요. */
+if(!/github\.io$/.test(location.hostname)||/teacher/.test(location.search))$("tbar").hidden=false;
+$("tbar").onclick=e=>{const b=e.target.closest("button");if(!b)return;const j=b.dataset.j;resetAll();
+  if(j==="1")return;
+  draw3(2);$("b3a").textContent="32";$("b3b").textContent="64";["b3a","b3b"].forEach(id=>$(id).classList.add("fill"));$("q3b").hidden=false;$("ratio3").hidden=false;$("next3").disabled=false;done.add(1);
+  ["c3a","c3b"].forEach(id=>$(id).querySelectorAll(".btn").forEach(x=>x.disabled=true));
+  if(j==="2"){show(2);return;}
+  T10.forEach((v,k)=>s1[k]=v);draw1();solved1=true;elapsed=138;rate=2;$("clock").textContent=fmtT(elapsed)+" (예시)";$("check1").disabled=true;$("clear1").disabled=true;$("after1").hidden=false;$("next1").disabled=false;done.add(2);
+  counted.add(9);table2();
+  if(j==="3"){show(3);draw2(17,.5,null);return;}
+  counted=new Set(SIZES.map(z=>z[0]));lv=LAST;table2();$("cnt2").hidden=false;$("next2").disabled=false;done.add(3);done.add(4);show(4);
+};
+
+resetAll();
+/* 수업 중 실수로 새로 고침하거나 나가지 않도록 */
+let touched=false;document.addEventListener("pointerdown",()=>{touched=true;},{once:true,capture:true});
+window.addEventListener("beforeunload",e=>{if(touched){e.preventDefault();e.returnValue="";}});
+</script>
+
+</html>

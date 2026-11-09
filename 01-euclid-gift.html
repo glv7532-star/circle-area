@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>유클리드의 선물</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&display=swap">
+<style>
+/* Layout: same notebook page as the other circle-unit tools; step strip on top, one card per step. Shapes sit on a 1cm grid so every length can be counted. */
+:root{
+  --bg:#efe8d8; --paper:#fbf7ee; --ink:#2f3a2c; --muted:#6c7462; --line:#d8ceb6; --grid:#d9cfb6;
+  --accent:#2d5d7b; --accent-bg:#dde8ef; --ok:#2f7a3d; --bad:#b23a48;
+  --pa:#f2c26b; --pa-edge:#b06a1f; --pb:#a9cbe3; --pb-edge:#2d5d7b; --rim:#7a3fa0; --cell:#9cc3e0;
+  --display:"Gaegu","Gowun Dodum",cursive; --body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141b26; --paper:#1f2836; --ink:#ece6d6; --muted:#a3a99c; --line:#334156; --grid:#2f3b4d;
+  --accent:#8cc0e0; --accent-bg:#1e3446; --ok:#7fd08c; --bad:#f08b97;
+  --pa:#8a6a2e; --pa-edge:#e6a65a; --pb:#2a4a63; --pb-edge:#8cc0e0; --rim:#c9a0ef; --cell:#2f5b7d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141b26; --paper:#1f2836; --ink:#ece6d6; --muted:#a3a99c; --line:#334156; --grid:#2f3b4d;
+  --accent:#8cc0e0; --accent-bg:#1e3446; --ok:#7fd08c; --bad:#f08b97;
+  --pa:#8a6a2e; --pa-edge:#e6a65a; --pb:#2a4a63; --pb-edge:#8cc0e0; --rim:#c9a0ef; --cell:#2f5b7d; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1{font-family:var(--display);font-weight:700;font-size:2.1rem;line-height:1.1;margin:0}
+.lead{margin:4px 0 0;color:var(--muted);font-size:.95rem;word-break:keep-all}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.stepi{font-size:.9rem;padding:8px 6px;border:1px solid var(--line);background:var(--paper);color:var(--muted);border-radius:8px;text-align:center;word-break:keep-all;line-height:1.25}
+.stepi b{font-family:var(--display);font-size:1.15rem;display:block;line-height:1}
+.stepi[aria-current="step"]{border-color:var(--accent);background:var(--accent-bg);color:var(--ink)}
+.stepi.done{color:var(--ink)} .stepi.done b::after{content:" \2713";font-size:.9rem;color:var(--ok)}
+@media (max-width:480px){.stepi{font-size:.76rem;padding:7px 3px}}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px}
+.card h2{font-family:var(--display);font-size:1.5rem;margin:0;line-height:1.2}
+.note{margin:0;color:var(--muted);font-size:.92rem;word-break:keep-all}
+.btn{font:inherit;font-size:1rem;padding:12px 10px;border-radius:10px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;word-break:keep-all;touch-action:manipulation}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+.btn.on{border-color:var(--accent);background:var(--accent-bg)}
+.btn.no{text-decoration:line-through;opacity:.5}
+.btn.yes{border-color:var(--ok);color:var(--ok);font-weight:700}
+.btn.fin::after{content:" \2713";color:var(--ok)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,.link:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.row .btn{flex:1 1 140px}
+.toast{min-height:1.4em;margin:0;font-size:.95rem;color:var(--accent);word-break:keep-all}
+.toast.bad{color:var(--bad)} .toast.ok{color:var(--ok)}
+.fig{width:100%;max-width:520px;height:auto;display:block;margin:0 auto;border-radius:12px;background:var(--bg)}
+.fig text{font-family:var(--body);fill:var(--ink);font-size:14px}
+.q{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border-radius:12px;background:var(--bg)}
+.q p{margin:0;word-break:keep-all}
+.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.ans{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ans input{font:inherit;font-size:1.1rem;padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);width:7em}
+.ans input:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+.ans input.err{border-color:var(--bad)}
+.ans .btn{flex:0 0 auto;padding:10px 18px}
+.errmsg{margin:0;font-size:13px;color:var(--bad);min-height:1.2em}
+.how{margin:0;padding:10px 14px;border-radius:12px;background:var(--accent-bg);font-family:var(--display);font-size:1.35rem;line-height:1.5;word-break:keep-all}
+.story{display:flex;flex-direction:column;gap:6px;padding:14px;border-radius:12px;background:var(--accent-bg)}
+.story strong{font-family:var(--display);font-size:1.35rem;line-height:1.2;word-break:keep-all}
+.story p{margin:0;word-break:keep-all}
+.tablebox{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:1rem}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);word-break:keep-all}
+th{color:var(--muted);font-weight:400}
+td:last-child{font-family:var(--display);font-size:1.2rem}
+.ask{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px;word-break:keep-all}
+.closing{margin:0;padding:14px 16px;border-radius:12px;background:var(--accent-bg);font-family:var(--display);font-size:1.4rem;line-height:1.4;text-align:center;word-break:keep-all}
+.tbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;border:1.5px dashed var(--accent);border-radius:10px;font-size:.85rem;color:var(--muted)}
+.tbar button,.tbar a{font:inherit;font-size:.85rem;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;text-decoration:none}
+.link{background:none;border:none;color:var(--muted);text-decoration:underline;font:inherit;font-size:.88rem;cursor:pointer;padding:0;align-self:flex-start}
+html,body{overscroll-behavior-y:contain}
+</style>
+
+<div class="wrap">
+  <div class="tbar" id="tbar" hidden><b>선생님 바로가기</b><button data-j="1">1단계</button><button data-j="2">2단계</button><button data-j="3">3단계</button><button data-j="4">마무리</button><a href="https://youtu.be/lwiVFwLwbA4" target="_blank" rel="noopener">영상 0:00~2:15</a></div>
+  <header>
+    <h1>유클리드의 선물</h1>
+    <p class="lead">약 2300년 전 그리스의 수학자 유클리드는 곧은 선으로 된 도형의 넓이를 구하는 방법을 깔끔하게 정리했어요. 우리가 5학년 때 배운 바로 그 방법들이에요. 유클리드가 남겨 준 선물을 다시 꺼내 볼까요?</p>
+  </header>
+
+  <nav class="steps" aria-label="단계">
+    <div class="stepi" id="tab1" aria-current="step"><b>1</b>직사각형</div>
+    <div class="stepi" id="tab2"><b>2</b>도형 변신</div>
+    <div class="stepi" id="tab3"><b>3</b>굽은 선은?</div>
+    <div class="stepi" id="tab4"><b>4</b>마무리</div>
+  </nav>
+
+  <!-- 1단계 -->
+  <section class="card" id="step1">
+    <h2>넓이는 1cm² 칸이 몇 개인지예요</h2>
+    <p class="note">넓이는 한 변이 1cm인 정사각형(1cm²)이 몇 개 들어가는지로 나타내요. 가로 6cm, 세로 4cm인 직사각형에는 1cm² 칸이 몇 개 들어갈까요?</p>
+    <svg class="fig" id="g1" viewBox="0 0 400 190" role="img" aria-label="1cm 모눈 위의 직사각형"></svg>
+    <div class="row"><button class="btn primary" id="count1">한 칸씩 세어 보기</button></div>
+    <p class="toast" id="toast1" role="status"></p>
+    <div class="q" id="q1" hidden>
+      <p>칸을 하나하나 세지 않고 한 번에 구하는 방법은 무엇일까요?</p>
+      <div class="choices" id="c1"><button class="btn" data-v="add">6 + 4</button><button class="btn" data-v="mul">6 × 4</button><button class="btn" data-v="half">6 × 4 ÷ 2</button></div>
+    </div>
+    <div class="row"><button class="btn primary" id="next1" disabled>다른 도형도 구해 보기</button></div>
+  </section>
+
+  <!-- 2단계 -->
+  <section class="card" id="step2" hidden>
+    <h2>직사각형으로 변신시켜요</h2>
+    <p class="note">5학년 때 배운 도형들은 잘라서 옮기거나, 똑같은 도형을 하나 더 붙여서 이미 아는 도형으로 바꿀 수 있어요. 도형을 하나씩 골라 '변신!'을 눌러 보세요. 한 칸은 1cm예요.</p>
+    <div class="row" id="shapeRow"></div>
+    <svg class="fig" id="g2" viewBox="0 0 400 190" role="img" aria-label="변신하는 도형"></svg>
+    <div class="row"><button class="btn primary" id="morph">변신!</button><button class="btn" id="unmorph" disabled>처음 모양으로</button></div>
+    <p class="how" id="how" hidden></p>
+    <div class="q" id="q2" hidden>
+      <p id="q2t"></p>
+      <form class="ans" id="f2" novalidate><input id="in2" type="text" inputmode="decimal" autocomplete="off" aria-label="넓이"><span>cm²</span><button class="btn primary" type="submit">확인하기</button></form>
+      <p class="errmsg" id="err2" role="alert"></p>
+    </div>
+    <p class="toast" id="toast2" role="status"></p>
+    <div class="row"><button class="btn primary" id="next2" disabled>원은 어떨까?</button></div>
+  </section>
+
+  <!-- 3단계 -->
+  <section class="card" id="step3" hidden>
+    <h2>그런데 굽은 선으로 된 도형은?</h2>
+    <svg class="fig" id="g3" viewBox="0 0 400 190" role="img" aria-label="모눈 위의 원"></svg>
+    <div class="q">
+      <p>원도 지금까지처럼 잘라서 옮기거나 붙여서, 직사각형으로 딱 맞게 바꿀 수 있을까요?</p>
+      <div class="choices" id="c3"><button class="btn" data-v="easy">쉽게 바꿀 수 있어요</button><button class="btn" data-v="hard">굽은 선 때문에 딱 맞게 바꾸기 어려워요</button></div>
+    </div>
+    <p class="toast" id="toast3" role="status"></p>
+    <div class="story" id="story3" hidden>
+      <strong>유클리드도 정복하지 못한 도형</strong>
+      <p>유클리드가 정리한 방법은 모두 곧은 선으로 된 도형을 잘라 붙여 직사각형으로 바꾸는 것이었어요. 하지만 원처럼 굽은 선으로 둘러싸인 도형은 아무리 잘라 붙여도 곧은 선으로 딱 맞아떨어지지 않았지요.</p>
+      <p>그 뒤 유클리드의 방법을 공부한 한 수학자가 이 문제에 도전했어요. 바로 시칠리아섬 시라쿠사의 <b>아르키메데스</b>예요. 아르키메데스는 이미 알고 있던 유클리드의 방법을 원에 '써먹을' 방법을 찾기 시작했어요.</p>
+    </div>
+    <div class="row"><button class="btn primary" id="next3" disabled>정리하기</button></div>
+  </section>
+
+  <!-- 마무리 -->
+  <section class="card" id="step4" hidden>
+    <h2>유클리드가 남겨 준 넓이 구하는 방법</h2>
+    <div class="tablebox"><table>
+      <thead><tr><th>도형</th><th>어떻게 바꿨나요?</th><th>넓이 구하는 방법</th></tr></thead>
+      <tbody>
+        <tr><td>직사각형</td><td>1cm² 칸을 세는 대신 곱셈</td><td>가로 × 세로</td></tr>
+        <tr><td>평행사변형</td><td>한쪽을 잘라 옮겨 직사각형으로</td><td>밑변 × 높이</td></tr>
+        <tr><td>삼각형</td><td>2개를 붙여 평행사변형으로</td><td>밑변 × 높이 ÷ 2</td></tr>
+        <tr><td>사다리꼴</td><td>2개를 붙여 평행사변형으로</td><td>(윗변 + 아랫변) × 높이 ÷ 2</td></tr>
+        <tr><td>마름모</td><td>둘러싼 직사각형의 절반</td><td>대각선 × 대각선 ÷ 2</td></tr>
+        <tr><td>원</td><td>?</td><td>?</td></tr>
+      </tbody>
+    </table></div>
+    <ol class="ask">
+      <li>직사각형의 넓이를 구할 때 칸을 하나하나 세지 않고 곱셈을 쓰는 까닭은 무엇일까요?</li>
+      <li>평행사변형, 삼각형, 사다리꼴, 마름모는 모두 어떤 도형을 이용해 넓이를 구했나요?</li>
+      <li>원의 넓이는 어떻게 구할 수 있을까요? 떠오르는 생각을 자유롭게 말해 보세요.</li>
+    </ol>
+    <p class="closing">수학자들은 긴 것과 복잡한 것을 싫어해요.<br>유클리드가 정리해 준 선물을 들고, 아르키메데스와 함께 원에 도전해 봐요!</p>
+  </section>
+
+  <button class="link" id="reset">처음부터 다시</button>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const num=s=>{const v=parseFloat(String(s).replace(",",".").trim());return isFinite(v)?v:NaN;};
+const done=new Set();
+const jo=w=>{const c=w.charCodeAt(w.length-1)-0xAC00;return w+(c>=0&&c%28?"은":"는");};
+function show(k){
+  for(const i of [1,2,3,4])$("step"+i).hidden=i!==k;
+  for(const i of [1,2,3,4]){const e=$("tab"+i);if(i===k)e.setAttribute("aria-current","step");else e.removeAttribute("aria-current");e.classList.toggle("done",i!==k&&done.has(i));}
+  if(k===2)pick(cur2);if(k===3)draw3();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+/* 모눈: 1cm = 30px, 왼쪽 위 (40,20)에서 시작 */
+const U=30,OX=40,OY=20;
+const gridBG=(w=11,h=5)=>{let g="";for(let i=0;i<=w;i++)g+=`<line x1="${OX+i*U}" y1="${OY}" x2="${OX+i*U}" y2="${OY+h*U}" stroke="var(--grid)"/>`;for(let j=0;j<=h;j++)g+=`<line x1="${OX}" y1="${OY+j*U}" x2="${OX+w*U}" y2="${OY+j*U}" stroke="var(--grid)"/>`;return g;};
+const P=(pts)=>pts.map(([x,y])=>`${OX+x*U},${OY+y*U}`).join(" ");
+
+/* ---------- 1단계 ---------- */
+let lit=0,anim1=0;
+function draw1(){let g=gridBG();
+  for(let k=0;k<24;k++){const x=k%6,y=Math.floor(k/6);g+=`<rect x="${OX+x*U+1}" y="${OY+y*U+1}" width="${U-2}" height="${U-2}" fill="${k<lit?"var(--cell)":"none"}"/>`+(k<lit?`<text x="${OX+x*U+U/2}" y="${OY+y*U+U/2+5}" text-anchor="middle" font-size="12">${k+1}</text>`:"");}
+  g+=`<rect x="${OX}" y="${OY}" width="${6*U}" height="${4*U}" fill="none" stroke="var(--pb-edge)" stroke-width="3"/>`;
+  g+=`<text x="${OX+3*U}" y="${OY+4*U+20}" text-anchor="middle">가로 6cm</text><text x="${OX+6*U+8}" y="${OY+2*U+5}">세로 4cm</text>`;
+  $("g1").innerHTML=g;}
+$("count1").onclick=()=>{$("count1").disabled=true;lit=0;const t0=performance.now(),ms=reduce?0:6000;$("toast1").className="toast";$("toast1").textContent="한 칸, 두 칸, 세 칸…";
+  const f=now=>{lit=ms?Math.min(24,Math.floor(24*(now-t0)/ms)+1):24;draw1();if(lit<24)anim1=requestAnimationFrame(f);else{$("toast1").textContent="1cm² 칸이 24개, 넓이는 24cm²예요. 그런데 하나하나 세니까 꽤 오래 걸렸지요?";$("q1").hidden=false;}};
+  anim1=requestAnimationFrame(f);};
+$("c1").onclick=e=>{const b=e.target.closest(".btn");if(!b||b.disabled)return;const tt=$("toast1");
+  if(b.dataset.v==="mul"){b.classList.add("yes");$("c1").querySelectorAll(".btn").forEach(x=>x.disabled=true);tt.className="toast ok";
+    tt.textContent="맞아요! 한 줄에 6칸씩 4줄이니 6 × 4 = 24예요. 같은 수를 여러 번 더하는 게 귀찮아서 곱셈을 만든 것처럼, 수학자들은 칸을 하나하나 세는 대신 가로 × 세로로 넓이를 구했어요.";$("next1").disabled=false;done.add(1);}
+  else{b.classList.add("no");b.disabled=true;tt.className="toast bad";tt.textContent=b.dataset.v==="add"?"6 + 4 = 10이에요. 칸은 24개였지요. 한 줄에 6칸씩 몇 줄이 있나요?":"직사각형은 칸이 꽉 차 있어요. 2로 나눌 필요가 있을까요?";}};
+$("next1").onclick=()=>show(2);
+
+/* ---------- 2단계: 변신 ----------
+   조각: 모눈 단위 꼭짓점. 변신할 때 dx,dy만큼 옮기거나, (cx,cy)를 중심으로 180도 돌려요. copy는 처음엔 숨어 있다가 나타나는 똑같은 도형이에요. */
+const SH={
+  para:{name:"평행사변형",ans:24,q:"평행사변형의 넓이는 몇 cm²일까요?",how:"평행사변형 = 직사각형 → 평행사변형의 넓이 = 밑변 × 높이",
+    lab:`<text x="${OX+3*U}" y="${OY+4*U+20}" text-anchor="middle">밑변 6cm</text>`,h:[2,0,2,4],
+    pcs:[{pts:[[2,0],[8,0],[6,4],[2,4]]},{pts:[[0,4],[2,0],[2,4]],dx:6,cut:true}],
+    wrong:{"12":"이번에는 2로 나누지 않아요. 잘라 옮긴 직사각형 그대로예요.","10":"6 + 4가 아니라 밑변 × 높이예요."}},
+  tri:{name:"삼각형",ans:12,q:"삼각형의 넓이는 몇 cm²일까요?",how:"삼각형 2개 = 평행사변형 → 삼각형의 넓이 = 밑변 × 높이 ÷ 2",
+    lab:`<text x="${OX+3*U}" y="${OY+4*U+20}" text-anchor="middle">밑변 6cm</text>`,h:[2,0,2,4],
+    pcs:[{pts:[[0,4],[6,4],[2,0]]},{pts:[[0,4],[6,4],[2,0]],copy:true,cx:4,cy:2}],
+    wrong:{"24":"그건 삼각형 2개를 붙인 평행사변형의 넓이예요. 삼각형은 그 절반이에요."}},
+  trap:{name:"사다리꼴",ans:18,q:"사다리꼴의 넓이는 몇 cm²일까요?",how:"사다리꼴 2개 = 평행사변형 → 사다리꼴의 넓이 = (윗변 + 아랫변) × 높이 ÷ 2",
+    lab:`<text x="${OX+2.5*U}" y="${OY-6}" text-anchor="middle">윗변 3cm</text><text x="${OX+3*U}" y="${OY+4*U+20}" text-anchor="middle">아랫변 6cm</text>`,h:[1,0,1,4],
+    pcs:[{pts:[[1,0],[4,0],[6,4],[0,4]]},{pts:[[1,0],[4,0],[6,4],[0,4]],copy:true,cx:5,cy:2}],
+    wrong:{"36":"그건 사다리꼴 2개를 붙인 평행사변형의 넓이예요. 사다리꼴은 그 절반이에요.","9":"윗변과 아랫변을 더한 다음, 높이를 곱하고 2로 나눠요."}},
+  rhom:{name:"마름모",ans:12,q:"마름모의 넓이는 몇 cm²일까요?",how:"마름모 = 둘러싼 직사각형의 절반 → 마름모의 넓이 = 대각선 × 대각선 ÷ 2",
+    lab:`<text x="${OX+3*U}" y="${OY+2*U-6}" text-anchor="middle">대각선 6cm</text><text x="${OX+3*U+6}" y="${OY+3.3*U}">대각선 4cm</text>`,h:null,diag:true,
+    pcs:[{pts:[[0,2],[3,0],[6,2],[3,4]]},
+         {pts:[[0,0],[3,0],[0,2]],cx:1.5,cy:1,outer:true},{pts:[[3,0],[6,0],[6,2]],cx:4.5,cy:1,outer:true},
+         {pts:[[6,2],[6,4],[3,4]],cx:4.5,cy:3,outer:true},{pts:[[0,2],[3,4],[0,4]],cx:1.5,cy:3,outer:true}],
+    wrong:{"24":"그건 마름모를 둘러싼 직사각형의 넓이예요. 바깥 삼각형 4개가 안쪽으로 접혀 들어가 꼭 맞았지요?"}}
+};
+const ORDER=["para","tri","trap","rhom"];let cur2="para",t2=0,anim2=0,fin=new Set();
+$("shapeRow").innerHTML=ORDER.map(k=>`<button class="btn" data-k="${k}">${SH[k].name}</button>`).join("");
+function draw2(){const s=SH[cur2],e=t2<.5?2*t2*t2:1-(-2*t2+2)**2/2;let g=gridBG();
+  s.pcs.forEach(p=>{
+    if(p.copy&&t2===0)return;
+    const fill=p.copy?"var(--pb)":p.outer?(t2>0?"var(--pb)":"none"):"var(--pa)",edge=p.copy||p.outer?"var(--pb-edge)":"var(--pa-edge)";
+    let tr="";if(p.dx)tr=`translate(${p.dx*U*e} 0)`;if(p.cx!=null)tr=`rotate(${180*e} ${OX+p.cx*U} ${OY+p.cy*U})`;
+    g+=`<polygon points="${P(p.pts)}" transform="${tr}" fill="${fill}" stroke="${edge}" stroke-width="${p.outer&&t2===0?1.5:2.5}" ${p.outer&&t2===0?'stroke-dasharray="5 4"':""} fill-opacity="${p.copy||p.outer?.85:1}"/>`;
+    if(p.cut&&t2===0)g+=`<line x1="${OX+2*U}" y1="${OY}" x2="${OX+2*U}" y2="${OY+4*U}" stroke="var(--bad)" stroke-width="2" stroke-dasharray="6 4"/>`;});
+  if(s.h){const [x1,y1,x2,y2]=s.h;g+=`<line x1="${OX+x1*U}" y1="${OY+y1*U}" x2="${OX+x2*U}" y2="${OY+y2*U}" stroke="var(--bad)" stroke-width="2" stroke-dasharray="4 3"/><text x="${OX+x1*U+6}" y="${OY+2*U+5}" style="fill:var(--bad)">높이 4cm</text>`;}
+  if(s.diag)g+=`<line x1="${OX}" y1="${OY+2*U}" x2="${OX+6*U}" y2="${OY+2*U}" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="4 3"/><line x1="${OX+3*U}" y1="${OY}" x2="${OX+3*U}" y2="${OY+4*U}" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+  g+=s.lab;$("g2").innerHTML=g;}
+function pick(k){cur2=k;cancelAnimationFrame(anim2);t2=0;draw2();
+  $("shapeRow").querySelectorAll(".btn").forEach(b=>{b.classList.toggle("on",b.dataset.k===k);b.classList.toggle("fin",fin.has(b.dataset.k));});
+  $("morph").disabled=false;$("unmorph").disabled=true;$("how").hidden=true;$("q2").hidden=true;$("in2").value="";$("in2").disabled=fin.has(k);$("err2").textContent="";$("toast2").textContent="";
+  if(fin.has(k)){$("toast2").className="toast ok";$("toast2").textContent=`${jo(SH[k].name)} 이미 구했어요. 변신을 다시 보거나 다른 도형을 골라 보세요.`;}}
+$("shapeRow").onclick=e=>{const b=e.target.closest(".btn");if(!b)return;pick(b.dataset.k);};
+function animate2(target,cb){cancelAnimationFrame(anim2);const s0=t2,t0=performance.now(),ms=reduce?0:1500;
+  const f=now=>{const k=ms?Math.min(1,(now-t0)/ms):1;t2=s0+(target-s0)*k;draw2();if(k<1)anim2=requestAnimationFrame(f);else cb&&cb();};anim2=requestAnimationFrame(f);}
+$("morph").onclick=()=>{$("morph").disabled=true;animate2(1,()=>{$("unmorph").disabled=false;const s=SH[cur2];$("how").textContent=s.how;$("how").hidden=false;
+  $("q2t").textContent=s.q;$("q2").hidden=false;if(!fin.has(cur2))$("in2").focus({preventScroll:true});});};
+$("unmorph").onclick=()=>{$("unmorph").disabled=true;animate2(0,()=>{$("morph").disabled=false;});};
+$("in2").addEventListener("input",()=>{$("err2").textContent="";$("in2").classList.remove("err");});
+$("f2").addEventListener("submit",e=>{e.preventDefault();if($("in2").disabled)return;const s=SH[cur2],v=num($("in2").value),tt=$("toast2");
+  if(isNaN(v)){$("in2").classList.add("err");$("err2").textContent="넓이를 수로 적어 주세요.";$("in2").focus();return;}
+  if(Math.abs(v-s.ans)<1e-6){fin.add(cur2);$("in2").disabled=true;tt.className="toast ok";
+    const left=ORDER.filter(k=>!fin.has(k)).map(k=>SH[k].name);
+    tt.textContent=`맞아요! ${s.name}의 넓이는 ${s.ans}cm²예요.`+(left.length?` 남은 도형: ${left.join(", ")}`:" 네 도형을 모두 구했어요!");
+    $("shapeRow").querySelector(`[data-k="${cur2}"]`).classList.add("fin");
+    if(!left.length){$("next2").disabled=false;done.add(2);}return;}
+  tt.className="toast bad";tt.textContent=s.wrong[String(v)]||"그림에서 길이를 찾아 위의 방법에 넣고 다시 계산해 보세요.";});
+$("next2").onclick=()=>show(3);
+
+/* ---------- 3단계 ---------- */
+function draw3(){let g=gridBG();g+=`<circle cx="${OX+5.5*U}" cy="${OY+2.5*U}" r="${2.3*U}" fill="var(--pa)" stroke="var(--rim)" stroke-width="3"/>`;$("g3").innerHTML=g;}
+$("c3").onclick=e=>{const b=e.target.closest(".btn");if(!b||b.disabled)return;const tt=$("toast3");
+  if(b.dataset.v==="hard"){b.classList.add("yes");$("c3").querySelectorAll(".btn").forEach(x=>x.disabled=true);tt.className="toast ok";tt.textContent="맞아요. 굽은 선은 잘라 붙여도 곧은 선과 딱 맞지 않아요.";$("story3").hidden=false;$("next3").disabled=false;done.add(3);}
+  else{b.classList.add("no");b.disabled=true;tt.className="toast bad";tt.textContent="원을 잘라서 옮기면 가장자리가 어떤 모양일까요? 곧은 선끼리 딱 맞을 수 있을지 생각해 보세요.";}};
+$("next3").onclick=()=>{done.add(4);show(4);};
+
+/* ---------- 처음부터 ---------- */
+function resetAll(){
+  cancelAnimationFrame(anim1);cancelAnimationFrame(anim2);done.clear();lit=0;fin=new Set();cur2="para";
+  $("count1").disabled=false;$("q1").hidden=true;$("next1").disabled=true;$("next2").disabled=true;$("next3").disabled=true;$("story3").hidden=true;
+  ["c1","c3"].forEach(id=>$(id).querySelectorAll(".btn").forEach(b=>{b.disabled=false;b.classList.remove("yes","no");}));
+  ["toast1","toast2","toast3"].forEach(id=>{$(id).textContent="";$(id).className="toast";});
+  draw1();show(1);
+}
+let resetArm=0;
+$("reset").onclick=()=>{
+  if(Date.now()-resetArm>4000){resetArm=Date.now();$("reset").textContent="정말 처음부터 할까요? 한 번 더 누르세요";setTimeout(()=>{$("reset").textContent="처음부터 다시";},4000);return;}
+  resetArm=0;$("reset").textContent="처음부터 다시";resetAll();
+};
+/* 선생님 바로가기: 학생용 주소(github.io)에서는 ?teacher 를 붙였을 때만 보여요. 버튼을 대신 누르지 않고 상태를 바로 맞춰요. */
+if(!/github\.io$/.test(location.hostname)||/teacher/.test(location.search))$("tbar").hidden=false;
+$("tbar").onclick=e=>{const b=e.target.closest("button");if(!b)return;const j=b.dataset.j;resetAll();
+  if(j==="1")return;
+  lit=24;draw1();$("count1").disabled=true;$("q1").hidden=false;$("c1").querySelectorAll(".btn").forEach(x=>x.disabled=true);$("next1").disabled=false;done.add(1);
+  if(j==="2"){show(2);return;}
+  fin=new Set(ORDER);$("next2").disabled=false;done.add(2);
+  if(j==="3"){show(3);return;}
+  $("story3").hidden=false;$("c3").querySelectorAll(".btn").forEach(x=>x.disabled=true);$("next3").disabled=false;done.add(3);done.add(4);show(4);
+};
+
+resetAll();
+/* 수업 중 실수로 새로 고침하거나 나가지 않도록 */
+let touched=false;document.addEventListener("pointerdown",()=>{touched=true;},{once:true,capture:true});
+window.addEventListener("beforeunload",e=>{if(touched){e.preventDefault();e.returnValue="";}});
+</script>
+
+</html>
