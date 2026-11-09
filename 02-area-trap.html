@@ -96,6 +96,8 @@ tr.hot td{background:var(--accent-bg)}
 .tbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;border:1.5px dashed var(--accent);border-radius:10px;font-size:.85rem;color:var(--muted)}
 .tbar button{font:inherit;font-size:.85rem;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
 .link{background:none;border:none;color:var(--muted);text-decoration:underline;font:inherit;font-size:.88rem;cursor:pointer;padding:0;align-self:flex-start}
+.k-in{color:var(--in-ink);font-weight:700}
+.k-out{color:var(--sq);font-weight:700}
 html,body{overscroll-behavior-y:contain}
 </style>
 
@@ -116,16 +118,16 @@ html,body{overscroll-behavior-y:contain}
   <!-- 1단계 -->
   <section class="card" id="step1">
     <h2>정사각형 2개로 원을 가둬요</h2>
-    <p class="note">반지름이 4cm인 원이에요. 먼저 5학년 때 배운 공식으로 원을 가둬 봐요. 원 안쪽에는 꼭짓점이 원에 닿는 정사각형, 바깥쪽에는 원을 꼭 감싸는 정사각형이 있어요.</p>
+    <p class="note">반지름이 4cm인 원이에요. 먼저 5학년 때 배운 공식으로 원을 가둬 봐요. 원 안쪽에는 꼭짓점이 원에 닿는 <span class="k-in">안쪽 정사각형</span>, 바깥쪽에는 원을 꼭 감싸는 <span class="k-out">바깥쪽 정사각형</span>이 있어요.</p>
     <div class="split">
       <svg class="fig" id="g3" viewBox="-200 -200 400 400" role="img" aria-label="원과 안쪽, 바깥쪽 정사각형"></svg>
       <div class="side">
         <div class="q" id="q3a">
-          <p>안쪽 정사각형은 두 대각선이 모두 <b>지름(8cm)</b>이에요. 마름모 넓이 구하는 방법(대각선 × 대각선 ÷ 2)을 쓰면 넓이는?</p>
+          <p><span class="k-in">안쪽 정사각형</span>은 두 대각선이 모두 <b>지름(8cm)</b>이에요. 마름모 넓이 구하는 방법(대각선 × 대각선 ÷ 2)을 쓰면 넓이는?</p>
           <div class="choices" id="c3a"><button class="btn" data-v="16">16cm²</button><button class="btn" data-v="32">32cm²</button><button class="btn" data-v="64">64cm²</button></div>
         </div>
         <div class="q" id="q3b" hidden>
-          <p>바깥쪽 정사각형은 한 변이 <b>지름(8cm)</b>이에요. 넓이는?</p>
+          <p><span class="k-out">바깥쪽 정사각형</span>은 한 변이 <b>지름(8cm)</b>이에요. 넓이는?</p>
           <div class="choices" id="c3b"><button class="btn" data-v="32">32cm²</button><button class="btn" data-v="64">64cm²</button><button class="btn" data-v="128">128cm²</button></div>
         </div>
         <p class="sent">원의 넓이는 <span class="blank" id="b3a">?</span>cm²보다 크고 <span class="blank" id="b3b">?</span>cm²보다 작아요.</p>
