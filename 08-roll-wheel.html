@@ -109,6 +109,7 @@ html,body{overscroll-behavior-y:contain}
       <form class="ans" id="f1" novalidate><input id="in1" type="text" inputmode="decimal" autocomplete="off" aria-label="예상한 거리"><span class="u">cm</span><button class="btn primary" type="submit" id="roll1">굴려 보기</button></form>
       <p class="errmsg" id="err1" role="alert"></p>
     </div>
+    <p class="note" id="need1">지름 10cm, 20cm, 30cm 바퀴를 모두 맞혀야 다음 단계로 갈 수 있어요. (0/3)</p>
     <p class="toast" id="toast1" role="status"></p>
     <ul class="rec" id="rec1"></ul>
     <div class="row"><button class="btn primary" id="next1" disabled>거꾸로 해 보기</button></div>
@@ -194,6 +195,9 @@ function roll(d,cb){
 
 /* ---------- 1단계 ---------- */
 let d1=10,ok1=new Set();
+const DS=[10,20,30];
+function mark1(){$("dRow").querySelectorAll(".btn").forEach(x=>{x.textContent=x.dataset.d+"cm"+(ok1.has(+x.dataset.d)?" ✓":"");});
+  $("need1").textContent=ok1.size>=3?"세 바퀴를 모두 맞혔어요!":`지름 10cm, 20cm, 30cm 바퀴를 모두 맞혀야 다음 단계로 갈 수 있어요. (${ok1.size}/3)`;}
 $("dRow").onclick=e=>{const b=e.target.closest(".btn");if(!b||rolling)return;d1=+b.dataset.d;$("dRow").querySelectorAll(".btn").forEach(x=>x.classList.toggle("on",x===b));
   $("p1").innerHTML=`지름이 <b>${d1}cm</b>인 바퀴가 한 바퀴 굴러가면 몇 cm를 갈지 먼저 계산해 보세요.`;$("in1").value="";$("err1").textContent="";$("toast1").textContent="";wheelSVG(d1,0,[],null);};
 $("in1").addEventListener("input",()=>{$("err1").textContent="";$("in1").classList.remove("err");});
@@ -205,8 +209,9 @@ $("f1").addEventListener("submit",e=>{e.preventDefault();if(rolling)return;
     else if(near(v,d1/2*PI)){tt.className="toast bad";tt.textContent=`실제로는 ${fx(C)}cm를 갔어요. 반지름에 3.14를 곱하지 않았나요? 원주는 지름 × 3.14예요.`;}
     else{tt.className="toast bad";tt.textContent=`실제로는 ${fx(C)}cm를 갔어요. 원주 = 지름 × 3.14로 다시 계산해 보세요.`;}
     $("rec1").insertAdjacentHTML("beforeend",`<li>지름 ${d1}cm: 예상 ${v}cm → 실제 ${fx(C)}cm ${hit?"✓":""}</li>`);
-    if(ok1.size>=2&&$("next1").disabled){$("next1").disabled=false;done.add(1);tt.textContent+=" 두 가지 바퀴를 맞혔어요. 다음 단계로 가 봐요!";}
-    else if(hit&&ok1.size<2)tt.textContent+=" 다른 지름의 바퀴도 계산해서 굴려 보세요.";});
+    mark1();
+    if(ok1.size>=3&&$("next1").disabled){$("next1").disabled=false;done.add(1);tt.textContent+=" 세 바퀴를 모두 맞혔어요. 다음 단계로 가 봐요!";}
+    else if(hit&&ok1.size<3)tt.textContent+=` 이번에는 지름 ${DS.filter(x=>!ok1.has(x)).join("cm, ")}cm 바퀴를 골라서 굴려 보세요.`;});
 });
 $("next1").onclick=()=>{show(2);setup2();};
 
@@ -262,7 +267,7 @@ $("next3").onclick=()=>{done.add(4);show(4);};
 
 /* ---------- 처음부터 ---------- */
 function resetAll(){
-  cancelAnimationFrame(anim);rolling=false;done.clear();flag=null;d1=10;ok1=new Set();
+  cancelAnimationFrame(anim);rolling=false;done.clear();flag=null;d1=10;ok1=new Set();mark1();
   $("dRow").querySelectorAll(".btn").forEach(x=>x.classList.toggle("on",x.dataset.d==="10"));
   $("p1").innerHTML=`지름이 <b>10cm</b>인 바퀴가 한 바퀴 굴러가면 몇 cm를 갈지 먼저 계산해 보세요.`;
   $("in1").value="";$("err1").textContent="";$("rec1").innerHTML="";$("next1").disabled=true;$("next2").disabled=true;
@@ -279,7 +284,7 @@ $("reset").onclick=()=>{
 if(!/github\.io$/.test(location.hostname)||/teacher/.test(location.search))$("tbar").hidden=false;
 $("tbar").onclick=e=>{const b=e.target.closest("button");if(!b)return;const j=b.dataset.j;resetAll();
   if(j==="1")return;
-  ok1=new Set([10,20]);$("rec1").innerHTML=`<li>지름 10cm: 예상 31.4cm → 실제 31.4cm ✓ (예시)</li><li>지름 20cm: 예상 62.8cm → 실제 62.8cm ✓ (예시)</li>`;$("next1").disabled=false;done.add(1);
+  ok1=new Set(DS);mark1();$("rec1").innerHTML=`<li>지름 10cm: 예상 31.4cm → 실제 31.4cm ✓ (예시)</li><li>지름 20cm: 예상 62.8cm → 실제 62.8cm ✓ (예시)</li><li>지름 30cm: 예상 94.2cm → 실제 94.2cm ✓ (예시)</li>`;$("next1").disabled=false;done.add(1);
   show(2);setup2();if(j==="2")return;
   $("q2").hidden=false;$("c2").querySelectorAll(".btn").forEach(x=>x.disabled=true);$("next2").disabled=false;done.add(2);
   if(j==="3"){show(3);setup3(0);return;}
