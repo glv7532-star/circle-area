@@ -108,6 +108,8 @@ tr.hot td{background:var(--accent-bg)}
 .legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.85rem;color:var(--muted);justify-content:center}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 .legend i{width:18px;height:0;border-top:3px solid;display:inline-block}
+.k-in{color:var(--inner);font-weight:700}
+.k-out{color:var(--outer);font-weight:700}
 html,body{overscroll-behavior-y:contain}
 </style>
 
@@ -128,7 +130,7 @@ html,body{overscroll-behavior-y:contain}
   <!-- 1단계 -->
   <section class="card" id="step1">
     <h2>원을 두 도형 사이에 가둬요</h2>
-    <p class="note">지름이 10cm인 원이에요. 안쪽에는 정육각형, 바깥쪽에는 정사각형이 있어요. 두 도형의 둘레는 우리가 아는 것만으로 구할 수 있어요.</p>
+    <p class="note">지름이 10cm인 원이에요. 안쪽에는 <span class="k-in">정육각형</span>, 바깥쪽에는 <span class="k-out">정사각형</span>이 있어요. 두 도형의 둘레는 우리가 아는 것만으로 구할 수 있어요.</p>
     <div class="split">
       <div>
         <svg class="fig" id="fig1" viewBox="-185 -185 370 370" role="img" aria-label="원과 안쪽 정육각형, 바깥쪽 정사각형"></svg>
@@ -136,11 +138,11 @@ html,body{overscroll-behavior-y:contain}
       </div>
       <div class="side">
         <div class="q" id="q1">
-          <p>안쪽 정육각형은 <b>정삼각형 6개</b>로 나눌 수 있어요. 정삼각형 한 변은 원의 반지름(5cm)과 같아요. 정육각형의 둘레는 몇 cm일까요?</p>
+          <p><span class="k-in">안쪽 정육각형</span>은 <b>정삼각형 6개</b>로 나눌 수 있어요. 정삼각형 한 변은 원의 반지름(5cm)과 같아요. 정육각형의 둘레는 몇 cm일까요?</p>
           <div class="choices" id="c1"><button class="btn" data-v="25">25cm</button><button class="btn" data-v="30">30cm</button><button class="btn" data-v="40">40cm</button></div>
         </div>
         <div class="q" id="q2" hidden>
-          <p>바깥쪽 정사각형의 한 변은 원의 지름(10cm)과 같아요. 정사각형의 둘레는 몇 cm일까요?</p>
+          <p><span class="k-out">바깥쪽 정사각형</span>의 한 변은 원의 지름(10cm)과 같아요. 정사각형의 둘레는 몇 cm일까요?</p>
           <div class="choices" id="c2"><button class="btn" data-v="20">20cm</button><button class="btn" data-v="40">40cm</button><button class="btn" data-v="50">50cm</button></div>
         </div>
         <p class="sent" id="sent1">원의 둘레는 지름의 <span class="blank in" id="b1a">?</span>배보다 길고, <span class="blank out" id="b1b">?</span>배보다 짧아요.</p>
@@ -153,7 +155,7 @@ html,body{overscroll-behavior-y:contain}
   <!-- 2단계 -->
   <section class="card" id="step2" hidden>
     <h2>아르키메데스의 길을 따라 96각형까지</h2>
-    <p class="note">아르키메데스는 바깥쪽에도 정육각형을 그리고, 변의 수를 두 배씩 늘려 원을 점점 더 꽉 가뒀어요. 이 계산에는 6학년이 아직 배우지 않은 계산(제곱근)이 필요해서 컴퓨터가 대신 해 줄게요.</p>
+    <p class="note">아르키메데스는 <span class="k-out">바깥쪽에도 정육각형</span>을 그리고, 변의 수를 두 배씩 늘려 원을 점점 더 꽉 가뒀어요. 이 계산에는 6학년이 아직 배우지 않은 계산(제곱근)이 필요해서 컴퓨터가 대신 해 줄게요.</p>
     <div class="split">
       <div>
         <svg class="fig" id="fig2" viewBox="-185 -185 370 370" role="img" aria-label="원과 안쪽, 바깥쪽 정다각형"></svg>
@@ -162,8 +164,8 @@ html,body{overscroll-behavior-y:contain}
       <div class="side">
         <div class="ngon" id="ngon2">정6각형<small>변 6개</small></div>
         <div class="vals">
-          <div class="val in"><span>안쪽 둘레는 지름의</span><b id="vin2">3.0000</b><span>배</span></div>
-          <div class="val out"><span>바깥쪽 둘레는 지름의</span><b id="vout2">3.4641</b><span>배</span></div>
+          <div class="val in"><span><span class="k-in">안쪽 둘레</span>는 지름의</span><b id="vin2">3.0000</b><span>배</span></div>
+          <div class="val out"><span><span class="k-out">바깥쪽 둘레</span>는 지름의</span><b id="vout2">3.4641</b><span>배</span></div>
         </div>
         <div class="bar"><svg id="bar2" viewBox="0 0 400 54" role="img" aria-label="원의 둘레가 들어 있는 범위"></svg></div>
         <p class="sent" id="sent2"></p>
@@ -184,7 +186,7 @@ html,body{overscroll-behavior-y:contain}
       <p>컴퓨터가 계산한 값(<span id="archOurs"></span>)이 그 범위 안에 쏙 들어가요.</p>
     </div>
     <div class="tablebox"><table>
-      <thead><tr><th>정다각형</th><th>안쪽 둘레 (지름의 몇 배)</th><th>바깥쪽 둘레 (지름의 몇 배)</th><th>두 값의 차이</th></tr></thead>
+      <thead><tr><th>정다각형</th><th><span class="k-in">안쪽 둘레</span> (지름의 몇 배)</th><th><span class="k-out">바깥쪽 둘레</span> (지름의 몇 배)</th><th>두 값의 차이</th></tr></thead>
       <tbody id="tbl2"></tbody>
     </table></div>
     <div class="row"><button class="btn primary" id="next2" disabled>아르키메데스보다 더 멀리 가 보기</button></div>
@@ -194,7 +196,7 @@ html,body{overscroll-behavior-y:contain}
   <section class="card" id="step3" hidden>
     <h2>아르키메데스보다 더 멀리</h2>
     <div class="q" id="pred">
-      <p>컴퓨터는 지치지 않아요. 변의 수를 끝없이 늘리면, 안쪽 값과 바깥쪽 값이 언젠가 <b>똑같아질까요</b>? 먼저 내 생각을 골라요.</p>
+      <p>컴퓨터는 지치지 않아요. 변의 수를 끝없이 늘리면, <span class="k-in">안쪽 값</span>과 <span class="k-out">바깥쪽 값</span>이 언젠가 <b>똑같아질까요</b>? 먼저 내 생각을 골라요.</p>
       <div class="opts" id="predOpts" role="group" aria-label="내 생각">
         <button class="opt" data-p="same" aria-pressed="false">언젠가 똑같아진다</button>
         <button class="opt" data-p="never" aria-pressed="false">점점 가까워지지만 똑같아지지는 않는다</button>
@@ -204,8 +206,8 @@ html,body{overscroll-behavior-y:contain}
     <div id="play3" hidden style="display:flex;flex-direction:column;gap:12px">
       <div class="ngon" id="ngon3"></div>
       <div class="vals">
-        <div class="val in"><span>안쪽 둘레는 지름의</span><b id="vin3"></b><span>배</span></div>
-        <div class="val out"><span>바깥쪽 둘레는 지름의</span><b id="vout3"></b><span>배</span></div>
+        <div class="val in"><span><span class="k-in">안쪽 둘레</span>는 지름의</span><b id="vin3"></b><span>배</span></div>
+        <div class="val out"><span><span class="k-out">바깥쪽 둘레</span>는 지름의</span><b id="vout3"></b><span>배</span></div>
       </div>
       <div>
         <p class="note">두 값에서 똑같은 자리까지는 이제 확실해요. 원의 둘레는 지름의</p>
