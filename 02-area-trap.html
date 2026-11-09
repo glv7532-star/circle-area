@@ -177,19 +177,35 @@ html,body{overscroll-behavior-y:contain}
     <h2>칸을 더 작게 하면 더 정확해질까?</h2>
     <p class="note">칸이 작을수록 원의 둘레에 걸친 부분이 줄어들어 더 정확해져요. 그런데 세야 할 칸은 어떻게 될까요?</p>
     <div class="split">
-      <canvas class="fig" id="g2" width="800" height="844" role="img" aria-label="더 작은 모눈 위의 원"></canvas>
+      <div><svg class="fig paint" id="g2s" viewBox="0 0 400 422" role="img" aria-label="0.5cm 모눈 위의 원"></svg>
+      <canvas class="fig" id="g2" width="800" height="844" role="img" aria-label="더 작은 모눈 위의 원" hidden></canvas></div>
       <div class="side">
         <div class="q" id="q2">
           <p>칸 한 변의 길이를 1cm에서 <b>0.5cm</b>로 줄이면, 같은 곳에 들어가는 칸은 몇 배가 될까요?</p>
           <div class="choices" id="c2"><button class="btn" data-v="2">2배</button><button class="btn" data-v="4">4배</button><button class="btn" data-v="8">8배</button></div>
         </div>
+        <div id="man2" hidden style="display:flex;flex-direction:column;gap:12px">
+          <p class="note">이번에도 직접 칠하며 세어 보세요. 칠하는 방법은 앞과 같아요. 둘레가 칸의 모서리를 아슬아슬하게 스치고 지나가는 칸은 어느 색으로 칠해도 괜찮아요.</p>
+          <div class="palette" id="pal2" role="group" aria-label="칠할 색">
+            <button class="sw" data-v="1" aria-pressed="true"><span style="background:var(--in)"></span>완전히 들어간 칸</button>
+            <button class="sw" data-v="2" aria-pressed="false"><span style="background:var(--edge)"></span>둘레가 지나가는 칸</button>
+            <button class="sw" data-v="0" aria-pressed="false"><span style="background:var(--cell)"></span>지우개</button>
+          </div>
+          <div class="meters">
+            <div class="meter in"><span>완전히 들어간 칸</span><b id="cntIn2">0</b></div>
+            <div class="meter edge"><span>둘레가 지나가는 칸</span><b id="cntEdge2">0</b></div>
+            <div class="meter"><span>세는 데 걸린 시간</span><b id="clock2">0초</b></div>
+          </div>
+          <div class="row"><button class="btn" id="clear2">모두 지우기</button><button class="btn primary" id="check2">다 셌어요</button></div>
+          <button class="link" id="giveup2" hidden>너무 오래 걸려요. 컴퓨터에게 맡길래요</button>
+        </div>
         <div id="cnt2" hidden style="display:flex;flex-direction:column;gap:10px">
           <div class="meters">
-            <div class="meter"><span>칸 한 변</span><b id="m2s">0.5cm</b></div>
+            <div class="meter"><span>칸 한 변</span><b id="m2s">0.25cm</b></div>
             <div class="meter in"><span>완전히 들어간 칸</span><b id="m2in">0</b></div>
             <div class="meter edge"><span>둘레가 지나가는 칸</span><b id="m2edge">0</b></div>
           </div>
-          <div class="row"><button class="btn primary" id="count2">컴퓨터가 대신 세기</button><button class="btn" id="smaller2" disabled>칸을 더 작게</button></div>
+          <div class="row"><button class="btn primary" id="smaller2">칸을 더 작게 (컴퓨터가 세기)</button></div>
         </div>
         <p class="toast" id="toast2" role="status"></p>
       </div>
@@ -286,7 +302,7 @@ $("c1").onclick=e=>{const b=e.target.closest(".btn");if(!b||b.disabled)return;co
     tt.textContent="맞아요! 37 + 32 ÷ 2 = 53이에요. 원의 넓이는 약 53cm², 반지름 × 반지름(16cm²)의 약 3.3배쯤 되겠네요.";$("next1").disabled=false;done.add(2);}
   else{b.classList.add("no");b.disabled=true;tt.className="toast bad";tt.textContent=b.dataset.v==="69"?"69는 둘레가 지나가는 칸을 모두 한 칸씩 센 값이에요. 반 칸씩이면 더 작아져요.":"완전히 들어간 37칸에, 둘레가 지나가는 32칸의 절반을 더해 보세요.";}
 };
-$("next1").onclick=()=>{counted.add(9);table2();show(3);draw2(17,.5,null);};
+$("next1").onclick=()=>{counted.add(9);table2();show(3);};
 
 /* ---------- 2단계: 더 작은 칸 ---------- */
 const SIZES=[[9,1],[17,.5],[33,.25],[65,.125],[129,.0625]],LAST=SIZES.length-1;
@@ -313,13 +329,52 @@ function table2(){$("tbl2").innerHTML=SIZES.filter(([N])=>counted.has(N)).map(([
   $("rateNote").textContent=`'손으로 센다면'은 2단계에서 내가 한 칸을 세는 데 걸린 시간(한 칸에 약 ${rate.toFixed(1)}초)으로 어림한 거예요.`;}
 $("c2").onclick=e=>{const b=e.target.closest(".btn");if(!b||b.disabled)return;const tt=$("toast2");
   if(b.dataset.v==="4"){b.classList.add("yes");$("c2").querySelectorAll(".btn").forEach(x=>x.disabled=true);tt.className="toast ok";
-    tt.textContent="맞아요! 1cm 칸 하나에 0.5cm 칸이 가로 2개, 세로 2개, 모두 4개 들어가요. 세야 할 칸도 거의 4배가 돼요.";$("cnt2").hidden=false;}
+    tt.textContent="맞아요! 1cm 칸 하나에 0.5cm 칸이 가로 2개, 세로 2개, 모두 4개 들어가요. 세야 할 칸도 거의 4배가 돼요. 정말 그런지 직접 칠하며 세어 볼까요?";$("man2").hidden=false;}
   else{b.classList.add("no");b.disabled=true;tt.className="toast bad";tt.textContent="1cm 칸 하나를 0.5cm 칸으로 나누면 가로로 몇 개, 세로로 몇 개가 들어갈까요?";}
 };
+/* ---------- 0.5cm 칸: 직접 칠하며 세기 ----------
+   0.5cm 모눈에서는 원의 둘레가 몇몇 칸의 모서리를 아주 가깝게(칸 크기의 10%쯤) 지나가요.
+   그런 칸은 눈으로 판단하기 어려우니, 파랑이든 노랑이든 맞은 것으로 쳐요. */
+const T05=truth(17,.5),AMB05=(()=>{const N=17,s=.5,a=new Set();for(let j=0;j<N;j++)for(let i=0;i<N;i++){const x0=-N*s/2+i*s,y0=-N*s/2+j*s,x1=x0+s,y1=y0+s;
+  const fx=Math.max(Math.abs(x0),Math.abs(x1)),fy=Math.max(Math.abs(y0),Math.abs(y1)),nx=(x0<=0&&x1>=0)?0:Math.min(Math.abs(x0),Math.abs(x1)),ny=(y0<=0&&y1>=0)?0:Math.min(Math.abs(y0),Math.abs(y1));
+  if(Math.min(Math.abs(Math.hypot(fx,fy)-RAD),Math.abs(Math.hypot(nx,ny)-RAD))<.15*s)a.add(j*N+i);}return a;})();
+let s2=new Array(289).fill(0),brush2=1,paint2=false,pval2=0,t02=0,el2=0,tick2=0,solved2=false,giveT=0;
+function draw2s(){$("g2s").innerHTML=gridSVG(17,.5,s2);cnt2u();}
+function cnt2u(){const [a,b]=counts(s2);$("cntIn2").textContent=a;$("cntEdge2").textContent=b;}
+function startClock2(){if(t02||solved2)return;t02=Date.now();tick2=setInterval(()=>{el2=(Date.now()-t02)/1000;$("clock2").textContent=fmtT(el2);if(el2>180)$("giveup2").hidden=false;},500);}
+function stopClock2(){clearInterval(tick2);if(t02)el2=(Date.now()-t02)/1000;$("clock2").textContent=fmtT(el2);}
+function paintAt2(el){if(!el||!el.classList||!el.classList.contains("c")||solved2||el.ownerSVGElement!==$("g2s"))return;const k=+el.dataset.k;if(s2[k]!==pval2){s2[k]=pval2;el.setAttribute("class","c"+(pval2?" v"+pval2:""));cnt2u();}}
+$("g2s").addEventListener("pointerdown",e=>{const el=e.target;if(!el.classList.contains("c")||solved2||$("man2").hidden)return;e.preventDefault();startClock2();
+  $("g2s").querySelectorAll(".wrong").forEach(x=>x.classList.remove("wrong"));
+  const k=+el.dataset.k;pval2=(brush2&&s2[k]===brush2)?0:brush2;paint2=true;paintAt2(el);});
+$("g2s").addEventListener("pointermove",e=>{if(!paint2)return;paintAt2(document.elementFromPoint(e.clientX,e.clientY));});
+addEventListener("pointerup",()=>{paint2=false;});addEventListener("pointercancel",()=>{paint2=false;});
+$("pal2").onclick=e=>{const b=e.target.closest(".sw");if(!b)return;brush2=+b.dataset.v;$("pal2").querySelectorAll(".sw").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));};
+$("clear2").onclick=()=>{if(solved2)return;s2.fill(0);draw2s();$("toast2").textContent="";};
+function done05(byHand){
+  solved2=true;stopClock2();$("check2").disabled=true;$("clear2").disabled=true;$("giveup2").hidden=true;
+  if(byHand&&el2>0)rate=Math.min(10,Math.max(.5,(elapsed+el2)/(IN10+ED10+177+64)));
+  counted.add(17);lv=1;table2();$("cnt2").hidden=false;$("smaller2").disabled=false;$("m2s").textContent="0.25cm";
+  const tt=$("toast2");tt.className="toast ok";
+  tt.textContent=byHand?`정확해요! 세야 할 칸이 69칸에서 241칸이 되었어요. 세는 데 ${fmtT(el2)} 걸렸어요. 범위는 44.25~60.25cm²로 좁아졌지만 셀 칸이 훨씬 많아졌지요? 더 작은 칸은 컴퓨터에게 맡겨 봐요.`
+    :`0.5cm 칸은 241칸이에요. 범위는 44.25~60.25cm²로 좁아졌어요. 더 작은 칸은 컴퓨터에게 맡겨 봐요.`;
+}
+$("check2").onclick=()=>{
+  if(solved2)return;const wrong=[];T05.forEach((v,k)=>{if(s2[k]===v)return;if(AMB05.has(k)&&(v&&s2[k]||v===2&&!s2[k]))return;wrong.push(k);});
+  const rs=$("g2s").querySelectorAll("rect.c"),tt=$("toast2");
+  if(!wrong.length){s2=T05.slice();draw2s();done05(true);return;}
+  wrong.forEach(k=>rs[k].classList.add("wrong"));tt.className="toast bad";
+  const miss=wrong.filter(k=>T05[k]&&!s2[k]).length,extra=wrong.filter(k=>!T05[k]&&s2[k]).length,mix=wrong.length-miss-extra;
+  const parts=[];if(miss)parts.push(`아직 안 칠한 칸 ${miss}개`);if(extra)parts.push(`원 밖인데 칠한 칸 ${extra}개`);if(mix)parts.push(`색이 바뀐 칸 ${mix}개`);
+  tt.textContent=`빨간 테두리 칸을 다시 보세요. (${parts.join(", ")})`;
+};
+$("giveup2").onclick=()=>{if(solved2)return;s2=T05.slice();draw2s();done05(false);};
+
 function runCount(){
+  $("g2s").hidden=true;$("g2").hidden=false;
   const [N,s]=SIZES[lv],T=truth(N,s),cells=new Array(N*N).fill(0);draw2(N,s,cells);
   const order=[];T.forEach((v,k)=>{if(v)order.push(k);});
-  $("m2s").textContent=s+"cm";$("count2").disabled=true;$("smaller2").disabled=true;
+  $("m2s").textContent=s+"cm";$("smaller2").disabled=true;
   let i=0,a=0,b=0;const total=order.length,dur=reduce?0:4000+lv*1000,st=performance.now();
   $("toast2").className="toast";$("toast2").textContent="컴퓨터가 칸을 하나씩 세고 있어요…";
   const step=now=>{const want=dur?Math.min(total,Math.ceil(total*(now-st)/dur)):total;
@@ -331,13 +386,11 @@ function runCount(){
 function finishCount(N,s,a,b){
   counted.add(N);table2();const whole=a+b,tt=$("toast2");tt.className="toast ok";
   const [lo,hi]=[+(a*s*s).toFixed(2),+((a+b)*s*s).toFixed(2)];
-  if(lv===1)tt.textContent=`세야 할 칸이 69칸에서 ${whole.toLocaleString("ko-KR")}칸이 되었어요! 범위는 ${lo}~${hi}cm²로 좁아졌지만 셀 칸이 훨씬 많아졌어요.`;
-  else if(lv<LAST)tt.textContent=`이번엔 ${whole.toLocaleString("ko-KR")}칸! 범위는 ${lo}~${hi}cm²로 더 좁아졌어요. 손으로 센다면 ${fmtT(whole*rate)}쯤 걸려요.`;
+  if(lv<LAST)tt.textContent=`이번엔 ${whole.toLocaleString("ko-KR")}칸! 범위는 ${lo}~${hi}cm²로 더 좁아졌어요. 손으로 센다면 ${fmtT(whole*rate)}쯤 걸려요.`;
   else tt.textContent=`${whole.toLocaleString("ko-KR")}칸! 범위는 ${lo}~${hi}cm²로 아주 좁아졌지만, 손으로 센다면 ${fmtT(whole*rate)}이나 걸려요. 그래도 원의 넓이를 딱 하나로 정하지는 못했어요.`;
   $("smaller2").disabled=lv>=LAST;if(lv>=2){$("next2").disabled=false;done.add(3);}
 }
-$("count2").onclick=runCount;
-$("smaller2").onclick=()=>{if(lv>=LAST)return;lv++;$("m2in").textContent=0;$("m2edge").textContent=0;runCount();};
+$("smaller2").onclick=()=>{if(lv>=LAST||!solved2)return;lv++;$("m2in").textContent=0;$("m2edge").textContent=0;runCount();};
 $("next2").onclick=()=>{done.add(4);show(4);};
 
 /* ---------- 3단계: 정사각형 2개 ---------- */
@@ -378,7 +431,10 @@ function resetAll(){
   $("pal").querySelectorAll(".sw").forEach(x=>x.setAttribute("aria-pressed",x.dataset.v==="1"?"true":"false"));
   $("clock").textContent="0초";$("check1").disabled=false;$("clear1").disabled=false;$("after1").hidden=true;$("next1").disabled=true;
   ["c1","c2","c3a","c3b"].forEach(id=>$(id).querySelectorAll(".btn").forEach(b=>{b.disabled=false;b.classList.remove("yes","no");}));
-  $("cnt2").hidden=true;$("count2").disabled=false;$("smaller2").disabled=true;$("next2").disabled=true;$("m2in").textContent=0;$("m2edge").textContent=0;$("tbl2").innerHTML="";$("rateNote").textContent="";
+  clearInterval(tick2);s2.fill(0);brush2=1;t02=0;el2=0;solved2=false;$("man2").hidden=true;$("clock2").textContent="0초";$("check2").disabled=false;$("clear2").disabled=false;$("giveup2").hidden=true;
+  $("pal2").querySelectorAll(".sw").forEach(x=>x.setAttribute("aria-pressed",x.dataset.v==="1"?"true":"false"));
+  $("g2s").hidden=false;$("g2").hidden=true;draw2s();
+  $("cnt2").hidden=true;$("smaller2").disabled=true;$("next2").disabled=true;$("m2in").textContent=0;$("m2edge").textContent=0;$("tbl2").innerHTML="";$("rateNote").textContent="";
   $("q3b").hidden=true;$("ratio3").hidden=true;$("next3").disabled=true;
   [["b3a","?"],["b3b","?"]].forEach(([id,v])=>{$(id).textContent=v;$(id).classList.remove("fill");});
   ["toast1","toast2","toast3"].forEach(id=>{$(id).textContent="";$(id).className="toast";});
@@ -403,8 +459,8 @@ $("tbar").onclick=e=>{const b=e.target.closest("button");if(!b)return;const j=b.
   if(j==="2"){show(2);return;}
   T10.forEach((v,k)=>s1[k]=v);draw1();solved1=true;elapsed=138;rate=2;$("clock").textContent=fmtT(elapsed)+" (예시)";$("check1").disabled=true;$("clear1").disabled=true;$("after1").hidden=false;$("next1").disabled=false;done.add(2);
   counted.add(9);table2();
-  if(j==="3"){show(3);draw2(17,.5,null);return;}
-  counted=new Set(SIZES.map(z=>z[0]));lv=LAST;table2();$("cnt2").hidden=false;$("next2").disabled=false;done.add(3);done.add(4);show(4);
+  if(j==="3"){show(3);return;}
+  solved2=true;s2=T05.slice();counted=new Set(SIZES.map(z=>z[0]));lv=LAST;table2();$("cnt2").hidden=false;$("next2").disabled=false;done.add(3);done.add(4);show(4);
 };
 
 resetAll();
