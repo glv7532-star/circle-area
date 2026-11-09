@@ -319,7 +319,7 @@ function quiz(id,right,hints,ok){
 quiz("c3a","r",{d:"조각 하나는 원의 중심에서 둘레까지예요. 그 길이는 지름의 절반이지요.",c:"원의 둘레는 조각의 굽은 쪽이에요. 세로는 뾰족한 끝에서 둘레까지의 길이예요."},
   ()=>{$("bH").textContent="반지름";$("bH").classList.add("fill");$("toast3").textContent="맞아요! 조각 하나는 원의 중심에서 둘레까지라서, 세로는 반지름이에요.";$("q3b").hidden=false;});
 quiz("c3b","c",{h:"원 하나만 잘랐다면 절반이 되었을 거예요. 위쪽에 노란 조각이 몇 개 모였나요? 노란 원의 조각 전부예요.",d:"지름은 곧은 선이에요. 위쪽 가장자리는 원의 둘레를 잘게 나눈 굽은 선들이 모인 거예요."},
-  ()=>{hiTop=true;drawDims();$("bW").textContent="원주";$("cw").textContent="원주";$("bW").classList.add("fill");$("toast3").textContent="맞아요! 노란 원의 둘레가 모두 위쪽에 모였으니, 가로는 원의 둘레 전체예요. 이렇게 원의 둘레를 원주라고 해요. 이제부터는 원주라고 부를게요.";$("q3c").hidden=false;});
+  ()=>{hiTop=true;drawDims();$("bW").textContent="원주";$("cw").textContent="원주";$("bW").classList.add("fill");$("toast3").textContent="맞아요! 노란 원의 둘레가 모두 위쪽에 모였으니, 가로는 원의 둘레 전체예요. 아래쪽에는 파란 원의 둘레가 모였고요. 두 원의 크기가 같으니 위아래 길이도 같아요. 이렇게 원의 둘레를 원주라고 해요. 이제부터는 원주라고 부를게요.";$("q3c").hidden=false;});
 quiz("c3c","2",{"1":"노란 원과 파란 원을 함께 붙였어요.","4":"노란 원 하나, 파란 원 하나였어요."},
   ()=>{$("bN").textContent="2";$("bN").classList.add("fill");$("toast3").textContent="맞아요! 원 2개로 만든 직사각형이니, 원 하나의 넓이는 그 절반이에요.";$("next3").disabled=false;done.add(3);});
 $("next3").onclick=()=>{done.add(4);show(4);};
