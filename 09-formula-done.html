@@ -106,7 +106,7 @@ html,body{overscroll-behavior-y:contain}
     <div class="lines" id="lines"></div>
     <div class="q" id="qa">
       <p>원주는 어떻게 구할 수 있었나요?</p>
-      <div class="choices" id="ca"><button class="btn" data-v="r">반지름 × 3.14</button><button class="btn" data-v="d">지름 × 3.14</button><button class="btn" data-v="4">지름 × 4</button></div>
+      <div class="choices" id="ca"><button class="btn" data-v="r">반지름 × 원주율</button><button class="btn" data-v="d">지름 × 원주율</button><button class="btn" data-v="4">지름 × 4</button></div>
     </div>
     <div class="q" id="qb" hidden>
       <p>지름은 반지름의 몇 배인가요?</p>
@@ -117,6 +117,7 @@ html,body{overscroll-behavior-y:contain}
       <div class="choices" id="cc"><button class="btn" data-v="same">처음 수 그대로예요</button><button class="btn" data-v="x4">처음 수의 4배예요</button><button class="btn" data-v="half">처음 수의 절반이에요</button></div>
     </div>
     <p class="toast" id="toast1" role="status"></p>
+    <p class="note" id="half1" hidden>교과서에서는 원 하나를 잘라 붙여서, 직사각형의 가로가 원주의 절반이 돼요. 그래서 원의 넓이 = 원주 × ½ × 반지름으로 써요. ÷ 2와 × ½은 같은 계산이라서, 정리하면 똑같이 반지름 × 반지름 × 원주율이 돼요.</p>
     <div class="row"><button class="btn primary" id="next1" disabled>공식으로 넓이 구해 보기</button></div>
   </section>
 
@@ -169,7 +170,8 @@ html,body{overscroll-behavior-y:contain}
   <!-- 마무리 -->
   <section class="card" id="step4" hidden>
     <h2>원의 넓이 공식</h2>
-    <p class="big">원의 넓이 = 반지름 × 반지름 × 3.14</p>
+    <p class="big">원의 넓이 = 반지름 × 반지름 × 원주율</p>
+    <p class="note">원주율은 3.14로 계산해요. 예를 들어 반지름이 4cm이면 4 × 4 × 3.14 = 50.24cm²예요.</p>
     <p class="note">원주를 모르던 피자 조각 마법의 공식이, 이제는 반지름 하나만 알면 쓸 수 있는 공식이 되었어요.</p>
     <ol class="ask">
       <li>모눈 칸을 세어 구하는 방법과 공식으로 구하는 방법 중에서 어느 쪽이 더 편했나요? 왜 그런가요?</li>
@@ -201,17 +203,18 @@ function quiz(id,right,hints,toast,ok){
 /* ---------- 1단계: 공식 변형 ---------- */
 const tk=(t,c="")=>`<span class="tk ${c}">${t}</span>`;
 const L1=`<p class="fl"><small>피자 조각 마법에서 만든 공식</small>원의 넓이 = ${tk("원주","qm")} × 반지름 ÷ 2</p>`;
-const L2=`<p class="fl"><small>원주 자리에 지름 × 3.14를 넣으면</small>원의 넓이 = ${tk("지름 × 3.14","new")} × 반지름 ÷ 2</p>`;
-const L3=`<p class="fl"><small>지름 자리에 반지름 × 2를 넣으면</small>원의 넓이 = ${tk("반지름 × 2","new")} × 3.14 × 반지름 ÷ 2</p>`;
-const L4=`<p class="fl"><small>× 2와 ÷ 2는 서로 없어져요</small>원의 넓이 = 반지름 ${tk("× 2","gone")} × 3.14 × 반지름 ${tk("÷ 2","gone")}</p>`;
-const L5=`<p class="fl last"><small>곱하는 순서를 바꿔 정리하면</small>원의 넓이 = 반지름 × 반지름 × 3.14</p>`;
-function setLines(k){$("lines").innerHTML=[L1,L2,L3,L4,L5].slice(0,k).join("");}
+const L2=`<p class="fl"><small>원주 자리에 지름 × 원주율을 넣으면</small>원의 넓이 = ${tk("지름 × 원주율","new")} × 반지름 ÷ 2</p>`;
+const L3=`<p class="fl"><small>지름 자리에 반지름 × 2를 넣으면</small>원의 넓이 = ${tk("반지름 × 2","new")} × 원주율 × 반지름 ÷ 2</p>`;
+const L4=`<p class="fl"><small>× 2와 ÷ 2는 서로 없어져요</small>원의 넓이 = 반지름 ${tk("× 2","gone")} × 원주율 × 반지름 ${tk("÷ 2","gone")}</p>`;
+const L5=`<p class="fl"><small>곱하는 순서를 바꿔 정리하면</small>원의 넓이 = 반지름 × 반지름 × 원주율</p>`;
+const L6=`<p class="fl last"><small>원주율 자리에 3.14를 넣어 계산해요</small>원의 넓이 = 반지름 × 반지름 × ${tk("3.14","new")}</p>`;
+function setLines(k){$("lines").innerHTML=[L1,L2,L3,L4,L5,L6].slice(0,k).join("");}
 quiz("ca","d",{r:"원주율은 원주 ÷ 지름이었어요. 반지름이 아니라 지름의 몇 배였지요?","4":"정사각형으로 가뒀을 때 지름의 4배보다 짧았어요. 실제로 재어 보니 지름의 약 몇 배였나요?"},"toast1",
-  ()=>{setLines(2);$("toast1").textContent="맞아요! 원주 = 지름 × 3.14였지요. 빈칸에 넣었어요.";$("qb").hidden=false;});
+  ()=>{setLines(2);$("toast1").textContent="맞아요! 원주 = 지름 × 원주율이었지요. 빈칸에 넣었어요.";$("qb").hidden=false;});
 quiz("cb","2",{"3":"지름은 원의 중심을 지나서 반지름 두 개가 이어진 길이예요.","4":"지름은 원의 중심을 지나서 반지름 두 개가 이어진 길이예요."},"toast1",
   ()=>{setLines(3);$("toast1").textContent="맞아요! 지름 = 반지름 × 2예요. 공식이 반지름만으로 바뀌어 가요.";$("qc").hidden=false;});
 quiz("cc","same",{x4:"예를 들어 5 × 2 ÷ 2를 계산해 보세요.",half:"예를 들어 5 × 2 ÷ 2를 계산해 보세요."},"toast1",
-  ()=>{setLines(5);$("toast1").textContent="맞아요! 5 × 2 ÷ 2 = 5처럼, 2를 곱하고 2로 나누면 처음 수 그대로예요. 공식이 이렇게 짧아졌어요. 이제 원주를 몰라도, 반지름 하나만 재면 넓이를 구할 수 있어요.";$("next1").disabled=false;done.add(1);});
+  ()=>{setLines(6);$("half1").hidden=false;$("toast1").textContent="맞아요! 5 × 2 ÷ 2 = 5처럼, 2를 곱하고 2로 나누면 처음 수 그대로예요. 공식이 이렇게 짧아졌어요. 이제 원주를 몰라도, 반지름 하나만 재면 넓이를 구할 수 있어요.";$("next1").disabled=false;done.add(1);});
 $("next1").onclick=()=>show(2);
 
 /* ---------- 2단계: 비교 ---------- */
@@ -294,7 +297,7 @@ $("next3").onclick=()=>{done.add(4);show(4);};
 function resetAll(){
   done.clear();setLines(1);
   ["ca","cb","cc","c2","c3a"].forEach(id=>$(id).querySelectorAll(".btn").forEach(b=>{b.disabled=false;b.classList.remove("yes","no");}));
-  $("qb").hidden=true;$("qc").hidden=true;$("next1").disabled=true;$("cmp2").hidden=true;$("kep").hidden=true;$("next3").disabled=true;
+  $("qb").hidden=true;$("qc").hidden=true;$("half1").hidden=true;$("next1").disabled=true;$("cmp2").hidden=true;$("kep").hidden=true;$("next3").disabled=true;
   ["toast1","toast2","toast3"].forEach(id=>{$(id).textContent="";$(id).className="toast";});
   apx=280;kn=8;$("nRow").querySelectorAll(".btn").forEach(x=>x.classList.toggle("on",x.dataset.n==="8"));buildK();show(1);
 }
@@ -308,7 +311,7 @@ $("reset").onclick=()=>{
 if(!/github\.io$/.test(location.hostname)||/teacher/.test(location.search))$("tbar").hidden=false;
 $("tbar").onclick=e=>{const b=e.target.closest("button");if(!b)return;const j=b.dataset.j;resetAll();
   if(j==="1")return;
-  setLines(5);["ca","cb","cc"].forEach(id=>$(id).querySelectorAll(".btn").forEach(x=>x.disabled=true));$("qb").hidden=false;$("qc").hidden=false;$("next1").disabled=false;done.add(1);
+  setLines(6);$("half1").hidden=false;["ca","cb","cc"].forEach(id=>$(id).querySelectorAll(".btn").forEach(x=>x.disabled=true));$("qb").hidden=false;$("qc").hidden=false;$("next1").disabled=false;done.add(1);
   if(j==="2"){show(2);return;}
   $("c2").querySelectorAll(".btn").forEach(x=>x.disabled=true);drawCmp();$("cmp2").hidden=false;done.add(2);
   if(j==="3"){show(3);return;}

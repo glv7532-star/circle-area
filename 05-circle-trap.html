@@ -416,7 +416,7 @@ function after3(){
   const d=P-p,z=Math.ceil(-Math.log10(d))-1,ds=d.toFixed(z+2);
   t.textContent=`정${nf(n)}각형이에요. 두 값의 차이는 ${ds}쯤, 소수점 아래 0이 ${z}개나 이어질 만큼 작아졌지만 0은 아니에요.`+(n>=MAXN?" 여기가 이 화면의 끝이에요. 그래도 두 값은 여전히 달라요.":"");
   if(n>=GOAL&&$("reveal3").hidden){
-    $("reveal3").innerHTML=`${PRED[pred]||""}<br>변을 아무리 늘려도 두 값은 점점 가까워질 뿐, 딱 같아지지는 않아요. 아르키메데스는 끝내 정확한 값을 찾지 못했어요.<br>그 뒤로 <b>약 2000년</b> 동안 수학자들이 연구한 끝에, 이 수는 소수점 아래 숫자가 <b>규칙 없이 끝없이 이어진다</b>는 것이 밝혀졌어요. 그래서 우리는 적당한 곳에서 끊어 <b>3.14</b>로 써요.`;
+    $("reveal3").innerHTML=`${PRED[pred]||""}<br>변을 아무리 늘려도 두 값은 점점 가까워질 뿐, 딱 같아지지는 않아요. 아르키메데스는 끝내 정확한 값을 찾지 못했어요.<br>그 뒤로 <b>약 2000년</b> 동안 수학자들이 연구한 끝에, 이 수는 소수점 아래 숫자가 <b>규칙 없이 끝없이 이어진다</b>는 것이 밝혀졌어요. 그래서 우리는 반올림하여 소수 둘째 자리까지 나타낸 <b>3.14</b>를 써요.`;
     $("reveal3").hidden=false;$("next3").disabled=false;done.add(3);}
 }
 $("dbl3").onclick=()=>{if(n>=MAXN)return;doubleOnce();after3();};
@@ -424,7 +424,7 @@ $("dbl3x5").onclick=()=>{for(let i=0;i<5&&n<MAXN;i++)doubleOnce();after3();};
 function prep4(){$("f4v").textContent=samePrefix(trunc(p,10),trunc(P,10));}
 $("next3").onclick=()=>{prep4();show(4);};
 function swap4(){const w=$("f4w");w.textContent="원주율";w.style.cssText="";w.classList.add("fill");$("swap4").disabled=true;
-  const t=$("toast4");t.textContent="훨씬 짧아졌지요? 이제부터는 이 수를 원주율이라고 부를게요. 원주율은 끝없이 이어지는 수라서 보통 3.14로 끊어 써요.";t.className="toast ok";$("next4").disabled=false;done.add(4);}
+  const t=$("toast4");t.textContent="훨씬 짧아졌지요? 이제부터는 이 수를 원주율이라고 부를게요. 원주율은 끝없이 이어지는 수라서, 반올림하여 3.14로 써요.";t.className="toast ok";$("next4").disabled=false;done.add(4);}
 $("swap4").onclick=swap4;
 $("next4").onclick=()=>{done.add(5);show(5);};
 
@@ -434,7 +434,7 @@ function renderSum(){
   const card=(k,v,d)=>`<div class="sumc"><span class="k">${k}</span><span class="v">${v}</span><span class="d">${d}</span></div>`;
   $("sum4").innerHTML=card("우리가 처음 가둔 범위","3배 ~ 4배","정육각형과 정사각형, 우리가 직접 계산했어요.")
     +card("아르키메데스의 범위 (96각형)","3.1408배 ~ 3.1429배","계산기 없이 손으로 구했어요.")
-    +card(`컴퓨터로 간 끝 (정${nf(n)}각형)`,`${s}…배`,"그래도 끝까지는 알 수 없어서, 3.14로 끊어 써요.");
+    +card(`컴퓨터로 간 끝 (정${nf(n)}각형)`,`${s}…배`,"그래도 끝까지는 알 수 없어서, 반올림하여 3.14로 써요.");
 }
 
 /* ---------- 처음부터 ---------- */

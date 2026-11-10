@@ -88,7 +88,7 @@ html,body{overscroll-behavior-y:contain}
   <div class="tbar" id="tbar" hidden><b>선생님 바로가기</b><button data-j="1">1단계</button><button data-j="2">2단계</button><button data-j="3">3단계</button><button data-j="4">마무리</button></div>
   <header>
     <h1>굴러라 바퀴</h1>
-    <p class="lead">바퀴가 한 바퀴 굴러가면, 바퀴의 둘레가 땅에 한 번 쭉 펼쳐져요. 그러니까 한 바퀴 굴러간 거리가 바로 원주예요. 원주는 지름 × 3.14였지요. 바퀴를 굴려서 확인해 봐요.</p>
+    <p class="lead">바퀴가 한 바퀴 굴러가면, 바퀴의 둘레가 땅에 한 번 쭉 펼쳐져요. 그러니까 한 바퀴 굴러간 거리가 바로 원주예요. 원주는 지름 × 원주율이고, 원주율은 3.14로 계산했지요. 바퀴를 굴려서 확인해 봐요.</p>
   </header>
 
   <nav class="steps" aria-label="단계">
@@ -144,7 +144,8 @@ html,body{overscroll-behavior-y:contain}
   <!-- 마무리 -->
   <section class="card" id="step4" hidden>
     <h2>지름만 알면 원주를 구할 수 있어요</h2>
-    <p class="formula">원주 = 지름 × 3.14<br>지름 = 원주 ÷ 3.14</p>
+    <p class="formula">원주 = 지름 × 원주율<br>지름 = 원주 ÷ 원주율</p>
+    <p class="note" style="text-align:center">원주율은 3.14로 계산해요. 예: 지름 10cm → 원주 10 × 3.14 = 31.4cm</p>
     <ol class="ask">
       <li>바퀴가 한 바퀴 굴러간 거리는 바퀴의 어느 부분의 길이와 같았나요?</li>
       <li>원주를 알고 있을 때 지름은 어떻게 구했나요?</li>
@@ -207,7 +208,7 @@ $("f1").addEventListener("submit",e=>{e.preventDefault();if(rolling)return;
   roll(d1,C=>{const tt=$("toast1"),hit=near(v,C);
     if(hit){ok1.add(d1);tt.className="toast ok";tt.textContent=`딱 맞았어요! ${d1} × 3.14 = ${fx(C)}cm를 굴러갔어요. 보라색 점선은 빨간 점이 지나간 길이에요.`;}
     else if(near(v,d1/2*PI)){tt.className="toast bad";tt.textContent=`실제로는 ${fx(C)}cm를 갔어요. 반지름에 3.14를 곱하지 않았나요? 원주는 지름 × 3.14예요.`;}
-    else{tt.className="toast bad";tt.textContent=`실제로는 ${fx(C)}cm를 갔어요. 원주 = 지름 × 3.14로 다시 계산해 보세요.`;}
+    else{tt.className="toast bad";tt.textContent=`실제로는 ${fx(C)}cm를 갔어요. 원주 = 지름 × 원주율(3.14)로 다시 계산해 보세요.`;}
     $("rec1").insertAdjacentHTML("beforeend",`<li>지름 ${d1}cm: 예상 ${v}cm → 실제 ${fx(C)}cm ${hit?"✓":""}</li>`);
     mark1();
     if(ok1.size>=3&&$("next1").disabled){$("next1").disabled=false;done.add(1);tt.textContent+=" 세 바퀴를 모두 맞혔어요. 다음 단계로 가 봐요!";}
@@ -231,7 +232,7 @@ $("roll2").onclick=()=>{if(rolling)return;const d=+$("dsl").value;$("dsl").disab
 };
 $("c2").onclick=e=>{const b=e.target.closest(".btn");if(!b||b.disabled)return;const tt=$("toast2");
   if(b.dataset.v==="div"){b.classList.add("yes");$("c2").querySelectorAll(".btn").forEach(x=>x.disabled=true);solved2=true;tt.className="toast ok";
-    tt.textContent=`맞아요! 원주 = 지름 × 3.14이니까, 거꾸로 지름 = 원주 ÷ 3.14예요. ${tgt[0]} ÷ 3.14 = ${tgt[1]}이니 지름을 ${tgt[1]}cm로 맞추고 굴려서 확인해 보세요.`;$("next2").disabled=false;done.add(2);}
+    tt.textContent=`맞아요! 원주 = 지름 × 원주율이니까, 거꾸로 지름 = 원주 ÷ 원주율이에요. 원주율 3.14를 넣으면 ${tgt[0]} ÷ 3.14 = ${tgt[1]}이에요. 지름을 ${tgt[1]}cm로 맞추고 굴려서 확인해 보세요.`;$("next2").disabled=false;done.add(2);}
   else{b.classList.add("no");b.disabled=true;tt.className="toast bad";tt.textContent=b.dataset.v==="mul"?"곱하면 깃발보다 훨씬 먼 거리가 나와요. 지름 × 3.14 = 원주였으니, 거꾸로 하려면?":"3.14를 빼는 것은 원주와 지름의 관계가 아니에요. 지름 × 3.14 = 원주를 거꾸로 생각해 보세요.";}};
 $("next2").onclick=()=>{show(3);setup3(0);};
 
@@ -250,7 +251,7 @@ const PROBS=[
    gen:"울타리의 길이는 화단의 원주예요. 반지름으로 지름을 먼저 구해 보세요.",ok:"맞아요! 지름은 3 × 2 = 6m, 원주는 6 × 3.14 = 18.84m예요."},
   {pic:"hoop",unit:"cm",ans:80,txt:"훌라후프의 둘레를 재었더니 251.2cm였어요. 이 훌라후프의 지름은 몇 cm일까요?",
    hints:[[788.77,"둘레에 3.14를 곱하면 더 커져요. 원주를 알 때 지름은 어떻게 구했나요?"],[40,"그건 반지름이에요. 문제에서는 지름을 물었어요."]],
-   gen:"지름 = 원주 ÷ 3.14였어요.",ok:"맞아요! 251.2 ÷ 3.14 = 80cm예요."}
+   gen:"지름 = 원주 ÷ 원주율이었어요. 원주율은 3.14로 계산해요.",ok:"맞아요! 251.2 ÷ 3.14 = 80cm예요."}
 ];
 let pi3=0;
 function setup3(i){pi3=i;const p=PROBS[i];$("pic3").innerHTML=PICS[p.pic];$("txt3").textContent=p.txt;$("u3").textContent=p.unit;

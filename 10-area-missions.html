@@ -75,10 +75,10 @@ html,body{overscroll-behavior-y:contain}
 </style>
 
 <div class="wrap">
-  <div class="tbar" id="tbar" hidden><b>선생님 바로가기</b><button data-j="0">처음 상태</button><button data-j="9">기본 9개 완료</button><button data-j="10">기본 모두 완료</button><button data-j="20">도전까지 모두 완료</button></div>
+  <div class="tbar" id="tbar" hidden><b>선생님 바로가기</b><button data-j="0">처음 상태</button><button data-j="almost">기본 하나 남기기</button><button data-j="main">기본 모두 완료</button><button data-j="all">도전까지 모두 완료</button></div>
   <header>
     <h1>원의 넓이 미션</h1>
-    <p class="lead">아르키메데스의 비밀 상자를 열려면 열쇠 10개가 필요해요. 기본 미션을 하나씩 풀어 열쇠를 모아 보세요. 뒤로 갈수록 어려워져요. 원주율은 3.14로 계산해요.</p>
+    <p class="lead">아르키메데스의 비밀 상자를 열려면 열쇠 12개가 필요해요. 기본 미션을 하나씩 풀어 열쇠를 모아 보세요. 넓이뿐 아니라 둘레를 묻는 미션도 있어요. 뒤로 갈수록 어려워져요. 원주율은 3.14로 계산해요.</p>
   </header>
 
   <section class="card">
@@ -115,12 +115,12 @@ html,body{overscroll-behavior-y:contain}
       </svg>
       <p>상자 안에는 아르키메데스의 무덤에 새겨졌다는 그림이 들어 있었어요. 원기둥 안에 공이 꼭 맞게 들어간 그림이에요. 아르키메데스는 이 둘 사이의 관계를 밝혀낸 것을 가장 자랑스러워해서, 자기 무덤에 이 그림을 새겨 달라고 했대요. 그리고 약 140년 뒤, 로마의 키케로가 풀숲에 묻혀 있던 이 무덤을 그림을 보고 알아냈다고 전해져요.</p>
       <ol class="ask">
-        <li>열 개의 미션 중 가장 어려웠던 미션은 무엇이었나요? 어디에서 막혔나요?</li>
-        <li>색칠한 부분의 넓이를 구할 때 어떤 방법을 썼나요? (나누기, 더하기, 빼기 등)</li>
+        <li>열두 개의 미션 중 가장 어려웠던 미션은 무엇이었나요? 어디에서 막혔나요?</li>
+        <li>색칠한 부분의 넓이를 구할 때와 둘레를 구할 때, 방법이 어떻게 달랐나요?</li>
         <li>이번 원 단원에서 가장 기억에 남는 활동은 무엇이었나요?</li>
       </ol>
       <p class="closing">유클리드의 직선 도형에서 출발해 아르키메데스의 원까지,<br>수학자들이 걸어간 길을 우리도 끝까지 걸어왔어요!</p>
-      <p class="note">아직 시간이 남았나요? 아래에 <b>도전 미션</b> 10개가 열렸어요.</p>
+      <p class="note">아직 시간이 남았나요? 아래에 <b>도전 미션</b> 12개가 열렸어요.</p>
     </div>
   </section>
 
@@ -155,6 +155,10 @@ const FIG={
   m8:()=>`<circle cx="120" cy="100" r="80" fill="${C}" stroke="${E}" ${SW}/><polygon points="120,20 200,100 120,180 40,100" fill="${W}" stroke="${E}" stroke-width="2"/>${dash(120,100,200,100)}${dot(120,100)}${lab(160,92,"4cm")}`,
   m9:()=>`<rect x="20" y="50" width="200" height="100" fill="${C}" stroke="${E}" ${SW}/><circle cx="70" cy="100" r="50" fill="${W}" stroke="${E}" stroke-width="2"/><circle cx="170" cy="100" r="50" fill="${W}" stroke="${E}" stroke-width="2"/>${lab(120,170,"20cm")}${lab(226,104,"10cm","start").replace('x="226"','x="224"')}`,
   m10:()=>`<path d="M70 60 H170 A40 40 0 0 1 170 140 H70 A40 40 0 0 1 70 60Z" fill="${C}" stroke="${E}" ${SW}/>${dash(70,60,70,140)}${dash(170,60,170,140)}${lab(120,52,"10cm")}${lab(120,104,"8cm")}`,
+  p1:()=>`<path d="M30 150 A90 90 0 0 1 210 150Z" fill="${C}" stroke="var(--rim)" stroke-width="5" stroke-linejoin="round"/>${dash(120,150,210,150)}${dot(120,150)}${lab(165,170,"4cm")}`,
+  p2:()=>`<rect x="40" y="20" width="160" height="160" fill="${C}" stroke="var(--rim)" stroke-width="5"/><circle cx="120" cy="100" r="80" fill="${W}" stroke="var(--rim)" stroke-width="4"/>${lab(120,196,"10cm")}`,
+  p3:()=>`<path d="M70 60 H170 A40 40 0 0 1 170 140 H70 A40 40 0 0 1 70 60Z" fill="${C}" stroke="var(--rim)" stroke-width="5"/>${dash(70,60,70,140)}${dash(170,60,170,140)}${lab(120,52,"10cm")}${lab(120,104,"8cm")}`,
+  p4:()=>`<rect x="40" y="20" width="160" height="160" fill="${C}" stroke="${E}" stroke-width="2"/>${["M40 20 L120 20 A80 80 0 0 1 40 100Z","M200 20 L200 100 A80 80 0 0 1 120 20Z","M200 180 L120 180 A80 80 0 0 1 200 100Z","M40 180 L40 100 A80 80 0 0 1 120 180Z"].map(d=>`<path d="${d}" fill="${W}" stroke="${E}" stroke-width="2"/>`).join("")}${["M120 20 A80 80 0 0 1 40 100","M200 100 A80 80 0 0 1 120 20","M120 180 A80 80 0 0 1 200 100","M40 100 A80 80 0 0 1 120 180"].map(d=>`<path d="${d}" fill="none" stroke="var(--rim)" stroke-width="5"/>`).join("")}${lab(120,196,"8cm")}`,
   b1:()=>`<path d="M120 100 L120 20 A80 80 0 1 0 200 100Z" fill="${C}" stroke="${E}" ${SW}/>${dash(120,100,200,100)}${dot(120,100)}${lab(160,118,"4cm")}`,
   b2:()=>`<circle cx="120" cy="100" r="80" fill="${C}" stroke="var(--rim)" stroke-width="5"/>${dot(120,100)}${lab(120,108,"원주 62.8cm")}`,
   b3:()=>`<circle cx="120" cy="100" r="80" fill="${C}" stroke="${E}" ${SW}/><circle cx="80" cy="100" r="40" fill="${W}" stroke="${E}" stroke-width="2"/><circle cx="160" cy="100" r="40" fill="${W}" stroke="${E}" stroke-width="2"/>${dash(120,100,120,20)}${dot(120,100)}${lab(126,56,"10cm","start")}`,
@@ -177,6 +181,9 @@ const MAIN=[
   {id:"m3",title:"반원",txt:"반지름이 4cm인 반원의 넓이는 몇 cm²일까요?",ans:25.12,
    wrong:[[50.24,"그건 원 전체의 넓이예요. 반원은 원의 절반이에요."],[12.56,"반원은 원의 절반이니 2로 한 번만 나눠요."]],
    hints:["반지름이 4cm인 원 전체의 넓이: 4 × 4 × 3.14 = 50.24","반원은 그 절반이에요."],ok:"4 × 4 × 3.14 ÷ 2 = 25.12cm²"},
+  {id:"p1",title:"반원의 둘레",txt:"반지름이 4cm인 반원이 있어요. 보라색 선, 곧 반원의 둘레는 몇 cm일까요?",ans:20.56,unit:"cm",
+   wrong:[[12.56,"그건 굽은 선의 길이만이에요. 아래의 곧은 선(지름)도 둘레예요."],[25.12,"그건 원 전체의 원주예요. 반원의 굽은 선은 그 절반이에요."],[16.56,"아래의 곧은 선은 반지름이 아니라 지름이에요."]],
+   hints:["둘레 = 굽은 선 + 곧은 선이에요.","굽은 선은 원주의 절반: 8 × 3.14 ÷ 2 = 12.56","곧은 선은 지름 8cm예요."],ok:"12.56 + 8 = 20.56cm"},
   {id:"m4",title:"원의 4분의 1",txt:"반지름이 10cm인 원을 똑같이 4조각으로 나눈 것 중 한 조각이에요. 넓이는 몇 cm²일까요?",ans:78.5,
    wrong:[[314,"그건 원 전체의 넓이예요. 4조각 중 1조각이에요."],[157,"그건 반원의 넓이예요. 4조각 중 1조각이에요."]],
    hints:["원 전체의 넓이: 10 × 10 × 3.14 = 314","4조각 중 1조각이니 4로 나눠요."],ok:"10 × 10 × 3.14 ÷ 4 = 78.5cm²"},
@@ -186,20 +193,26 @@ const MAIN=[
   {id:"m6",title:"정사각형 속 원",txt:"한 변이 10cm인 정사각형 안에 원이 꼭 맞게 들어 있어요. 색칠한 부분의 넓이는 몇 cm²일까요?",ans:21.5,
    wrong:[[78.5,"그건 원의 넓이예요. 색칠한 부분은 정사각형에서 원을 뺀 부분이에요."],[100,"그건 정사각형 전체의 넓이예요. 원 부분은 색칠되지 않았어요."],[-214,"원의 넓이를 지름 10cm로 계산하지 않았나요? 반지름은 5cm예요."]],
    hints:["정사각형의 넓이: 10 × 10 = 100","원의 지름이 10cm이니 반지름은 5cm, 원의 넓이: 5 × 5 × 3.14 = 78.5","색칠한 부분 = 정사각형 − 원"],ok:"100 − 78.5 = 21.5cm²"},
+  {id:"p2",title:"정사각형 속 원의 둘레",txt:"한 변이 10cm인 정사각형 안에 원이 꼭 맞게 들어 있어요. 색칠한 부분의 둘레(보라색 선)는 몇 cm일까요?",ans:71.4,unit:"cm",
+   wrong:[[40,"그건 바깥 정사각형의 둘레만이에요. 안쪽 원의 둘레도 색칠한 부분의 둘레예요."],[31.4,"그건 원주만이에요. 바깥 정사각형의 둘레도 더해요."],[8.6,"둘레는 빼지 않고 모두 더해요."]],
+   hints:["색칠한 부분은 바깥쪽 정사각형과 안쪽 원, 두 선으로 둘러싸여 있어요.","정사각형의 둘레: 10 × 4 = 40","원의 지름은 10cm, 원주: 10 × 3.14 = 31.4"],ok:"40 + 31.4 = 71.4cm"},
   {id:"m7",title:"도넛 모양",txt:"반지름이 6cm인 큰 원 안에 반지름이 3cm인 작은 원이 뚫려 있어요. 색칠한 부분의 넓이는 몇 cm²일까요?",ans:84.78,
    wrong:[[113.04,"그건 큰 원 전체의 넓이예요. 가운데 작은 원은 뚫려 있어요."],[28.26,"그건 작은 원의 넓이예요. 큰 원에서 작은 원을 빼요."]],
    hints:["큰 원의 넓이: 6 × 6 × 3.14 = 113.04","작은 원의 넓이: 3 × 3 × 3.14 = 28.26","색칠한 부분 = 큰 원 − 작은 원"],ok:"113.04 − 28.26 = 84.78cm²"},
-  {id:"m8",title:"원 속 정사각형",txt:"반지름이 4cm인 원 안에 네 꼭짓점이 원에 닿는 정사각형이 있어요. 색칠한 부분의 넓이는 몇 cm²일까요?",ans:18.24,
-   wrong:[[50.24,"그건 원 전체의 넓이예요. 가운데 정사각형은 색칠되지 않았어요."],[32,"그건 정사각형의 넓이예요. 원에서 정사각형을 빼요."],[-13.76,"정사각형의 한 변은 8cm가 아니에요. 두 대각선이 지름(8cm)이니 마름모처럼 대각선 × 대각선 ÷ 2로 구해요."]],
-   hints:["원의 넓이: 4 × 4 × 3.14 = 50.24","정사각형의 두 대각선은 모두 지름 8cm예요. 넓이 = 8 × 8 ÷ 2 = 32","색칠한 부분 = 원 − 정사각형"],ok:"50.24 − 32 = 18.24cm²"},
   {id:"m9",title:"직사각형 속 원 2개",txt:"가로 20cm, 세로 10cm인 직사각형 안에 똑같은 원 2개가 꼭 맞게 들어 있어요. 색칠한 부분의 넓이는 몇 cm²일까요?",ans:43,
    wrong:[[121.5,"원은 1개가 아니라 2개예요."],[157,"그건 원 2개의 넓이예요. 직사각형에서 원 2개를 빼요."],[200,"그건 직사각형 전체의 넓이예요."]],
    hints:["직사각형의 넓이: 20 × 10 = 200","원 하나의 지름은 10cm, 반지름은 5cm예요. 원 하나의 넓이: 78.5","색칠한 부분 = 직사각형 − 원 2개"],ok:"200 − 78.5 × 2 = 43cm²"},
-  {id:"m10",title:"운동장 트랙 모양",txt:"가로 10cm, 세로 8cm인 직사각형 양쪽에 반원이 붙어 있어요. 전체 넓이는 몇 cm²일까요?",ans:130.24,
+  {id:"m10",title:"운동장 트랙의 넓이",txt:"가로 10cm, 세로 8cm인 직사각형 양쪽에 반원이 붙어 있어요. 전체 넓이는 몇 cm²일까요?",ans:130.24,
    wrong:[[80,"그건 가운데 직사각형만의 넓이예요. 양쪽 반원도 더해요."],[105.12,"반원은 양쪽에 2개 있어요."],[280.96,"반원의 지름이 8cm이니 반지름은 4cm예요."]],
-   hints:["가운데 직사각형의 넓이: 10 × 8 = 80","양쪽 반원 2개를 합치면 지름 8cm인 원 1개예요. 4 × 4 × 3.14 = 50.24","전체 = 직사각형 + 원"],ok:"80 + 50.24 = 130.24cm²"}
+   hints:["가운데 직사각형의 넓이: 10 × 8 = 80","양쪽 반원 2개를 합치면 지름 8cm인 원 1개예요. 4 × 4 × 3.14 = 50.24","전체 = 직사각형 + 원"],ok:"80 + 50.24 = 130.24cm²"},
+  {id:"p3",title:"운동장 트랙의 둘레",txt:"바로 앞 미션의 운동장 트랙 모양이에요. 바깥 둘레(보라색 선)는 몇 cm일까요?",ans:45.12,unit:"cm",
+   wrong:[[61.12,"점선은 트랙 안쪽의 선이라서 둘레가 아니에요."],[32.56,"양쪽 반원을 합치면 원 1개의 원주예요. 반원 하나만 더하지 않았나요?"],[36,"양쪽의 굽은 선은 곧은 선이 아니에요. 원주로 구해요."],[70.24,"양쪽 반원 2개를 합치면 원 2개가 아니라 원 1개예요."]],
+   hints:["둘레 = 위아래 곧은 선 2개 + 양쪽 굽은 선 2개예요.","곧은 선: 10 × 2 = 20","양쪽 반원을 합치면 지름 8cm인 원 1개의 원주: 8 × 3.14 = 25.12"],ok:"20 + 25.12 = 45.12cm"}
 ];
 const BONUS=[
+  {id:"m8",title:"원 속 정사각형",txt:"반지름이 4cm인 원 안에 네 꼭짓점이 원에 닿는 정사각형이 있어요. 색칠한 부분의 넓이는 몇 cm²일까요?",ans:18.24,
+   wrong:[[50.24,"그건 원 전체의 넓이예요. 가운데 정사각형은 색칠되지 않았어요."],[32,"그건 정사각형의 넓이예요. 원에서 정사각형을 빼요."],[-13.76,"정사각형의 한 변은 8cm가 아니에요. 두 대각선이 지름(8cm)이니 마름모처럼 대각선 × 대각선 ÷ 2로 구해요."]],
+   hints:["원의 넓이: 4 × 4 × 3.14 = 50.24","정사각형의 두 대각선은 모두 지름 8cm예요. 넓이 = 8 × 8 ÷ 2 = 32","색칠한 부분 = 원 − 정사각형"],ok:"50.24 − 32 = 18.24cm²"},
   {id:"b1",title:"원의 4분의 3",txt:"반지름이 4cm인 원에서 4분의 1을 잘라 냈어요. 남은 부분의 넓이는 몇 cm²일까요?",ans:37.68,
    wrong:[[50.24,"그건 원 전체의 넓이예요. 4분의 1이 잘려 나갔어요."],[12.56,"그건 잘려 나간 4분의 1의 넓이예요."],[25.12,"그건 반원의 넓이예요. 4조각 중 3조각이 남았어요."]],
    hints:["원 전체: 4 × 4 × 3.14 = 50.24","4조각 중 3조각이 남았어요. 50.24 ÷ 4 × 3"],ok:"50.24 ÷ 4 × 3 = 37.68cm²"},
@@ -215,6 +228,9 @@ const BONUS=[
   {id:"b5",title:"네 모퉁이의 부채꼴",txt:"한 변이 8cm인 정사각형의 네 꼭짓점을 중심으로, 반지름이 4cm인 원의 4분의 1이 하나씩 그려져 있어요. 가운데 색칠한 부분의 넓이는 몇 cm²일까요?",ans:13.76,
    wrong:[[50.24,"그건 모퉁이 4조각을 모은 넓이예요. 정사각형에서 빼요."],[51.44,"모퉁이 조각은 4개예요."],[64,"그건 정사각형 전체의 넓이예요."]],
    hints:["모퉁이의 4분의 1 원 4개를 모으면 반지름 4cm인 원 1개가 돼요. 4 × 4 × 3.14 = 50.24","정사각형: 8 × 8 = 64","색칠한 부분 = 정사각형 − 원 1개"],ok:"64 − 50.24 = 13.76cm²"},
+  {id:"p4",title:"네 모퉁이 부채꼴의 둘레",txt:"바로 앞 도전 미션의 네 모퉁이 부채꼴 그림이에요. 가운데 색칠한 부분의 둘레(보라색 선)는 몇 cm일까요?",ans:25.12,unit:"cm",
+   wrong:[[57.12,"정사각형의 변은 색칠한 부분의 둘레가 아니에요. 색칠한 부분은 굽은 선 4개로만 둘러싸여 있어요."],[12.56,"굽은 선 4개를 모으면 반지름 4cm인 원 1개의 원주예요. 반지름이 아니라 지름에 3.14를 곱해요."],[13.76,"그건 넓이예요. 이번에는 둘레를 구해요."],[50.24,"그건 넓이예요. 이번에는 둘레를 구해요."]],
+   hints:["색칠한 부분은 굽은 선 4개로만 둘러싸여 있어요.","4분의 1 원의 굽은 선 4개를 모으면 원 1개의 원주가 돼요.","반지름 4cm, 지름 8cm인 원의 원주: 8 × 3.14"],ok:"8 × 3.14 = 25.12cm"},
   {id:"b6",title:"반원 속 반원 2개",txt:"반지름이 10cm인 큰 반원 안에, 똑같은 작은 반원 2개가 나란히 들어 있어요. 색칠한 부분의 넓이는 몇 cm²일까요?",ans:78.5,
    wrong:[[157,"그건 큰 반원 전체의 넓이예요."],[117.75,"작은 반원은 2개예요."]],
    hints:["큰 반원: 10 × 10 × 3.14 ÷ 2 = 157","작은 반원의 반지름은 5cm, 작은 반원 2개를 합치면 반지름 5cm인 원 1개: 78.5","색칠한 부분 = 큰 반원 − 작은 원 1개"],ok:"157 − 78.5 = 78.5cm²"},
@@ -237,10 +253,10 @@ const starSVG=on=>`<svg class="key" viewBox="0 0 30 30" aria-hidden="true"><path
 const list=s=>s==="m"?MAIN:BONUS,doneSet=s=>s==="m"?solved:bsolved;
 function card(s,m,i){const d=doneSet(s).has(i),on=cur.set===s&&cur.i===i;return `<button class="mc${d?" done":""}" data-s="${s}" data-i="${i}" aria-pressed="${on}"><svg viewBox="0 0 240 200" aria-hidden="true">${FIG[m.id]()}</svg><b>${s==="m"?"미션":"도전"} ${i+1}</b><span>${m.title}</span></button>`;}
 function renderBoard(){
-  $("keys").innerHTML=`<span>모은 열쇠 ${solved.size} / 10</span>`+MAIN.map((_,i)=>keySVG(solved.has(i))).join("");
+  $("keys").innerHTML=`<span>모은 열쇠 ${solved.size} / ${MAIN.length}</span>`+MAIN.map((_,i)=>keySVG(solved.has(i))).join("");
   $("board").innerHTML=MAIN.map((m,i)=>card("m",m,i)).join("");
   const open=solved.size===MAIN.length;$("final").hidden=!open;$("bonus").hidden=!open;
-  if(open){$("stars").innerHTML=`<span>받은 별 ${bsolved.size} / 10</span>`+BONUS.map((_,i)=>starSVG(bsolved.has(i))).join("");$("bboard").innerHTML=BONUS.map((m,i)=>card("b",m,i)).join("");$("bdone").hidden=bsolved.size<BONUS.length;}
+  if(open){$("stars").innerHTML=`<span>받은 별 ${bsolved.size} / ${BONUS.length}</span>`+BONUS.map((_,i)=>starSVG(bsolved.has(i))).join("");$("bboard").innerHTML=BONUS.map((m,i)=>card("b",m,i)).join("");$("bdone").hidden=bsolved.size<BONUS.length;}
 }
 function openM(s,i){
   cur={set:s,i};hintN=0;const m=list(s)[i],isDone=doneSet(s).has(i);
@@ -273,9 +289,9 @@ $("reset").onclick=()=>{
 };
 /* 선생님 바로가기: 학생용 주소(github.io)에서는 ?teacher 를 붙였을 때만 보여요. */
 if(!/github\.io$/.test(location.hostname)||/teacher/.test(location.search))$("tbar").hidden=false;
-$("tbar").onclick=e=>{const b=e.target.closest("button");if(!b)return;const k=+b.dataset.j;resetAll();
-  for(let i=0;i<Math.min(k,10);i++)solved.add(i);for(let i=0;i<k-10;i++)bsolved.add(i);
-  if(k<10)openM("m",k);else if(k<20)openM("b",0);else openM("b",9);};
+$("tbar").onclick=e=>{const b=e.target.closest("button");if(!b)return;const j=b.dataset.j,ML=MAIN.length,BL=BONUS.length;resetAll();if(j==="0")return;
+  const k=j==="almost"?ML-1:ML;for(let i=0;i<k;i++)solved.add(i);if(j==="all")for(let i=0;i<BL;i++)bsolved.add(i);
+  if(j==="almost")openM("m",ML-1);else if(j==="main")openM("b",0);else openM("b",BL-1);};
 
 resetAll();
 /* 수업 중 실수로 새로 고침하거나 나가지 않도록 */
