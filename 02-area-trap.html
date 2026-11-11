@@ -79,6 +79,10 @@ h1{font-family:var(--display);font-weight:700;font-size:2.1rem;line-height:1.1;m
 .sent{margin:0;padding:12px 14px;border-radius:12px;background:var(--accent-bg);font-size:1.05rem;line-height:1.9;word-break:keep-all}
 .blank{display:inline-block;min-width:2.4em;text-align:center;border-bottom:2px solid var(--ink);font-family:var(--display);font-size:1.4rem;line-height:1;padding:0 4px;font-variant-numeric:tabular-nums}
 .blank.fill{color:var(--accent);border-color:var(--accent)}
+.rin{width:2.6em;font:inherit;font-family:var(--display);font-size:1.4rem;line-height:1.2;text-align:center;padding:2px 4px;border:none;border-bottom:2px solid var(--ink);border-radius:4px 4px 0 0;background:var(--bg);color:var(--ink)}
+.rin:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+.rin.err{border-color:var(--bad)}
+.rin:disabled{color:var(--accent);border-color:var(--accent);background:transparent}
 .tablebox{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:.92rem;font-variant-numeric:tabular-nums}
 th,td{text-align:right;padding:6px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
@@ -139,9 +143,10 @@ html,body{overscroll-behavior-y:contain}
     </div>
     <div class="ratio" id="ratio3" hidden>
       <strong>반지름을 한 변으로 하는 정사각형과 비교해 봐요</strong>
-      <p>반지름 × 반지름 = 4 × 4 = 16cm²예요. 32cm²와 64cm²는 이 넓이의 몇 배일까요?</p>
-      <p class="sent" style="background:var(--paper)">원의 넓이는 반지름 × 반지름의 <span class="blank fill">2</span>배보다 크고 <span class="blank fill">4</span>배보다 작아요.</p>
-      <p>계산 두 번으로 금방 가뒀지만, 범위가 너무 넓어요. 원의 넓이가 35cm²쯤인지 60cm²쯤인지도 알 수 없지요. 더 정확하게 가둘 방법은 없을까요?</p>
+      <p>반지름 × 반지름 = 4 × 4 = 16cm²예요. 32cm²와 64cm²는 16cm²의 몇 배일까요? 계산해서 빈칸에 써 보세요.</p>
+      <form id="rform" class="sent" style="background:var(--paper)" novalidate>원의 넓이는 반지름 × 반지름의 <input id="r1" class="rin" type="text" inputmode="decimal" autocomplete="off" aria-label="32cm²는 16cm²의 몇 배">배보다 크고 <input id="r2" class="rin" type="text" inputmode="decimal" autocomplete="off" aria-label="64cm²는 16cm²의 몇 배">배보다 작아요. <button class="btn primary" type="submit" id="rok" style="padding:8px 16px">확인하기</button></form>
+      <p class="toast" id="rtoast" role="status"></p>
+      <p id="rmore" hidden>계산 두 번으로 금방 가뒀지만, 범위가 너무 넓어요. 원의 넓이가 35cm²쯤인지 60cm²쯤인지도 알 수 없지요. 더 정확하게 가둘 방법은 없을까요?</p>
     </div>
     <div class="row"><button class="btn primary" id="next3" disabled>모눈 칸으로 더 정확하게</button></div>
   </section>
@@ -421,7 +426,18 @@ function quiz3(id,right,hints,ok){$(id).onclick=e=>{const b=e.target.closest(".b
 quiz3("c3a","32",{"16":"대각선 × 대각선 ÷ 2예요. 8 × 8 ÷ 2를 계산해 보세요.","64":"마름모는 대각선 × 대각선을 한 다음 2로 나눠야 해요."},
   ()=>{draw3(1);$("b3a").textContent="32";$("b3a").classList.add("fill");$("toast3").textContent="맞아요! 8 × 8 ÷ 2 = 32cm²예요. 원은 이것보다 넓어요.";$("q3b").hidden=false;});
 quiz3("c3b","64",{"32":"한 변이 8cm인 정사각형이에요. 8 × 8을 계산해 보세요.","128":"정사각형 넓이는 한 변 × 한 변이에요."},
-  ()=>{draw3(2);$("b3b").textContent="64";$("b3b").classList.add("fill");$("toast3").textContent="맞아요! 8 × 8 = 64cm²예요. 계산 두 번으로 금방 가뒀어요. 그런데 범위가 꽤 넓지요?";$("ratio3").hidden=false;$("next3").disabled=false;done.add(1);});
+  ()=>{draw3(2);$("b3b").textContent="64";$("b3b").classList.add("fill");$("toast3").textContent="맞아요! 8 × 8 = 64cm²예요. 계산 두 번으로 금방 가뒀어요. 그런데 범위가 꽤 넓지요?";$("ratio3").hidden=false;$("r1").focus({preventScroll:true});});
+function ratioDone(){["r1","r2","rok"].forEach(id=>$(id).disabled=true);$("r1").value="2";$("r2").value="4";$("rmore").hidden=false;$("next3").disabled=false;done.add(1);}
+["r1","r2"].forEach(id=>$(id).addEventListener("input",()=>$(id).classList.remove("err")));
+$("rform").addEventListener("submit",e=>{e.preventDefault();if($("rok").disabled)return;const tt=$("rtoast"),n=v=>{const x=parseFloat(String(v).replace(",",".").trim());return isFinite(x)?x:NaN;},a=n($("r1").value),b=n($("r2").value);
+  $("r1").classList.toggle("err",a!==2);$("r2").classList.toggle("err",b!==4);
+  if(a===2&&b===4){tt.className="toast ok";tt.textContent="맞아요! 32 ÷ 16 = 2, 64 ÷ 16 = 4예요.";ratioDone();return;}
+  tt.className="toast bad";
+  if(isNaN(a)||isNaN(b))tt.textContent="두 빈칸에 모두 수를 써 주세요.";
+  else if(a===4&&b===2)tt.textContent="앞 빈칸은 작은 쪽(32cm²), 뒤 빈칸은 큰 쪽(64cm²)이에요.";
+  else if(a===16||b===48||a===512||b===1024)tt.textContent="몇 배인지는 나눗셈으로 구해요. 32 ÷ 16을 계산해 보세요.";
+  else if(a!==2)tt.textContent="32cm²는 16cm²의 몇 배일까요? 32 ÷ 16을 계산해 보세요.";
+  else tt.textContent="64cm²는 16cm²의 몇 배일까요? 64 ÷ 16을 계산해 보세요.";});
 $("next3").onclick=()=>{show(2);};
 
 /* ---------- 마무리 ---------- */
@@ -446,6 +462,7 @@ function resetAll(){
   $("g2s").hidden=false;$("g2").hidden=true;draw2s();
   $("cnt2").hidden=true;$("smaller2").disabled=true;$("next2").disabled=true;$("m2in").textContent=0;$("m2edge").textContent=0;$("tbl2").innerHTML="";$("rateNote").textContent="";
   $("q3b").hidden=true;$("ratio3").hidden=true;$("next3").disabled=true;
+  ["r1","r2"].forEach(id=>{$(id).value="";$(id).classList.remove("err");});["r1","r2","rok"].forEach(id=>$(id).disabled=false);$("rmore").hidden=true;$("rtoast").textContent="";$("rtoast").className="toast";
   [["b3a","?"],["b3b","?"]].forEach(([id,v])=>{$(id).textContent=v;$(id).classList.remove("fill");});
   ["toast1","toast2","toast3"].forEach(id=>{$(id).textContent="";$(id).className="toast";});
   draw1();draw3(0);show(1);
@@ -464,7 +481,7 @@ $("reset").onclick=()=>{
 if(!/github\.io$/.test(location.hostname)||/teacher/.test(location.search))$("tbar").hidden=false;
 $("tbar").onclick=e=>{const b=e.target.closest("button");if(!b)return;const j=b.dataset.j;resetAll();
   if(j==="1")return;
-  draw3(2);$("b3a").textContent="32";$("b3b").textContent="64";["b3a","b3b"].forEach(id=>$(id).classList.add("fill"));$("q3b").hidden=false;$("ratio3").hidden=false;$("next3").disabled=false;done.add(1);
+  draw3(2);$("b3a").textContent="32";$("b3b").textContent="64";["b3a","b3b"].forEach(id=>$(id).classList.add("fill"));$("q3b").hidden=false;$("ratio3").hidden=false;ratioDone();
   ["c3a","c3b"].forEach(id=>$(id).querySelectorAll(".btn").forEach(x=>x.disabled=true));
   if(j==="2"){show(2);return;}
   T10.forEach((v,k)=>s1[k]=v);draw1();solved1=true;elapsed=138;rate=2;$("clock").textContent=fmtT(elapsed)+" (예시)";$("check1").disabled=true;$("clear1").disabled=true;$("after1").hidden=false;$("next1").disabled=false;done.add(2);
