@@ -48,5 +48,9 @@ a:hover,a:focus-visible{border-color:var(--accent);background:var(--accent-bg);o
     <p style="margin:0">© 2026 김지훈. All rights reserved. 이 프로그램의 기획, 차시 재구성, 발문과 문항, 화면 구성은 제작자의 창작물이며 저작권법의 보호를 받습니다. 제작자의 허락 없이 복제, 수정, 배포하거나 다른 곳에 게시할 수 없으며, 상업적으로 이용할 수 없습니다.</p>
   </footer>
 </div>
+<script>/* teacher-mode: ?teacher 로 열면 차시로 가는 링크에도 ?teacher 를 붙여 선생님 바로가기가 계속 보이게 해요. */
+if(/teacher/.test(location.search)){document.querySelectorAll('a[href$=".html"]').forEach(a=>{a.href=a.getAttribute("href")+"?teacher";});
+  const h=document.querySelector("h1");if(h){const m=document.createElement("span");m.textContent="선생님 모드";m.style.cssText="display:inline-block;margin-left:10px;padding:2px 10px;border-radius:999px;font-size:.9rem;vertical-align:middle;border:1.5px dashed currentColor;opacity:.7";h.appendChild(m);}}
+</script>
 </body>
 </html>
