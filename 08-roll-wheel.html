@@ -186,7 +186,7 @@ function show(k){
   if(prev!==k&&k===2){flag=tgt[0];wheelSVG(+$("dsl").value,0,[],null);}
   for(const i of [1,2,3,4])$("step"+i).hidden=i!==k;
   for(const i of [1,2,3,4]){const e=$("tab"+i);if(i===k)e.setAttribute("aria-current","step");else e.removeAttribute("aria-current");e.classList.toggle("done",i!==k&&done.has(i));}
-  $("stage").hidden=k>=3;
+  $("stage").toggleAttribute("hidden",k>=3);/* svg 요소는 .hidden 속성이 없어서 hidden 속성을 직접 붙여요 */
   window.scrollTo({top:0,behavior:"smooth"});
 }
 

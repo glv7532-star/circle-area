@@ -209,7 +209,7 @@ html,body{overscroll-behavior-y:contain}
           </figure>
         </div>
         <div id="man2" hidden style="display:flex;flex-direction:column;gap:12px">
-          <p class="note">이번에도 직접 칠하며 세어 보세요. 칸이 많아서 이번에는 손가락으로 쓸어서 칠할 수도 있어요. 둘레가 칸의 모서리를 아슬아슬하게 스치고 지나가는 칸은 어느 색으로 칠해도 괜찮아요.</p>
+          <p class="note">이번에도 직접 칠하며 세어 보세요. 칸이 많아서 이번에는 손가락으로 쓸어서 칠할 수도 있어요. 둘레가 칸을 조금이라도 지나가면 노란색으로 칠해요. 둘레 선에 모서리가 살짝 덮여 보이는 칸은 노란색으로 칠해도 맞다고 해 줄게요.</p>
           <div class="palette" id="pal2" role="group" aria-label="칠할 색">
             <button class="sw" data-v="1" aria-pressed="true"><span style="background:var(--in)"></span>완전히 들어간 칸</button>
             <button class="sw" data-v="2" aria-pressed="false"><span style="background:var(--edge)"></span>둘레가 지나가는 칸</button>
@@ -299,7 +299,7 @@ function gridSVG(N,s,cells){
 
 /* ---------- 1단계: 직접 칠하며 세기 ---------- */
 const T10=truth(9,1),[IN10,ED10]=counts(T10);
-let s1=new Array(81).fill(0),brush=1,painting=false,pval=0,t0=0,elapsed=0,tick=0,solved1=false;
+let rec1=0,s1=new Array(81).fill(0),brush=1,painting=false,pval=0,t0=0,elapsed=0,tick=0,solved1=false;
 function draw1(){$("g1").innerHTML=gridSVG(9,1,s1);upd1();}
 function upd1(){
   const rs=$("g1").querySelectorAll("rect.c");rs.forEach((r,k)=>{r.setAttribute("class","c"+(s1[k]?" v"+s1[k]:""));});
@@ -322,7 +322,7 @@ $("clear1").onclick=()=>{if(solved1)return;s1.fill(0);draw1();$("toast1").textCo
 $("check1").onclick=()=>{
   if(solved1)return;const wrong=[];T10.forEach((v,k)=>{if(s1[k]!==v)wrong.push(k);});
   const rs=$("g1").querySelectorAll("rect.c"),tt=$("toast1");
-  if(!wrong.length){solved1=true;stopClock();tt.className="toast ok";
+  if(!wrong.length){solved1=true;stopClock();rec1=elapsed;tt.className="toast ok";
     tt.textContent=`정확해요! 세는 데 ${fmtT(elapsed)} 걸렸어요.`;$("check1").disabled=true;$("clear1").disabled=true;$("after1").hidden=false;$("redo1").hidden=false;return;}
   wrong.forEach(k=>rs[k].classList.add("wrong"));tt.className="toast bad";
   const miss=wrong.filter(k=>T10[k]&&!s1[k]).length,extra=wrong.filter(k=>!T10[k]&&s1[k]).length,mix=wrong.length-miss-extra;
@@ -364,9 +364,7 @@ $("c2").onclick=e=>{const b=e.target.closest(".btn");if(!b||b.disabled)return;co
     tt.textContent="맞아요! 1cm 칸 하나에 0.5cm 칸이 가로 2개, 세로 2개, 모두 4개 들어가요. 세어야 할 칸도 거의 4배가 돼요. 정말 그런지 직접 칠하며 세어 볼까요?";$("man2").hidden=false;}
   else{b.classList.add("no");b.disabled=true;tt.className="toast bad";tt.textContent="칸 한 변의 길이가 반이 되면, 가로로도 2개, 세로로도 2개가 들어가요. 그림에서 작은 칸이 모두 몇 개인지 세어 보세요.";$("hint2").hidden=false;}
 };
-/* ---------- 0.5cm 칸: 직접 칠하며 세기 ----------
-   0.5cm 모눈에서는 원의 둘레가 몇몇 칸의 모서리를 아주 가깝게(칸 크기의 10%쯤) 지나가요.
-   그런 칸은 눈으로 판단하기 어려우니, 파랑이든 노랑이든 맞은 것으로 쳐요. */
+/* ---------- 0.5cm 칸: 직접 칠하며 세기 ---------- */
 /* 원 안에 완전히 들어가지만 바깥 모서리가 둘레 선에 덮여 보이는 칸(AMBF)만 너그럽게 봐요.
    선이 칸에 닿아 보이므로 '둘레가 지나가는 칸'으로 칠해도 맞다고 해요. 안 칠하면 틀려요.
    둘레가 조금이라도 지나가는 칸은 반드시 '둘레가 지나가는 칸'으로 칠해야 해요. */
@@ -408,7 +406,7 @@ $("check2").onclick=()=>{
 $("giveup2").onclick=()=>{if(solved2)return;s2=T05.slice();draw2s();done05(false);};
 
 function runCount(){
-  $("g2s").hidden=true;$("g2").hidden=false;
+  $("g2s").toggleAttribute("hidden",true);$("g2").hidden=false;
   const [N,s]=SIZES[lv],T=truth(N,s),cells=new Array(N*N).fill(0);draw2(N,s,cells);
   const order=[];T.forEach((v,k)=>{if(v)order.push(k);});
   $("m2s").textContent=s+"cm";$("smaller2").disabled=true;
@@ -466,7 +464,7 @@ $("next3").onclick=()=>{show(2);};
 function renderSum(){
   const c=(k,v,d)=>`<div class="sumc"><span class="k">${k}</span><span class="v">${v}</span><span class="d">${d}</span></div>`;
   $("sum4").innerHTML=c("정사각형 2개로 가두기","32 ~ 64cm²","계산 두 번이면 끝나지만 범위가 넓어요.")
-    +c("모눈 1cm 칸 (직접 셈)","37 ~ 69cm²",`69칸을 세는 데 ${elapsed?fmtT(elapsed):"한참"} 걸렸어요.`)
+    +c("모눈 1cm 칸 (직접 셈)","37 ~ 69cm²",`69칸을 세는 데 ${rec1?fmtT(rec1):"한참"} 걸렸어요.`)
     +(()=>{const f=SIZES.filter(([N])=>counted.has(N)).pop()||SIZES[2],[N,sz]=f,[a,b]=counts(truth(N,sz));
       return c(`모눈 ${sz}cm 칸 (컴퓨터가 셈)`,`${+(a*sz*sz).toFixed(2)} ~ ${+((a+b)*sz*sz).toFixed(2)}cm²`,`정확하지만 ${(a+b).toLocaleString("ko-KR")}칸을 손으로 세면 약 ${fmtT((a+b)*rate)} 걸려요.`);})()
     ;
@@ -477,13 +475,13 @@ $("redo1").onclick=()=>{s1.fill(0);solved1=false;t0=0;clearInterval(tick);$("clo
 /* ---------- 처음부터 ---------- */
 function resetAll(){
   cancelAnimationFrame(counting);clearInterval(tick);done.clear();
-  s1.fill(0);brush=1;t0=0;elapsed=0;solved1=false;rate=2;lv=1;counted=new Set();
+  s1.fill(0);brush=1;t0=0;elapsed=0;rec1=0;solved1=false;rate=2;lv=1;counted=new Set();
   $("pal").querySelectorAll(".sw").forEach(x=>x.setAttribute("aria-pressed",x.dataset.v==="1"?"true":"false"));
   $("clock").textContent="0초";$("check1").disabled=false;$("clear1").disabled=false;$("after1").hidden=true;$("next1").disabled=true;
   ["c1","c2","c3a","c3b"].forEach(id=>$(id).querySelectorAll(".btn").forEach(b=>{b.disabled=false;b.classList.remove("yes","no");}));
   clearInterval(tick2);s2.fill(0);brush2=1;t02=0;el2=0;solved2=false;$("man2").hidden=true;$("clock2").textContent="0초";$("check2").disabled=false;$("clear2").disabled=false;$("giveup2").hidden=true;
   $("pal2").querySelectorAll(".sw").forEach(x=>x.setAttribute("aria-pressed",x.dataset.v==="1"?"true":"false"));
-  $("g2s").hidden=false;$("g2").hidden=true;draw2s();
+  $("g2s").toggleAttribute("hidden",false);$("g2").hidden=true;draw2s();
   $("cnt2").hidden=true;$("smaller2").disabled=true;$("next2").disabled=true;$("m2in").textContent=0;$("m2edge").textContent=0;$("tbl2").innerHTML="";$("rateNote").textContent="";
   $("q3b").hidden=true;$("ratio3").hidden=true;$("next3").disabled=true;
   ["r1","r2"].forEach(id=>{$(id).value="";$(id).classList.remove("err");});["r1","r2","rok"].forEach(id=>$(id).disabled=false);$("rmore").hidden=true;$("rtoast").textContent="";$("rtoast").className="toast";
@@ -508,10 +506,16 @@ $("tbar").onclick=e=>{const b=e.target.closest("button");if(!b)return;const j=b.
   draw3(2);$("b3a").textContent="32";$("b3b").textContent="64";["b3a","b3b"].forEach(id=>$(id).classList.add("fill"));$("q3b").hidden=false;$("ratio3").hidden=false;ratioDone();
   ["c3a","c3b"].forEach(id=>$(id).querySelectorAll(".btn").forEach(x=>x.disabled=true));
   if(j==="2"){show(2);return;}
-  T10.forEach((v,k)=>s1[k]=v);draw1();solved1=true;elapsed=138;rate=2;$("clock").textContent=fmtT(elapsed)+" (예시)";$("check1").disabled=true;$("clear1").disabled=true;$("after1").hidden=false;$("next1").disabled=false;done.add(2);
+  T10.forEach((v,k)=>s1[k]=v);draw1();solved1=true;elapsed=138;rec1=138;rate=2;$("clock").textContent=fmtT(elapsed)+" (예시)";$("check1").disabled=true;$("clear1").disabled=true;$("after1").hidden=false;$("next1").disabled=false;done.add(2);
   counted.add(9);table2();
+  show(2);/* 지나온 단계 표시를 눌러 돌아갈 수 있게 2단계도 연 것으로 */
   if(j==="3"){show(3);return;}
-  solved2=true;s2=T05.slice();counted=new Set(SIZES.map(z=>z[0]));lv=LAST;table2();$("cnt2").hidden=false;$("next2").disabled=false;done.add(3);done.add(4);show(4);
+  /* 3단계를 끝까지 한 상태: '4배' 정답, 0.5cm 모눈 완료, 컴퓨터가 가장 작은 칸까지 센 그림 */
+  $("c2").querySelectorAll(".btn").forEach(x=>{x.disabled=true;if(x.dataset.v==="4")x.classList.add("yes");});$("hint2").hidden=true;$("man2").hidden=false;
+  solved2=true;s2=T05.slice();draw2s();$("check2").disabled=true;$("clear2").disabled=true;$("giveup2").hidden=true;$("clock2").textContent="(예시)";
+  counted=new Set(SIZES.map(z=>z[0]));lv=LAST;table2();$("cnt2").hidden=false;$("smaller2").disabled=true;$("next2").disabled=false;
+  {const [N,s]=SIZES[LAST],T=truth(N,s),[a,b]=counts(T);$("g2s").toggleAttribute("hidden",true);$("g2").hidden=false;draw2(N,s,T);$("m2s").textContent=s+"cm";$("m2in").textContent=a.toLocaleString("ko-KR");$("m2edge").textContent=b.toLocaleString("ko-KR");}
+  done.add(3);done.add(4);show(3);show(4);
 };
 
 resetAll();

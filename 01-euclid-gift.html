@@ -371,8 +371,9 @@ $("tbar").onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.datas
   lit=24;draw1();$("count1").disabled=true;$("q1").hidden=false;$("c1").querySelectorAll(".btn").forEach(x=>x.disabled=true);$("next1").disabled=false;done.add(1);
   if(j==="2"){show(2);return;}
   fin=new Set(ORDER);$("next2").disabled=false;done.add(2);
+  show(2);/* 지나온 단계 표시를 눌러 돌아갈 수 있게 2단계도 연 것으로 */
   if(j==="3"){show(3);return;}
-  $("story3").hidden=false;$("c3").querySelectorAll(".btn").forEach(x=>x.disabled=true);$("next3").disabled=false;done.add(3);done.add(4);show(4);
+  $("story3").hidden=false;$("c3").querySelectorAll(".btn").forEach(x=>x.disabled=true);$("next3").disabled=false;done.add(3);done.add(4);show(3);show(4);
 };
 
 resetAll();
