@@ -312,7 +312,10 @@ function paintAt(el){if(!el||!el.classList||!el.classList.contains("c")||solved1
 $("g1").addEventListener("pointerdown",e=>{const el=e.target;if(!el.classList.contains("c")||solved1)return;e.preventDefault();startClock();
   $("g1").querySelectorAll(".wrong").forEach(x=>x.classList.remove("wrong"));
   const k=+el.dataset.k;pval=(brush&&s1[k]===brush)?0:brush;painting=true;paintAt(el);});
-/* 1cm 모눈은 한 칸씩 눌러서만 칠해요(쓸어서 칠하면 세는 수고로움을 겪지 못해서). */
+/* 1cm 모눈은 학생 화면에서는 한 칸씩 눌러서만 칠해요(쓸어서 칠하면 세는 수고로움을 겪지 못해서).
+   선생님 화면(?teacher)에서는 설명할 때 수업이 늘어지지 않도록 쓸어서 칠할 수 있어요. */
+const TEACHER=/teacher/.test(location.search);
+$("g1").addEventListener("pointermove",e=>{if(!painting||!TEACHER)return;paintAt(document.elementFromPoint(e.clientX,e.clientY));});
 addEventListener("pointerup",()=>{painting=false;});addEventListener("pointercancel",()=>{painting=false;});
 $("pal").onclick=e=>{const b=e.target.closest(".sw");if(!b)return;brush=+b.dataset.v;$("pal").querySelectorAll(".sw").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));};
 $("clear1").onclick=()=>{if(solved1)return;s1.fill(0);draw1();$("toast1").textContent="";};
