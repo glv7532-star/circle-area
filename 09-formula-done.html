@@ -197,11 +197,11 @@ html,body{overscroll-behavior-y:contain}
 <script>
 const $=id=>document.getElementById(id);
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
-const done=new Set();
+const done=new Set();let kBuilt=false;/* 케플러 단계는 처음 들어갈 때만 새로 시작하고, 다시 돌아오면 하던 모습 그대로 보여 줘요. */
 function show(k){
   for(const i of [1,2,3,4])$("step"+i).hidden=i!==k;
   for(const i of [1,2,3,4]){const e=$("tab"+i);if(i===k)e.setAttribute("aria-current","step");else e.removeAttribute("aria-current");e.classList.toggle("done",i!==k&&done.has(i));}
-  if(k===3){drawTri();buildK();}
+  if(k===3){drawTri();if(!kBuilt){buildK();kBuilt=true;}else drawK();}
   window.scrollTo({top:0,behavior:"smooth"});
 }
 function quiz(id,right,hints,toast,ok){
@@ -309,7 +309,7 @@ function resetAll(){
   ["ca","cb","cc","c2","c3a"].forEach(id=>$(id).querySelectorAll(".btn").forEach(b=>{b.disabled=false;b.classList.remove("yes","no");}));
   $("qb").hidden=true;$("qc").hidden=true;$("half1").hidden=true;$("next1").disabled=true;$("cmp2").hidden=true;$("kep").hidden=true;$("next3").disabled=true;
   ["toast1","toast2","toast3"].forEach(id=>{$(id).textContent="";$(id).className="toast";});
-  apx=280;kn=8;$("nRow").querySelectorAll(".btn").forEach(x=>x.classList.toggle("on",x.dataset.n==="8"));buildK();show(1);
+  kBuilt=false;apx=280;kn=8;$("nRow").querySelectorAll(".btn").forEach(x=>x.classList.toggle("on",x.dataset.n==="8"));buildK();show(1);
 }
 let resetArm=0;
 $("reset").onclick=()=>{

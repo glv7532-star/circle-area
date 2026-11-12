@@ -202,8 +202,21 @@ const done=new Set();
 const STAGES=[4,8,16];let si=0;
 let cur=1,n=4,t=0,anim=0,showDims=false,hiTop=false,hiH=false,drag=false,busy=false,pst=[],active=-1,grab=[0,0],madeOnce=false,topName="노란 원의 둘레 전체";
 
+/* 무대(조각 그림)는 모든 단계가 함께 써요. 단계를 떠날 때 무대 모습을 저장해 두었다가,
+   그 단계로 다시 돌아오면 그때 모습으로 되살려요. */
+const KEEP={};
+function snapStage(){return {n,si,t,drag,showDims,hiTop,hiH,pst:pst.map(q=>({...q})),touch:$("stage").style.touchAction};}
+function restoreStage(S){n=S.n;si=S.si;t=S.t;drag=S.drag;showDims=S.showDims;hiTop=S.hiTop;hiH=S.hiH;pst=S.pst.map(q=>({...q}));active=-1;
+  build();$("stage").style.touchAction=S.touch||"manipulation";drawDims();}
 function show(k){
+  if(busy&&k!==cur)return;
+  const prev=cur;
+  if(prev!==k)KEEP[prev]=snapStage();
   cur=k;
+  if(prev!==k){
+    if(KEEP[k])restoreStage(KEEP[k]);
+    else if(k===1){n=STAGES[si];drag=false;t=1;showDims=false;hiTop=false;hiH=false;active=-1;build();$("stage").style.touchAction="manipulation";drawDims();}
+  }
   for(const i of [1,2,3,4,5])$("step"+i).hidden=i!==k;
   for(const i of [1,2,3,4,5]){const e=$("tab"+i);if(i===k)e.setAttribute("aria-current","step");else e.removeAttribute("aria-current");e.classList.toggle("done",i!==k&&done.has(i));}
   window.scrollTo({top:0,behavior:"smooth"});
@@ -358,6 +371,7 @@ $("next4").onclick=()=>{done.add(5);show(5);};
 
 /* ---------- 처음부터 ---------- */
 function resetAll(){
+  for(const k in KEEP)delete KEEP[k];
   cancelAnimationFrame(anim);busy=false;drag=false;active=-1;cur=1;done.clear();si=0;n=4;t=0;showDims=false;hiTop=false;hiH=false;build();startDrag();
   madeOnce=false;$("move1").disabled=true;$("back1").disabled=true;$("q1").hidden=true;$("next1").disabled=true;$("next2").disabled=true;$("next3").disabled=true;$("next4").disabled=true;$("swap4").disabled=false;topName="노란 원의 둘레 전체";
   ["c1","c3a","c3b","c3c"].forEach(id=>$(id).querySelectorAll(".btn").forEach(b=>{b.disabled=false;b.classList.remove("yes","no");}));

@@ -172,7 +172,13 @@ const PI=3.14,done=new Set();
 const num=s=>{const v=parseFloat(String(s).replace(",",".").trim());return isFinite(v)?v:NaN;};
 const near=(a,b)=>Math.abs(a-b)<0.005+1e-9*Math.abs(b);
 const fx=v=>+v.toFixed(2);
+/* 무대(바퀴와 자)는 1·2단계가 함께 써요. 단계 표시를 눌러 돌아오면 그 단계의 무대로 다시 그려요. */
+let curStep=1;
 function show(k){
+  if(rolling&&k!==curStep)return;
+  const prev=curStep;curStep=k;
+  if(prev!==k&&k===1){flag=null;wheelSVG(d1,0,[],null);}
+  if(prev!==k&&k===2){flag=tgt[0];wheelSVG(+$("dsl").value,0,[],null);}
   for(const i of [1,2,3,4])$("step"+i).hidden=i!==k;
   for(const i of [1,2,3,4]){const e=$("tab"+i);if(i===k)e.setAttribute("aria-current","step");else e.removeAttribute("aria-current");e.classList.toggle("done",i!==k&&done.has(i));}
   $("stage").hidden=k>=3;
