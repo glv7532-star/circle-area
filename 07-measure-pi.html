@@ -69,7 +69,7 @@ th:first-child,td:first-child{text-align:left;white-space:normal;word-break:keep
 th{color:var(--muted);font-weight:400}
 td.ratio{font-family:var(--display);font-size:1.3rem}
 td.warn{color:var(--bad)}
-.del{font:inherit;font-size:.85rem;padding:4px 10px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--muted);cursor:pointer}
+.del{font:inherit;font-size:.85rem;padding:8px 14px;min-height:44px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--muted);cursor:pointer}
 .ex{font-size:.75rem;color:var(--muted);margin-left:4px}
 .empty{padding:22px 14px;border:1.5px dashed var(--line);border-radius:12px;text-align:center;color:var(--muted);word-break:keep-all}
 .chart{width:100%;height:auto;display:block}
@@ -183,7 +183,7 @@ html,body{overscroll-behavior-y:contain}
   <!-- 마무리 -->
   <section class="card" id="step4" hidden>
     <h2>지름만 알면 원주를 구할 수 있어요</h2>
-    <p class="formula">원주율 = 원주 ÷ 지름 ≒ 3.14<br>원주 = 지름 × 3.14</p>
+    <p class="formula">원주율 = 원주 ÷ 지름 = 약 3.14<br>원주 = 지름 × 3.14</p>
     <p class="note">내가 잰 원주와, 지름 × 3.14로 계산한 원주를 비교해 보세요.</p>
     <div class="tablebox"><table>
       <thead><tr><th>물건</th><th>지름</th><th>잰 원주</th><th>지름 × 3.14</th><th>차이</th></tr></thead>
@@ -255,7 +255,8 @@ $("form").addEventListener("submit",e=>{
   rows.push({name,d:+d.toFixed(2),c:+c.toFixed(2)});save();
   $("fName").value="";$("fD").value="";$("fC").value="";$("fName").focus();renderLog();
 });
-$("logBox").addEventListener("click",e=>{const b=e.target.closest(".del");if(!b)return;rows.splice(+b.dataset.i,1);save();renderLog();});
+/* 기록이 4개보다 적어지면 2단계부터 다시 잠가요(빈 기록으로 비교하지 않도록) */
+$("logBox").addEventListener("click",e=>{const b=e.target.closest(".del");if(!b)return;const was=rows.length>=4;rows.splice(+b.dataset.i,1);save();if(was&&rows.length<4)resetSteps();renderLog();});
 $("next1").onclick=()=>{done.add(1);show(2);};
 
 /* ---------- 2단계: 그래프 ---------- */
@@ -273,7 +274,7 @@ function drawChart(){
     for(let i=0;i<=full;i++){const cx=X0+rad+i*dp;
       g+=`<circle cx="${cx.toFixed(2)}" cy="${cy.toFixed(2)}" r="${rad.toFixed(2)}" fill="var(${i%2?"--dot2":"--dot"})" stroke="var(--ink)" stroke-width="1"/>`;
       if(dp>=22)g+=`<line x1="${(cx-rad).toFixed(2)}" y1="${cy.toFixed(2)}" x2="${(cx+rad).toFixed(2)}" y2="${cy.toFixed(2)}" stroke="#fff" stroke-width="1.2" stroke-dasharray="3 3"/>`;
-      if(dp>=26&&i<full)g+=`<text class="num" x="${cx.toFixed(2)}" y="${(cy-5).toFixed(2)}" text-anchor="middle" style="fill:#fff">${i+1}</text>`;}
+      if(dp>=26&&i<full)g+=`<text class="num" x="${cx.toFixed(2)}" y="${(cy-5).toFixed(2)}" text-anchor="middle" style="fill:${i%2?"#2a2210":"#fff"}">${i+1}</text>`;}
     g+=`</g>`;
     /* 잘린 4번째 원의 나머지는 점선으로 */
     const cx4=X0+rad+full*dp;g+=`<circle cx="${cx4.toFixed(2)}" cy="${cy.toFixed(2)}" r="${rad.toFixed(2)}" fill="none" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 3" clip-path="url(#co${k})"/>`;
@@ -283,13 +284,18 @@ function drawChart(){
     y+=rowH+12;});
   $("chart").setAttribute("viewBox",`0 0 540 ${y}`);$("chart").innerHTML=g;
 }
-$("scaleBtn").onclick=()=>{same=!same;$("scaleBtn").textContent=same?"실제 크기로 돌아가기":"크기를 똑같이 맞춰 보기";drawChart();};
+function setSame(v){same=v;$("scaleBtn").textContent=same?"실제 크기로 돌아가기":"크기를 똑같이 맞춰 보기";drawChart();}
+$("scaleBtn").onclick=()=>setSame(!same);
+function ok2(){
+  if(!rows.length)return;const tt=$("toast2");
+  $("c2").querySelectorAll(".btn").forEach(x=>{x.disabled=true;if(x.dataset.v==="same")x.classList.add("yes");});tt.className="toast ok";
+  const byD=rows.slice().sort((a,b)=>a.d-b.d),sm=byD[0],bg=byD[byD.length-1];
+  const who=sm.d<bg.d?`가장 작은 ${sm.name}(지름 ${sm.d}cm)도, 가장 큰 ${bg.name}(지름 ${bg.d}cm)도`:"우리가 잰 물건들은 모두";
+  tt.textContent=`맞아요! ${who} 원주는 지름 3개를 늘어놓은 것보다 조금 더 길어요. 지름의 약 3.14배예요. 원의 크기와 상관없이 원주÷지름은 언제나 일정해요. 지난 시간에 배운 원주율이 바로 이 수예요.`;
+  if(!same)setSame(true);$("next2").disabled=false;done.add(2);
+}
 $("c2").onclick=e=>{const b=e.target.closest(".btn");if(!b||b.disabled)return;const tt=$("toast2");
-  if(b.dataset.v==="same"){b.classList.add("yes");$("c2").querySelectorAll(".btn").forEach(x=>x.disabled=true);tt.className="toast ok";
-    const byD=rows.slice().sort((a,b)=>a.d-b.d),sm=byD[0],bg=byD[byD.length-1];
-    const who=sm.d<bg.d?`가장 작은 ${sm.name}(지름 ${sm.d}cm)도, 가장 큰 ${bg.name}(지름 ${bg.d}cm)도`:"우리가 잰 물건들은 모두";
-    tt.textContent=`맞아요! ${who} 원주는 지름 3개를 늘어놓은 것보다 조금 더 길어요. 지름의 약 3.14배예요. 원의 크기와 상관없이 원주÷지름은 언제나 일정해요. 지난 시간에 배운 원주율이 바로 이 수예요.`;
-    if(!same)$("scaleBtn").click();$("next2").disabled=false;done.add(2);}
+  if(b.dataset.v==="same")ok2();
   else{b.classList.add("no");b.disabled=true;tt.className="toast bad";tt.textContent="보라색 선 아래에 물건이 몇 개 들어가는지, 끝에 적힌 몇 배인지를 작은 물건부터 큰 물건까지 차례로 비교해 보세요.";}
 };
 $("next2").onclick=()=>show(3);
@@ -299,14 +305,20 @@ function renderStat(){
   const qs=rows.map(ratio),avg=qs.reduce((a,b)=>a+b,0)/qs.length;
   $("stat3").innerHTML=`<div class="st"><span>가장 작은 값</span><b>${f2(Math.min(...qs))}</b></div><div class="st"><span>가장 큰 값</span><b>${f2(Math.max(...qs))}</b></div><div class="st"><span>모두의 평균</span><b>${f2(avg)}</b></div>`;
 }
-const FB={string:"맞아요. 실이 늘어나거나 비스듬히 감기면 원주가 실제보다 길게 재어져요.",dia:"맞아요. 중심을 지나지 않으면 지름이 실제보다 짧게 재어져서 원주÷지름이 커져요.",ruler:"맞아요. 눈금 사이를 어림하면 0.1cm쯤은 쉽게 달라져요.",shape:"맞아요. 컵이나 테이프처럼 실제 물건은 완전한 원이 아닐 때가 많아요.",diff:"이건 아니에요. 2단계에서 보았듯 크기가 달라도 원주÷지름은 거의 같았어요. 모든 원의 원주율은 똑같아요."};
+const FB={string:"맞아요. 실을 감을 때 당겨지거나 비뚤게 감기면 값이 달라져요.",dia:"맞아요. 중심을 지나지 않으면 지름이 실제보다 짧게 재어져서 원주÷지름이 커져요.",ruler:"맞아요. 눈금 사이를 어림하면 0.1cm쯤은 쉽게 달라져요.",shape:"맞아요. 컵이나 테이프처럼 실제 물건은 완전한 원이 아닐 때가 많아요.",diff:"이건 아니에요. 2단계에서 보았듯 크기가 달라도 원주÷지름은 거의 같았어요. 모든 원의 원주율은 똑같아요."};
 let picks=new Set();
-$("o3").onclick=e=>{const b=e.target.closest(".opt");if(!b||b.disabled)return;const k=b.dataset.k;picks.has(k)?picks.delete(k):picks.add(k);b.setAttribute("aria-pressed",picks.has(k)?"true":"false");$("check3").disabled=!picks.size;};
-$("check3").onclick=()=>{if(!picks.size)return;
-  $("o3").querySelectorAll(".opt").forEach(b=>{b.disabled=true;if(b.dataset.k==="diff"&&picks.has("diff"))b.classList.add("wrongpick");});
-  const miss=["string","dia","ruler","shape"].filter(k=>!picks.has(k)).length;
-  $("fb3").innerHTML=[...picks].map(k=>`<li class="${k==="diff"?"x":""}">${FB[k]}</li>`).join("")+(miss?`<li>고르지 않은 것 중에도 까닭이 ${miss}가지 더 있어요. 무엇일지 친구와 이야기해 보세요.</li>`:"");
-  $("check3").disabled=true;$("story3").hidden=false;$("next3").disabled=false;done.add(3);};
+/* 맞는 까닭 4개를 모두 고르고 오답은 고르지 않아야 통과해요. 그 전까지는 다시 고를 수 있어요. */
+const RIGHT3=["string","dia","ruler","shape"];
+$("o3").onclick=e=>{const b=e.target.closest(".opt");if(!b||b.disabled)return;const k=b.dataset.k;picks.has(k)?picks.delete(k):picks.add(k);b.setAttribute("aria-pressed",picks.has(k)?"true":"false");
+  if(!picks.has(k))b.classList.remove("wrongpick");$("check3").disabled=!picks.size;};
+function judge3(){
+  const miss=RIGHT3.filter(k=>!picks.has(k)).length,wrong=picks.has("diff"),ok=!miss&&!wrong;
+  $("o3").querySelectorAll(".opt").forEach(b=>{b.classList.toggle("wrongpick",b.dataset.k==="diff"&&wrong);if(ok)b.disabled=true;});
+  $("fb3").innerHTML=[...picks].map(k=>`<li class="${k==="diff"?"x":""}">${FB[k]}</li>`).join("")+(miss?`<li>고르지 않은 것 중에도 까닭이 ${miss}가지 더 있어요. 다시 골라 보세요.</li>`:wrong?`<li>까닭이 아닌 것을 빼고 다시 확인해 보세요.</li>`:"");
+  $("check3").disabled=true;
+  if(ok){$("story3").hidden=false;$("next3").disabled=false;done.add(3);}
+}
+$("check3").onclick=()=>{if(picks.size)judge3();};
 $("next3").onclick=()=>{done.add(4);show(4);};
 
 /* ---------- 마무리 ---------- */
@@ -325,7 +337,7 @@ function resetSteps(){
 let resetArm=0;
 $("reset").onclick=()=>{
   if(Date.now()-resetArm>4000){resetArm=Date.now();$("reset").textContent="기록도 모두 지워져요. 정말 처음부터 할까요? 한 번 더 누르세요";setTimeout(()=>{$("reset").textContent="처음부터 다시";},4000);return;}
-  resetArm=0;$("reset").textContent="처음부터 다시";rows=[];save();clearErr();resetSteps();renderLog();show(1);
+  resetArm=0;$("reset").textContent="처음부터 다시";rows=[];save();clearErr();["fName","fD","fC"].forEach(i=>{$(i).value="";});resetSteps();renderLog();show(1);
 };
 
 /* 선생님 바로가기: 학생용 주소(github.io)에서는 ?teacher 를 붙였을 때만 보여요. */
@@ -335,9 +347,11 @@ $("tbar").onclick=e=>{const b=e.target.closest("button");if(!b)return;const j=b.
   if(j==="ex"||rows.length<4){rows=EX.map(([name,d,c])=>({name,d,c,ex:true}));save();renderLog();}
   if(j==="ex"){show(1);return;}
   resetSteps();if(j==="1"){show(1);return;}
-  done.add(1);if(j==="2"){show(2);return;}
-  $("c2").querySelector('[data-v="same"]').click();if(j==="3"){show(3);return;}
-  ["string","dia"].forEach(k=>$("o3").querySelector(`[data-k="${k}"]`).click());$("check3").click();show(4);
+  done.add(1);show(2);if(j==="2")return;
+  ok2();show(3);if(j==="3")return;
+  /* 3단계를 끝낸 모습: 맞는 까닭 4개를 고른 상태 (버튼을 대신 누르지 않아요) */
+  picks=new Set(RIGHT3);$("o3").querySelectorAll(".opt").forEach(b=>b.setAttribute("aria-pressed",picks.has(b.dataset.k)?"true":"false"));judge3();
+  done.add(4);show(4);
 };
 
 load();renderLog();show(1);

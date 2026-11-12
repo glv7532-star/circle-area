@@ -326,8 +326,9 @@ function draw1(){
   $("fig1").innerHTML=g;
 }
 
-/* 2단계 그림 */
+/* 2단계 그림: 3단계에서 변을 더 늘렸어도 2단계에서는 96각형까지의 값만 보여 줘요 */
 function draw2(){
+  const S=hist.filter(h=>h.n<=96).pop(),n=S.n,p=S.p,P=S.P;
   const m=Math.min(n,768),ro=R/Math.cos(Math.PI/n);
   let g=`<polygon points="${polyPts(m,ro)}" fill="var(--outer-bg)" stroke="var(--outer)" stroke-width="2.6" stroke-linejoin="round"/>`;
   g+=`<circle cx="0" cy="0" r="${R}" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/>`;
@@ -338,11 +339,11 @@ function draw2(){
   const a=trunc(p,4),b=trunc(P,4),k=samePrefix(a,b).length;
   $("vin2").innerHTML=k>1?markSame(a,k):a;$("vout2").innerHTML=k>1?markSame(b,k):b;
   $("sent2").innerHTML=`원주는 지름의 <span class="blank in">${a}</span>배보다 길고, <span class="blank out">${b}</span>배보다 짧아요.`;
-  drawBar();drawMag();drawTable();
+  drawBar(p,P);drawMag(n);drawTable(n);
   $("dbl2").disabled=n>=96;
 }
 /* 범위 막대: 3.0 ~ 3.5 */
-function drawBar(){
+function drawBar(p,P){
   const L=20,W=360,x=v=>L+(v-3)/0.5*W;
   let g=`<line x1="${L}" y1="22" x2="${L+W}" y2="22" stroke="var(--line)" stroke-width="10" stroke-linecap="round"/>`;
   g+=`<rect x="${x(p)}" y="15" width="${Math.max(2,x(P)-x(p))}" height="14" rx="3" fill="var(--band)"/>`;
@@ -352,7 +353,7 @@ function drawBar(){
   $("bar2").innerHTML=g;
 }
 /* 돋보기: 원의 꼭대기 둘레를 가로 세로 같은 배율로 확대해요 */
-function drawMag(){
+function drawMag(n){
   const a=Math.PI/n,ca=Math.cos(a),ro=R/ca;
   const w=Math.min(1.6*R,3*R*Math.sin(a));       /* 창 가로 반폭 */
   const sc=200/w,X=x=>200+x*sc,Y=d=>40+d*sc;   /* d: 원 꼭대기에서 아래로 내려간 거리 */
@@ -375,7 +376,7 @@ function drawMag(){
   const z=Math.max(1,Math.round(R/w*1.0));
   $("zoom2").textContent=n<=12?"원래 크기 그대로":`약 ${nf(z)}배 확대`;
 }
-function drawTable(){
+function drawTable(n){
   $("tbl2").innerHTML=hist.filter(h=>h.n<=96).map(h=>`<tr class="${h.n===n?"hot":""}"><td>정${h.n}각형</td><td class="in">${trunc(h.p,4)}</td><td class="out">${trunc(h.P,4)}</td><td>${trunc(h.P-h.p,4)}</td></tr>`).join("");
 }
 
@@ -427,7 +428,7 @@ function after3(){
   const d=P-p,z=Math.ceil(-Math.log10(d))-1,ds=d.toFixed(z+2);
   t.textContent=`정${nf(n)}각형이에요. 두 값의 차이는 ${ds}쯤, 소수점 아래 0이 ${z}개나 이어질 만큼 작아졌지만 0은 아니에요.`+(n>=MAXN?" 여기가 이 화면의 끝이에요. 그래도 두 값은 여전히 달라요.":"");
   if(n>=GOAL&&$("reveal3").hidden){
-    $("reveal3").innerHTML=`${PRED[pred]||""}<br>변을 아무리 늘려도 두 값은 점점 가까워질 뿐, 딱 같아지지는 않아요. 아르키메데스는 끝내 정확한 값을 찾지 못했어요.<br>그 뒤로 <b>약 2000년</b> 동안 수학자들이 연구한 끝에, 이 수는 소수점 아래 숫자가 <b>규칙 없이 끝없이 이어진다</b>는 것이 밝혀졌어요. 그래서 우리는 반올림하여 소수 둘째 자리까지 나타낸 <b>3.14</b>를 써요.`;
+    $("reveal3").innerHTML=`${PRED[pred]?PRED[pred]+"<br>":""}변을 아무리 늘려도 두 값은 점점 가까워질 뿐, 딱 같아지지는 않아요. 아르키메데스는 끝내 정확한 값을 찾지 못했어요.<br>그 뒤로 <b>약 2000년</b> 동안 수학자들이 연구한 끝에, 이 수는 소수점 아래 숫자가 <b>규칙 없이 끝없이 이어진다</b>는 것이 밝혀졌어요. 그래서 우리는 반올림하여 소수 둘째 자리까지 나타낸 <b>3.14</b>를 써요.`;
     $("reveal3").hidden=false;$("next3").disabled=false;done.add(3);}
 }
 $("dbl3").onclick=()=>{if(n>=MAXN)return;doubleOnce();after3();};
@@ -465,12 +466,23 @@ $("reset").onclick=()=>{
 
 /* 선생님 바로가기: 학생용 주소(github.io)에서는 ?teacher 를 붙였을 때만 보여요 */
 if(!/github\.io$/.test(location.hostname)||/teacher/.test(location.search))$("tbar").hidden=false;
-function finish1(){$("c1").querySelector('[data-v="30"]').click();$("c2").querySelector('[data-v="40"]').click();}
+/* 버튼을 대신 누르지 않고 상태를 바로 맞춰요. 예측은 고르지 않은 채로 둬요(학생이 고른 것처럼 보이지 않게). */
+function finish1(){
+  ["c1","c2"].forEach(id=>$(id).querySelectorAll(".btn").forEach(b=>{b.disabled=true;b.classList.toggle("yes",b.dataset.v===(id==="c1"?"30":"40"));}));
+  $("q2").hidden=false;$("b1a").textContent="3";$("b1b").textContent="4";s1.sq=true;draw1();
+  const t=$("toast1");t.className="toast ok";t.textContent="맞아요! 10cm짜리 변이 4개라서 40cm, 지름의 4배예요. 원은 이 두 도형 사이에 갇혀 있으니 원주도 그 사이에 있어요.";
+  $("next1").disabled=false;done.add(1);
+}
 $("tbar").onclick=e=>{const b=e.target.closest("button");if(!b)return;const j=b.dataset.j;resetAll();
   if(j==="1")return;
   finish1();if(j==="2"){show(2);return;}
-  while(n<96)doubleOnce();show(2);$("archOurs").textContent=`${trunc(p,4)}배와 ${trunc(P,4)}배 사이`;$("arch").hidden=false;$("next2").disabled=false;done.add(2);if(j==="3"){show(3);draw3();return;}
-  show(3);$("predOpts").querySelector('[data-p="never"]').click();while(n<GOAL)doubleOnce();after3();prep4();if(j==="4"){show(4);window.scrollTo(0,0);return;}swap4();done.add(5);show(5);
+  while(n<96)doubleOnce();show(2);$("archOurs").textContent=`${trunc(p,4)}배와 ${trunc(P,4)}배 사이`;$("arch").hidden=false;$("next2").disabled=false;done.add(2);
+  {const t=$("toast2");t.className="toast ok";t.textContent="96각형! 안쪽과 바깥쪽이 원에 거의 딱 붙었어요. 돋보기로 봐도 구별하기 어렵지요.";}
+  if(j==="3"){show(3);draw3();return;}
+  $("predOpts").querySelectorAll(".opt").forEach(x=>{x.setAttribute("aria-pressed","false");x.disabled=true;});$("play3").hidden=false;
+  show(3);while(n<GOAL)doubleOnce();after3();prep4();
+  show(4);if(j==="4"){window.scrollTo(0,0);return;}
+  swap4();done.add(5);show(5);
   window.scrollTo(0,0);
 };
 
