@@ -63,6 +63,7 @@ h1{font-family:var(--display);font-weight:700;font-size:2.1rem;line-height:1.1;m
 .fig rect.c{fill:var(--cell);stroke:var(--grid);stroke-width:1}
 .fig rect.c.v1{fill:var(--in)} .fig rect.c.v2{fill:var(--edge)}
 .fig rect.c.wrong{stroke:var(--bad);stroke-width:3}
+.fig rect.c.adj{stroke:var(--accent);stroke-width:2.5;stroke-dasharray:4 3}
 .side{display:flex;flex-direction:column;gap:12px;min-width:0}
 .palette{display:flex;flex-wrap:wrap;gap:8px}
 .sw{display:flex;align-items:center;gap:8px;font:inherit;font-size:.95rem;padding:8px 12px 8px 8px;border-radius:999px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;word-break:keep-all}
@@ -350,9 +351,14 @@ $("c2").onclick=e=>{const b=e.target.closest(".btn");if(!b||b.disabled)return;co
 /* ---------- 0.5cm 칸: 직접 칠하며 세기 ----------
    0.5cm 모눈에서는 원의 둘레가 몇몇 칸의 모서리를 아주 가깝게(칸 크기의 10%쯤) 지나가요.
    그런 칸은 눈으로 판단하기 어려우니, 파랑이든 노랑이든 맞은 것으로 쳐요. */
-const T05=truth(17,.5),AMB05=(()=>{const N=17,s=.5,a=new Set();for(let j=0;j<N;j++)for(let i=0;i<N;i++){const x0=-N*s/2+i*s,y0=-N*s/2+j*s,x1=x0+s,y1=y0+s;
+/* 원 안에 완전히 들어가지만 바깥 모서리가 둘레 선에 덮여 보이는 칸(AMBF)만 너그럽게 봐요.
+   선이 칸에 닿아 보이므로 '둘레가 지나가는 칸'으로 칠해도 맞다고 해요. 안 칠하면 틀려요.
+   둘레가 조금이라도 지나가는 칸은 반드시 '둘레가 지나가는 칸'으로 칠해야 해요. */
+const T05=truth(17,.5),AMBF=new Set(),AMBN=new Set();
+(()=>{const N=17,s=.5;for(let j=0;j<N;j++)for(let i=0;i<N;i++){const x0=-N*s/2+i*s,y0=-N*s/2+j*s,x1=x0+s,y1=y0+s;
   const fx=Math.max(Math.abs(x0),Math.abs(x1)),fy=Math.max(Math.abs(y0),Math.abs(y1)),nx=(x0<=0&&x1>=0)?0:Math.min(Math.abs(x0),Math.abs(x1)),ny=(y0<=0&&y1>=0)?0:Math.min(Math.abs(y0),Math.abs(y1));
-  if(Math.min(Math.abs(Math.hypot(fx,fy)-RAD),Math.abs(Math.hypot(nx,ny)-RAD))<.15*s)a.add(j*N+i);}return a;})();
+  if(Math.abs(Math.hypot(fx,fy)-RAD)<.075)AMBF.add(j*N+i);if(Math.abs(Math.hypot(nx,ny)-RAD)<.075)AMBN.add(j*N+i);}})();
+const ok05=(k,v)=>v===T05[k]||(AMBF.has(k)&&v===2);
 let s2=new Array(289).fill(0),brush2=1,paint2=false,pval2=0,t02=0,el2=0,tick2=0,solved2=false,giveT=0;
 function draw2s(){$("g2s").innerHTML=gridSVG(17,.5,s2);cnt2u();}
 function cnt2u(){const [a,b]=counts(s2);$("cntIn2").textContent=a;$("cntEdge2").textContent=b;}
@@ -366,22 +372,23 @@ $("g2s").addEventListener("pointermove",e=>{if(!paint2)return;paintAt2(document.
 addEventListener("pointerup",()=>{paint2=false;});addEventListener("pointercancel",()=>{paint2=false;});
 $("pal2").onclick=e=>{const b=e.target.closest(".sw");if(!b)return;brush2=+b.dataset.v;$("pal2").querySelectorAll(".sw").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));};
 $("clear2").onclick=()=>{if(solved2)return;s2.fill(0);draw2s();$("toast2").textContent="";};
-function done05(byHand){
+function done05(byHand,adj=0){
   solved2=true;stopClock2();$("check2").disabled=true;$("clear2").disabled=true;$("giveup2").hidden=true;
   if(byHand&&el2>0)rate=Math.min(10,Math.max(.5,(elapsed+el2)/(IN10+ED10+177+64)));
   counted.add(17);lv=1;table2();$("cnt2").hidden=false;$("smaller2").disabled=false;$("m2s").textContent="0.25cm";
   const tt=$("toast2");tt.className="toast ok";
   tt.textContent=byHand?`정확해요! 세어야 할 칸이 69칸에서 241칸이 되었어요. 세는 데 ${fmtT(el2)} 걸렸어요. 범위는 44.25~60.25cm²로 좁아졌지만 셀 칸이 훨씬 많아졌지요? 더 작은 칸은 컴퓨터에게 맡겨 봐요.`
+    +(adj?` 점선 테두리 칸 ${adj}개는 둘레 선에 덮여 보이지만, 컴퓨터로 재면 원 안에 완전히 들어가는 칸이에요. 눈으로는 가리기 어려워서 맞다고 했어요. 컴퓨터로 정확히 세면 완전히 들어간 칸은 177칸, 둘레가 지나가는 칸은 64칸이에요.`:"")
     :`0.5cm 칸은 241칸이에요. 범위는 44.25~60.25cm²로 좁아졌어요. 더 작은 칸은 컴퓨터에게 맡겨 봐요.`;
 }
 $("check2").onclick=()=>{
-  if(solved2)return;const wrong=[];T05.forEach((v,k)=>{if(s2[k]===v)return;if(AMB05.has(k)&&(v&&s2[k]||v===2&&!s2[k]))return;wrong.push(k);});
+  if(solved2)return;const wrong=[];T05.forEach((v,k)=>{if(!ok05(k,s2[k]))wrong.push(k);});
   const rs=$("g2s").querySelectorAll("rect.c"),tt=$("toast2");
-  if(!wrong.length){s2=T05.slice();draw2s();done05(true);return;}
+  if(!wrong.length){const adj=[];T05.forEach((v,k)=>{if(s2[k]!==v)adj.push(k);});adj.forEach(k=>rs[k].classList.add("adj"));done05(true,adj.length);return;}
   wrong.forEach(k=>rs[k].classList.add("wrong"));tt.className="toast bad";
   const miss=wrong.filter(k=>T05[k]&&!s2[k]).length,extra=wrong.filter(k=>!T05[k]&&s2[k]).length,mix=wrong.length-miss-extra;
   const parts=[];if(miss)parts.push(`아직 안 칠한 칸 ${miss}개`);if(extra)parts.push(`원 밖인데 칠한 칸 ${extra}개`);if(mix)parts.push(`색이 바뀐 칸 ${mix}개`);
-  tt.textContent=`빨간 테두리 칸을 다시 보세요. (${parts.join(", ")})`;
+  tt.textContent=`빨간 테두리 칸을 다시 보세요. (${parts.join(", ")}) 둘레가 칸을 조금이라도 지나가면 노란색이에요.`;
 };
 $("giveup2").onclick=()=>{if(solved2)return;s2=T05.slice();draw2s();done05(false);};
 
