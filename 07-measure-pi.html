@@ -344,6 +344,26 @@ load();renderLog();show(1);
 /* 수업 중 실수로 새로 고침하거나 나가지 않도록 (기록은 이 태블릿에 저장되지만, 그래도 조심해요) */
 let touched=false;document.addEventListener("pointerdown",()=>{touched=true;},{once:true,capture:true});
 window.addEventListener("beforeunload",e=>{if(touched){e.preventDefault();e.returnValue="";}});
+
+/* ---------- 지나온 단계로 돌아가기 ----------
+   한 번 열린(해금된) 단계는 위의 단계 표시를 눌러 다시 갈 수 있어요. 진행 상태는 그대로 남아요. */
+(()=>{
+  const nav=document.querySelector("nav.steps");if(!nav||typeof show!=="function")return;
+  const tabs=[...nav.querySelectorAll(".stepi")],reached=new Set([1]);
+  const st=document.createElement("style");
+  st.textContent=".stepi.go{cursor:pointer;border-style:dashed;color:var(--ink)}.stepi.go:hover{border-color:var(--accent)}.stepi:focus-visible{outline:3px solid var(--accent);outline-offset:2px}.navhint{margin:-4px 0 0;font-size:.82rem;color:var(--muted);text-align:center;word-break:keep-all}";
+  document.head.appendChild(st);
+  const hint=document.createElement("p");hint.className="navhint";hint.hidden=true;hint.textContent="지나온 단계는 위의 단계 표시를 눌러 다시 볼 수 있어요.";nav.after(hint);
+  const cur=()=>tabs.findIndex(t=>t.getAttribute("aria-current")==="step")+1;
+  function paint(){const c=cur();tabs.forEach((t,i)=>{const n=i+1,ok=reached.has(n)&&n!==c;t.classList.toggle("go",ok);t.tabIndex=ok?0:-1;
+    if(ok){t.setAttribute("role","button");t.setAttribute("aria-label",`${n}단계로 가기`);}else{t.removeAttribute("role");t.removeAttribute("aria-label");}});
+    hint.hidden=reached.size<2;}
+  const _show=show;show=function(k){reached.add(+k);const r=_show.apply(this,arguments);paint();return r;};
+  for(const name of ["resetAll","resetSteps"]){if(typeof window[name]==="function"){const f=window[name];window[name]=function(){reached.clear();reached.add(1);const r=f.apply(this,arguments);paint();return r;};}}
+  tabs.forEach((t,i)=>{const go=()=>{const n=i+1;if(reached.has(n)&&n!==cur())show(n);};
+    t.addEventListener("click",go);t.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go();}});});
+  paint();
+})();
 </script>
 
 </html>

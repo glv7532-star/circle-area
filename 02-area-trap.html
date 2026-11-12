@@ -155,7 +155,7 @@ html,body{overscroll-behavior-y:contain}
   <!-- 2단계 -->
   <section class="card" id="step2" hidden>
     <h2>모눈 칸을 직접 세어 더 정확하게 가둬요</h2>
-    <p class="note">같은 원을 1cm 모눈 위에 그렸어요. 넓이가 1cm²인 칸이 몇 개 들어가는지 세어 봐요. 보라색 선이 원의 둘레예요. 색을 고르고 칸을 누르거나 손가락으로 쓸어서 칠해 보세요.</p>
+    <p class="note">같은 원을 1cm 모눈 위에 그렸어요. 넓이가 1cm²인 칸이 몇 개 들어가는지 세어 봐요. 보라색 선이 원의 둘레예요. 색을 고르고 칸을 <b>하나씩 눌러</b> 칠해 보세요. 한 칸, 한 칸 세는 마음으로요.</p>
     <div class="split">
       <svg class="fig paint" id="g1" viewBox="0 0 400 422" role="img" aria-label="1cm 모눈 위의 원"></svg>
       <div class="side">
@@ -170,6 +170,7 @@ html,body{overscroll-behavior-y:contain}
           <div class="meter"><span>세는 데 걸린 시간</span><b id="clock">0초</b></div>
         </div>
         <div class="row"><button class="btn" id="clear1">모두 지우기</button><button class="btn primary" id="check1">다 세었어요</button></div>
+        <button class="link" id="redo1" hidden>한 번 더 칠해 보기</button>
         <p class="toast" id="toast1" role="status"></p>
         <div id="after1" hidden style="display:flex;flex-direction:column;gap:12px">
           <p class="sent">원의 넓이는 <span class="blank fill">37</span>cm²보다 크고 <span class="blank fill">69</span>cm²보다 작아요.<br>정사각형으로 가둔 범위(32 ~ 64cm²)보다 좁아졌어요.</p>
@@ -194,9 +195,21 @@ html,body{overscroll-behavior-y:contain}
         <div class="q" id="q2">
           <p>칸 한 변의 길이를 1cm에서 <b>0.5cm</b>로 줄이면, 같은 곳에 들어가는 칸은 몇 배가 될까요?</p>
           <div class="choices" id="c2"><button class="btn" data-v="2">2배</button><button class="btn" data-v="4">4배</button><button class="btn" data-v="8">8배</button></div>
+          <figure id="hint2" hidden style="margin:0;display:flex;flex-direction:column;align-items:center;gap:6px">
+            <svg viewBox="0 0 220 200" style="width:180px;height:auto" role="img" aria-label="한 변이 1cm인 칸을 한 변이 0.5cm인 칸으로 나눈 그림">
+              <rect x="40" y="20" width="150" height="150" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/>
+              <line x1="115" y1="20" x2="115" y2="170" stroke="var(--accent)" stroke-width="2.5" stroke-dasharray="7 5"/>
+              <line x1="40" y1="95" x2="190" y2="95" stroke="var(--accent)" stroke-width="2.5" stroke-dasharray="7 5"/>
+              <text x="115" y="192" text-anchor="middle" font-size="15" fill="var(--ink)">1cm</text>
+              <text x="77" y="14" text-anchor="middle" font-size="13" fill="var(--accent)">0.5cm</text>
+              <text x="152" y="14" text-anchor="middle" font-size="13" fill="var(--accent)">0.5cm</text>
+              <text x="22" y="100" text-anchor="middle" font-size="15" fill="var(--ink)">1cm</text>
+            </svg>
+            <figcaption class="note" style="text-align:center">1cm 칸 하나를 0.5cm 칸으로 나눈 그림이에요. 작은 칸이 몇 개 생기는지 세어 보세요.</figcaption>
+          </figure>
         </div>
         <div id="man2" hidden style="display:flex;flex-direction:column;gap:12px">
-          <p class="note">이번에도 직접 칠하며 세어 보세요. 칠하는 방법은 앞과 같아요. 둘레가 칸의 모서리를 아슬아슬하게 스치고 지나가는 칸은 어느 색으로 칠해도 괜찮아요.</p>
+          <p class="note">이번에도 직접 칠하며 세어 보세요. 칸이 많아서 이번에는 손가락으로 쓸어서 칠할 수도 있어요. 둘레가 칸의 모서리를 아슬아슬하게 스치고 지나가는 칸은 어느 색으로 칠해도 괜찮아요.</p>
           <div class="palette" id="pal2" role="group" aria-label="칠할 색">
             <button class="sw" data-v="1" aria-pressed="true"><span style="background:var(--in)"></span>완전히 들어간 칸</button>
             <button class="sw" data-v="2" aria-pressed="false"><span style="background:var(--edge)"></span>둘레가 지나가는 칸</button>
@@ -293,13 +306,13 @@ function upd1(){
   const [a,b]=counts(s1);$("cntIn").textContent=a;$("cntEdge").textContent=b;
 }
 const fmtT=sec=>sec>=3600?`${Math.floor(sec/3600)}시간 ${Math.round(sec%3600/60)}분`:sec>=60?`${Math.floor(sec/60)}분 ${Math.round(sec%60)}초`:`${Math.round(sec)}초`;
-function startClock(){if(t0||solved1)return;t0=Date.now();tick=setInterval(()=>{elapsed=(Date.now()-t0)/1000;$("clock").textContent=fmtT(elapsed);},500);}
+function startClock(){if(t0||solved1)return;t0=Date.now();tick=setInterval(()=>{elapsed=(Date.now()-t0)/1000;},500);$("clock").textContent="재는 중";}
 function stopClock(){clearInterval(tick);if(t0)elapsed=(Date.now()-t0)/1000;$("clock").textContent=fmtT(elapsed);}
 function paintAt(el){if(!el||!el.classList||!el.classList.contains("c")||solved1)return;const k=+el.dataset.k;if(s1[k]!==pval){s1[k]=pval;el.setAttribute("class","c"+(pval?" v"+pval:""));const [a,b]=counts(s1);$("cntIn").textContent=a;$("cntEdge").textContent=b;}}
 $("g1").addEventListener("pointerdown",e=>{const el=e.target;if(!el.classList.contains("c")||solved1)return;e.preventDefault();startClock();
   $("g1").querySelectorAll(".wrong").forEach(x=>x.classList.remove("wrong"));
   const k=+el.dataset.k;pval=(brush&&s1[k]===brush)?0:brush;painting=true;paintAt(el);});
-$("g1").addEventListener("pointermove",e=>{if(!painting)return;paintAt(document.elementFromPoint(e.clientX,e.clientY));});
+/* 1cm 모눈은 한 칸씩 눌러서만 칠해요(쓸어서 칠하면 세는 수고로움을 겪지 못해서). */
 addEventListener("pointerup",()=>{painting=false;});addEventListener("pointercancel",()=>{painting=false;});
 $("pal").onclick=e=>{const b=e.target.closest(".sw");if(!b)return;brush=+b.dataset.v;$("pal").querySelectorAll(".sw").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));};
 $("clear1").onclick=()=>{if(solved1)return;s1.fill(0);draw1();$("toast1").textContent="";};
@@ -307,7 +320,7 @@ $("check1").onclick=()=>{
   if(solved1)return;const wrong=[];T10.forEach((v,k)=>{if(s1[k]!==v)wrong.push(k);});
   const rs=$("g1").querySelectorAll("rect.c"),tt=$("toast1");
   if(!wrong.length){solved1=true;stopClock();tt.className="toast ok";
-    tt.textContent=`정확해요! 세는 데 ${fmtT(elapsed)} 걸렸어요.`;$("check1").disabled=true;$("clear1").disabled=true;$("after1").hidden=false;return;}
+    tt.textContent=`정확해요! 세는 데 ${fmtT(elapsed)} 걸렸어요.`;$("check1").disabled=true;$("clear1").disabled=true;$("after1").hidden=false;$("redo1").hidden=false;return;}
   wrong.forEach(k=>rs[k].classList.add("wrong"));tt.className="toast bad";
   const miss=wrong.filter(k=>T10[k]&&!s1[k]).length,extra=wrong.filter(k=>!T10[k]&&s1[k]).length,mix=wrong.length-miss-extra;
   const parts=[];if(miss)parts.push(`아직 안 칠한 칸 ${miss}개`);if(extra)parts.push(`원 밖인데 칠한 칸 ${extra}개`);if(mix)parts.push(`색이 바뀐 칸 ${mix}개`);
@@ -342,11 +355,11 @@ function draw2(N,s,cells){
 function rowOf(N,s){const [a,b]=counts(truth(N,s));const whole=a+b,lo=a*s*s,hi=(a+b)*s*s,mid=(a+b/2)*s*s;
   return `<tr class="${counted.has(N)&&N===SIZES[lv][0]?"hot":""}"><td>${s}cm</td><td>${whole.toLocaleString("ko-KR")}개</td><td>${+lo.toFixed(2)} ~ ${+hi.toFixed(2)}cm²</td><td>약 ${+mid.toFixed(1)}cm²</td><td>약 ${(mid/16).toFixed(2)}배</td><td>약 ${fmtT(whole*rate)}</td></tr>`;}
 function table2(){$("tbl2").innerHTML=SIZES.filter(([N])=>counted.has(N)).map(([N,s])=>rowOf(N,s)).join("");
-  $("rateNote").textContent=`'손으로 센다면'은 2단계에서 내가 한 칸을 세는 데 걸린 시간(한 칸에 약 ${rate.toFixed(1)}초)으로 어림한 거예요.`;}
+  $("rateNote").textContent=`'손으로 센다면'은 한 칸을 확인하고 세는 데 2초씩 걸린다고 어림한 거예요. 쉬지 않고 센다고 했을 때예요.`;}
 $("c2").onclick=e=>{const b=e.target.closest(".btn");if(!b||b.disabled)return;const tt=$("toast2");
-  if(b.dataset.v==="4"){b.classList.add("yes");$("c2").querySelectorAll(".btn").forEach(x=>x.disabled=true);tt.className="toast ok";
+  if(b.dataset.v==="4"){$("hint2").hidden=true;b.classList.add("yes");$("c2").querySelectorAll(".btn").forEach(x=>x.disabled=true);tt.className="toast ok";
     tt.textContent="맞아요! 1cm 칸 하나에 0.5cm 칸이 가로 2개, 세로 2개, 모두 4개 들어가요. 세어야 할 칸도 거의 4배가 돼요. 정말 그런지 직접 칠하며 세어 볼까요?";$("man2").hidden=false;}
-  else{b.classList.add("no");b.disabled=true;tt.className="toast bad";tt.textContent="1cm 칸 하나를 0.5cm 칸으로 나누면 가로로 몇 개, 세로로 몇 개가 들어갈까요?";}
+  else{b.classList.add("no");b.disabled=true;tt.className="toast bad";tt.textContent="칸 한 변의 길이가 반이 되면, 가로로도 2개, 세로로도 2개가 들어가요. 그림에서 작은 칸이 모두 몇 개인지 세어 보세요.";$("hint2").hidden=false;}
 };
 /* ---------- 0.5cm 칸: 직접 칠하며 세기 ----------
    0.5cm 모눈에서는 원의 둘레가 몇몇 칸의 모서리를 아주 가깝게(칸 크기의 10%쯤) 지나가요.
@@ -362,7 +375,7 @@ const ok05=(k,v)=>v===T05[k]||(AMBF.has(k)&&v===2);
 let s2=new Array(289).fill(0),brush2=1,paint2=false,pval2=0,t02=0,el2=0,tick2=0,solved2=false,giveT=0;
 function draw2s(){$("g2s").innerHTML=gridSVG(17,.5,s2);cnt2u();}
 function cnt2u(){const [a,b]=counts(s2);$("cntIn2").textContent=a;$("cntEdge2").textContent=b;}
-function startClock2(){if(t02||solved2)return;t02=Date.now();tick2=setInterval(()=>{el2=(Date.now()-t02)/1000;$("clock2").textContent=fmtT(el2);if(el2>180)$("giveup2").hidden=false;},500);}
+function startClock2(){if(t02||solved2)return;t02=Date.now();tick2=setInterval(()=>{el2=(Date.now()-t02)/1000;if(el2>180)$("giveup2").hidden=false;},500);$("clock2").textContent="재는 중";}
 function stopClock2(){clearInterval(tick2);if(t02)el2=(Date.now()-t02)/1000;$("clock2").textContent=fmtT(el2);}
 function paintAt2(el){if(!el||!el.classList||!el.classList.contains("c")||solved2||el.ownerSVGElement!==$("g2s"))return;const k=+el.dataset.k;if(s2[k]!==pval2){s2[k]=pval2;el.setAttribute("class","c"+(pval2?" v"+pval2:""));cnt2u();}}
 $("g2s").addEventListener("pointerdown",e=>{const el=e.target;if(!el.classList.contains("c")||solved2||$("man2").hidden)return;e.preventDefault();startClock2();
@@ -374,7 +387,6 @@ $("pal2").onclick=e=>{const b=e.target.closest(".sw");if(!b)return;brush2=+b.dat
 $("clear2").onclick=()=>{if(solved2)return;s2.fill(0);draw2s();$("toast2").textContent="";};
 function done05(byHand,adj=0){
   solved2=true;stopClock2();$("check2").disabled=true;$("clear2").disabled=true;$("giveup2").hidden=true;
-  if(byHand&&el2>0)rate=Math.min(10,Math.max(.5,(elapsed+el2)/(IN10+ED10+177+64)));
   counted.add(17);lv=1;table2();$("cnt2").hidden=false;$("smaller2").disabled=false;$("m2s").textContent="0.25cm";
   const tt=$("toast2");tt.className="toast ok";
   tt.textContent=byHand?`정확해요! 세어야 할 칸이 69칸에서 241칸이 되었어요. 세는 데 ${fmtT(el2)} 걸렸어요. 범위는 44.25~60.25cm²로 좁아졌지만 셀 칸이 훨씬 많아졌지요? 더 작은 칸은 컴퓨터에게 맡겨 봐요.`
@@ -457,6 +469,8 @@ function renderSum(){
     ;
 }
 
+$("redo1").onclick=()=>{s1.fill(0);solved1=false;t0=0;clearInterval(tick);$("clock").textContent="0초";$("check1").disabled=false;$("clear1").disabled=false;$("redo1").hidden=true;$("toast1").textContent="";$("toast1").className="toast";draw1();};
+
 /* ---------- 처음부터 ---------- */
 function resetAll(){
   cancelAnimationFrame(counting);clearInterval(tick);done.clear();
@@ -471,11 +485,11 @@ function resetAll(){
   $("q3b").hidden=true;$("ratio3").hidden=true;$("next3").disabled=true;
   ["r1","r2"].forEach(id=>{$(id).value="";$(id).classList.remove("err");});["r1","r2","rok"].forEach(id=>$(id).disabled=false);$("rmore").hidden=true;$("rtoast").textContent="";$("rtoast").className="toast";
   [["b3a","?"],["b3b","?"]].forEach(([id,v])=>{$(id).textContent=v;$(id).classList.remove("fill");});
-  ["toast1","toast2","toast3"].forEach(id=>{$(id).textContent="";$(id).className="toast";});
+  ["toast1","toast2","toast3"].forEach(id=>{$(id).textContent="";$(id).className="toast";});$("hint2").hidden=true;$("redo1").hidden=true;
   draw1();draw3(0);show(1);
 }
 /* 1단계를 마치면 한 칸 세는 데 걸린 시간을 기록해 둬요 */
-const _check=$("check1").onclick;$("check1").onclick=()=>{_check();if(solved1&&elapsed>0)rate=Math.min(10,Math.max(.5,elapsed/(IN10+ED10)));};
+/* '손으로 센다면'은 한 칸에 2초로 고정해서 어림해요(쓸어서 칠한 속도로 계산하면 너무 짧게 나와서). */
 
 let resetArm=0;
 $("reset").onclick=()=>{
@@ -501,6 +515,26 @@ resetAll();
 /* 수업 중 실수로 새로 고침하거나 나가지 않도록 */
 let touched=false;document.addEventListener("pointerdown",()=>{touched=true;},{once:true,capture:true});
 window.addEventListener("beforeunload",e=>{if(touched){e.preventDefault();e.returnValue="";}});
+
+/* ---------- 지나온 단계로 돌아가기 ----------
+   한 번 열린(해금된) 단계는 위의 단계 표시를 눌러 다시 갈 수 있어요. 진행 상태는 그대로 남아요. */
+(()=>{
+  const nav=document.querySelector("nav.steps");if(!nav||typeof show!=="function")return;
+  const tabs=[...nav.querySelectorAll(".stepi")],reached=new Set([1]);
+  const st=document.createElement("style");
+  st.textContent=".stepi.go{cursor:pointer;border-style:dashed;color:var(--ink)}.stepi.go:hover{border-color:var(--accent)}.stepi:focus-visible{outline:3px solid var(--accent);outline-offset:2px}.navhint{margin:-4px 0 0;font-size:.82rem;color:var(--muted);text-align:center;word-break:keep-all}";
+  document.head.appendChild(st);
+  const hint=document.createElement("p");hint.className="navhint";hint.hidden=true;hint.textContent="지나온 단계는 위의 단계 표시를 눌러 다시 볼 수 있어요.";nav.after(hint);
+  const cur=()=>tabs.findIndex(t=>t.getAttribute("aria-current")==="step")+1;
+  function paint(){const c=cur();tabs.forEach((t,i)=>{const n=i+1,ok=reached.has(n)&&n!==c;t.classList.toggle("go",ok);t.tabIndex=ok?0:-1;
+    if(ok){t.setAttribute("role","button");t.setAttribute("aria-label",`${n}단계로 가기`);}else{t.removeAttribute("role");t.removeAttribute("aria-label");}});
+    hint.hidden=reached.size<2;}
+  const _show=show;show=function(k){reached.add(+k);const r=_show.apply(this,arguments);paint();return r;};
+  for(const name of ["resetAll","resetSteps"]){if(typeof window[name]==="function"){const f=window[name];window[name]=function(){reached.clear();reached.add(1);const r=f.apply(this,arguments);paint();return r;};}}
+  tabs.forEach((t,i)=>{const go=()=>{const n=i+1;if(reached.has(n)&&n!==cur())show(n);};
+    t.addEventListener("click",go);t.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go();}});});
+  paint();
+})();
 </script>
 
 </html>
