@@ -285,6 +285,7 @@ function show(n){
   for(const i of [1,2,3,4,5])$("step"+i).hidden=i!==n;
   for(const i of [1,2,3,4,5]){const t=$("tab"+i);if(i===n)t.setAttribute("aria-current","step");else t.removeAttribute("aria-current");t.classList.toggle("done",i!==n&&done.has(i));}
   if(n===2)draw2();
+  if(n===4)prep4();
   if(n===5)renderSum();
   window.scrollTo({top:0,behavior:"smooth"});
 }

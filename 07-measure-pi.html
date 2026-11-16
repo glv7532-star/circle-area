@@ -265,8 +265,9 @@ function drawChart(){
   /* 좌표평면 대신: 원주를 곧게 펼친 선 아래에, 같은 원을 중심이 일직선이 되게 나란히 놓아요.
      원 3개와 조금이 펼친 원주와 길이가 같다는 것이 보여요. */
   const X0=160,SW=290,list=rows.slice().sort((a,b)=>a.d-b.d),maxC=Math.max(...list.map(r=>r.c));
+  /* 지름을 잘못 적어 원주÷지름이 아주 크게 나와도(예: 지름 0.01cm) 원을 몇만 개씩 그리지 않도록 8개까지만 그려요. */
   let g="",y=8;
-  list.forEach((r,k)=>{const Lpx=same?SW:SW*r.c/maxC,dp=Lpx/ratio(r),rad=dp/2,full=Math.floor(ratio(r)+1e-9);
+  list.forEach((r,k)=>{const Lpx=same?SW:SW*r.c/maxC,dp=Lpx/ratio(r),rad=dp/2,full=Math.min(8,Math.floor(ratio(r)+1e-9));
     const top=y,rowH=Math.max(52,dp+28),cy=top+16+rad;
     g+=`<text class="lbl" x="0" y="${top+16}">${esc(r.name)}</text><text x="0" y="${top+34}">지름 ${r.d}cm</text><text x="0" y="${top+50}">원주 ${r.c}cm</text>`;
     g+=`<rect x="${X0}" y="${top+4}" width="${Lpx.toFixed(2)}" height="6" rx="3" fill="var(--guide)"/>`;

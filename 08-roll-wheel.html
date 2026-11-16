@@ -85,6 +85,8 @@ h1{font-family:var(--display);font-weight:700;font-size:2.1rem;line-height:1.1;m
 .tbar button{font:inherit;font-size:.85rem;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
 .link{background:none;border:none;color:var(--muted);text-decoration:underline;font:inherit;font-size:.88rem;cursor:pointer;padding:0;align-self:flex-start}
 html,body{overscroll-behavior-y:contain}
+/* 가로 화면에서는 무대 높이를 줄여 아래 문제와 입력 칸이 한 화면에 보이게 해요 */
+@media (orientation:landscape){#stage{height:38vh;width:auto;max-width:100%;aspect-ratio:560/230;margin:0 auto}}
 </style>
 
 <div class="wrap">
