@@ -245,10 +245,10 @@ html,body{overscroll-behavior-y:contain}
       </div>
       <p class="toast" id="toast3" role="status"></p>
       <p class="reveal" id="reveal3" hidden></p>
-      <div class="vidbox" id="vid3" data-start="457" data-end="483" hidden>
-        <p class="vidtag">선생님 화면에만 보여요 · 아르키메데스 영상 7분 37초 ~ 8분 3초 (끝없이 이어지는 수)</p>
+      <div class="vidbox" id="vid3" data-start="343" data-end="" hidden>
+        <p class="vidtag">선생님 화면에만 보여요 · 아르키메데스 영상 5분 43초부터 끝까지 (끝없이 이어지는 수)</p>
         <p class="vidnote">영상에서 '무한한 수'라고 하는 부분은 수업에서 쓰는 말인 <b>'끝없이 이어지는 수'</b>로 바꿔 말해 주세요. 영상의 1882년 이야기는 '자와 컴퍼스만으로 원과 넓이가 같은 정사각형을 그릴 수 없다'는 뜻이에요. 원의 넓이를 구할 수 없다는 뜻이 아니에요.</p>
-        <div class="row"><button class="btn vidplay" type="button">영상 보기</button><a class="link" href="https://www.youtube.com/watch?v=lwiVFwLwbA4&amp;t=457s" target="_blank" rel="noopener">영상이 안 나오면 유튜브에서 열기</a></div>
+        <div class="row"><button class="btn vidplay" type="button">영상 보기</button><a class="link" href="https://www.youtube.com/watch?v=lwiVFwLwbA4&amp;t=343s" target="_blank" rel="noopener">영상이 안 나오면 유튜브에서 열기</a></div>
         <div class="vidframe"></div>
       </div>
       <div class="row"><button class="btn primary" id="next3" disabled>다음</button></div>
@@ -298,7 +298,7 @@ const TEACHER=!/github\.io$/.test(location.hostname)||/teacher/.test(location.se
 function stopVideos(){document.querySelectorAll(".vidframe").forEach(f=>f.innerHTML="");document.querySelectorAll(".vidplay").forEach(b=>b.textContent="영상 보기");}
 document.addEventListener("click",e=>{const b=e.target.closest(".vidplay");if(!b)return;const box=b.closest(".vidbox"),f=box.querySelector(".vidframe");
   if(f.innerHTML){f.innerHTML="";b.textContent="영상 보기";return;}
-  stopVideos();f.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/lwiVFwLwbA4?start=${box.dataset.start}&end=${box.dataset.end}&autoplay=1&rel=0" title="아르키메데스 영상" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;b.textContent="영상 닫기";});
+  stopVideos();f.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/lwiVFwLwbA4?start=${box.dataset.start}${box.dataset.end?"&end="+box.dataset.end:""}&autoplay=1&rel=0" title="아르키메데스 영상" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;b.textContent="영상 닫기";});
 
 const $=id=>document.getElementById(id);
 const NS="http://www.w3.org/2000/svg";
