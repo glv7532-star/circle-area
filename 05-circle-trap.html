@@ -296,6 +296,8 @@ function show(n){
 let n=6,p=3,P=2*Math.sqrt(3),hist=[{n:6,p:3,P:2*Math.sqrt(3)}];
 function doubleOnce(){const P2=2*p*P/(p+P),p2=Math.sqrt(p*P2);n*=2;p=p2;P=P2;hist.push({n,p,P});}
 function trunc(v,d){const k=10**d;return (Math.floor(v*k+1e-9)/k).toFixed(d);}
+/* 두 값의 차이는 화면에 보이는 두 값(소수 넷째 자리까지)을 뺀 값으로 보여 줘요. 학생이 직접 빼 본 값과 같게요. */
+const diff4=(p,P)=>(trunc(P,4)-trunc(p,4)).toFixed(4);
 function samePrefix(a,b){let i=0;while(i<a.length&&a[i]===b[i])i++;let s=a.slice(0,i);if(s.endsWith("."))s=s.slice(0,-1);return s;}
 function markSame(str,len){return `<span class="same">${str.slice(0,len)}</span>${str.slice(len)}`;}
 const nf=x=>x.toLocaleString("ko-KR");
@@ -378,7 +380,7 @@ function drawMag(n){
   $("zoom2").textContent=n<=12?"원래 크기 그대로":`약 ${nf(z)}배 확대`;
 }
 function drawTable(n){
-  $("tbl2").innerHTML=hist.filter(h=>h.n<=96).map(h=>`<tr class="${h.n===n?"hot":""}"><td>정${h.n}각형</td><td class="in">${trunc(h.p,4)}</td><td class="out">${trunc(h.P,4)}</td><td>${trunc(h.P-h.p,4)}</td></tr>`).join("");
+  $("tbl2").innerHTML=hist.filter(h=>h.n<=96).map(h=>`<tr class="${h.n===n?"hot":""}"><td>정${h.n}각형</td><td class="in">${trunc(h.p,4)}</td><td class="out">${trunc(h.P,4)}</td><td>${diff4(h.p,h.P)}</td></tr>`).join("");
 }
 
 /* ---------- 1단계 ---------- */
@@ -404,7 +406,7 @@ $("next1").onclick=()=>show(2);
 $("dbl2").onclick=()=>{
   if(n>=96)return;doubleOnce();draw2();
   const t=$("toast2");t.className="toast";
-  if(n<96)t.textContent=`정${n}각형이 되었어요. 두 값의 차이가 ${trunc(P-p,4)}로 줄었어요. 범위 막대도 살펴보세요.`;
+  if(n<96)t.textContent=`정${n}각형이 되었어요. 두 값의 차이가 ${diff4(p,P)}${/[036]$/.test(diff4(p,P))?"으로":"로"} 줄었어요. 범위 막대도 살펴보세요.`;
   else{t.className="toast ok";t.textContent="96각형! 안쪽과 바깥쪽이 원에 거의 딱 붙었어요. 돋보기로 봐도 구별하기 어렵지요.";
     $("archOurs").textContent=`${trunc(p,4)}배와 ${trunc(P,4)}배 사이`;$("arch").hidden=false;$("next2").disabled=false;done.add(2);}
 };
