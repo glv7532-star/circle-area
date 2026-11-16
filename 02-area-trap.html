@@ -292,8 +292,9 @@ function gridSVG(N,s,cells){
   g+=`<circle cx="${CX}" cy="${CY}" r="${RAD*PX}" fill="none" stroke="var(--rim)" stroke-width="2.4" pointer-events="none"/>`;
   g+=`<circle cx="${CX}" cy="${CY}" r="3.5" fill="var(--ink)" pointer-events="none"/>`;
   g+=`<line x1="${CX}" y1="${CY}" x2="${CX+RAD*PX}" y2="${CY}" stroke="var(--ink)" stroke-width="1.6" stroke-dasharray="5 4" pointer-events="none"/>`;
-  g+=`<text x="${CX+RAD*PX/2}" y="${CY-6}" text-anchor="middle" style="fill:var(--ink)">반지름 4cm</text>`;
-  g+=`<text x="${CX}" y="${T+N*c+24}" text-anchor="middle">한 칸은 가로 ${s}cm, 세로 ${s}cm</text>`;
+  /* 글자는 터치를 받지 않게 해요(글자 밑의 칸도 눌러서, 쓸어서 칠할 수 있도록). */
+  g+=`<text x="${CX+RAD*PX/2}" y="${CY-6}" text-anchor="middle" style="fill:var(--ink)" pointer-events="none">반지름 4cm</text>`;
+  g+=`<text x="${CX}" y="${T+N*c+24}" text-anchor="middle" pointer-events="none">한 칸은 가로 ${s}cm, 세로 ${s}cm</text>`;
   return g;
 }
 
@@ -305,18 +306,29 @@ function upd1(){
   const rs=$("g1").querySelectorAll("rect.c");rs.forEach((r,k)=>{r.setAttribute("class","c"+(s1[k]?" v"+s1[k]:""));});
   const [a,b]=counts(s1);$("cntIn").textContent=a;$("cntEdge").textContent=b;
 }
-const fmtT=sec=>sec>=3600?`${Math.floor(sec/3600)}시간 ${Math.round(sec%3600/60)}분`:sec>=60?`${Math.floor(sec/60)}분 ${Math.round(sec%60)}초`:`${Math.round(sec)}초`;
+/* 먼저 반올림한 다음 나눠요('1분 60초', '1시간 60분'처럼 나오지 않게). */
+const fmtT=sec=>{sec=Math.round(sec);if(sec>=3600){const m=Math.round(sec/60);return `${Math.floor(m/60)}시간 ${m%60}분`;}return sec>=60?`${Math.floor(sec/60)}분 ${sec%60}초`:`${sec}초`;};
 function startClock(){if(t0||solved1)return;t0=Date.now();tick=setInterval(()=>{elapsed=(Date.now()-t0)/1000;},500);$("clock").textContent="재는 중";}
 function stopClock(){clearInterval(tick);if(t0)elapsed=(Date.now()-t0)/1000;$("clock").textContent=fmtT(elapsed);}
-function paintAt(el){if(!el||!el.classList||!el.classList.contains("c")||solved1)return;const k=+el.dataset.k;if(s1[k]!==pval){s1[k]=pval;el.setAttribute("class","c"+(pval?" v"+pval:""));const [a,b]=counts(s1);$("cntIn").textContent=a;$("cntEdge").textContent=b;}}
+/* 손가락마다 칠하는 색(지우기 포함)과 마지막 위치를 따로 기억해요.
+   여러 손가락으로 칠해도 한 손가락이 다른 손가락의 색을 바꾸지 않아요. */
+const pv1=new Map(),pv2=new Map();
+/* 빠르게 쓸어도 칸을 건너뛰지 않도록, 지난 위치에서 지금 위치까지 반 칸 간격으로 따라가며 칠해요. */
+function strokeTo(m,e,paint){const st=m.get(e.pointerId);if(!st)return;const dx=e.clientX-st.x,dy=e.clientY-st.y,n=Math.min(200,Math.max(1,Math.ceil(Math.hypot(dx,dy)/st.step)));
+  for(let i=1;i<=n;i++)paint(document.elementFromPoint(st.x+dx*i/n,st.y+dy*i/n),st.v);st.x=e.clientX;st.y=e.clientY;}
+const strokeStart=(m,e,el,v)=>m.set(e.pointerId,{v,x:e.clientX,y:e.clientY,step:Math.max(4,el.getBoundingClientRect().width/2)});
+function paintAt(el,v){if(!el||!el.classList||!el.classList.contains("c")||solved1||el.ownerSVGElement!==$("g1"))return;const k=+el.dataset.k;if(s1[k]!==v){s1[k]=v;el.setAttribute("class","c"+(v?" v"+v:""));const [a,b]=counts(s1);$("cntIn").textContent=a;$("cntEdge").textContent=b;}}
 $("g1").addEventListener("pointerdown",e=>{const el=e.target;if(!el.classList.contains("c")||solved1)return;e.preventDefault();startClock();
   $("g1").querySelectorAll(".wrong").forEach(x=>x.classList.remove("wrong"));
-  const k=+el.dataset.k;pval=(brush&&s1[k]===brush)?0:brush;painting=true;paintAt(el);});
+  const k=+el.dataset.k,v=(brush&&s1[k]===brush)?0:brush;strokeStart(pv1,e,el,v);paintAt(el,v);});
 /* 1cm 모눈은 학생 화면에서는 한 칸씩 눌러서만 칠해요(쓸어서 칠하면 세는 수고로움을 겪지 못해서).
    선생님 화면(?teacher)에서는 설명할 때 수업이 늘어지지 않도록 쓸어서 칠할 수 있어요. */
 const TEACHER=/teacher/.test(location.search);
-$("g1").addEventListener("pointermove",e=>{if(!painting||!TEACHER)return;paintAt(document.elementFromPoint(e.clientX,e.clientY));});
-addEventListener("pointerup",()=>{painting=false;});addEventListener("pointercancel",()=>{painting=false;});
+$("g1").addEventListener("pointermove",e=>{if(!TEACHER)return;strokeTo(pv1,e,paintAt);});
+for(const ty of ["pointerup","pointercancel"])addEventListener(ty,e=>{pv1.delete(e.pointerId);pv2.delete(e.pointerId);});
+/* 칸을 칠하는 터치는 브라우저가 화면 넘기기 몸짓으로 보지 않게 해요.
+   (빠르게 쓸고 손을 떼면, 바로 뒤에 누른 버튼이 한 번 안 눌리는 일을 막아요.) */
+for(const id of ["g1","g2s"])$(id).addEventListener("touchstart",e=>{if(e.cancelable&&e.target.classList&&e.target.classList.contains("c"))e.preventDefault();},{passive:false});
 $("pal").onclick=e=>{const b=e.target.closest(".sw");if(!b)return;brush=+b.dataset.v;$("pal").querySelectorAll(".sw").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));};
 $("clear1").onclick=()=>{if(solved1)return;s1.fill(0);draw1();$("toast1").textContent="";};
 $("check1").onclick=()=>{
@@ -378,12 +390,11 @@ function draw2s(){$("g2s").innerHTML=gridSVG(17,.5,s2);cnt2u();}
 function cnt2u(){const [a,b]=counts(s2);$("cntIn2").textContent=a;$("cntEdge2").textContent=b;}
 function startClock2(){if(t02||solved2)return;t02=Date.now();tick2=setInterval(()=>{el2=(Date.now()-t02)/1000;if(el2>180)$("giveup2").hidden=false;},500);$("clock2").textContent="재는 중";}
 function stopClock2(){clearInterval(tick2);if(t02)el2=(Date.now()-t02)/1000;$("clock2").textContent=fmtT(el2);}
-function paintAt2(el){if(!el||!el.classList||!el.classList.contains("c")||solved2||el.ownerSVGElement!==$("g2s"))return;const k=+el.dataset.k;if(s2[k]!==pval2){s2[k]=pval2;el.setAttribute("class","c"+(pval2?" v"+pval2:""));cnt2u();}}
+function paintAt2(el,v){if(!el||!el.classList||!el.classList.contains("c")||solved2||el.ownerSVGElement!==$("g2s"))return;const k=+el.dataset.k;if(s2[k]!==v){s2[k]=v;el.setAttribute("class","c"+(v?" v"+v:""));cnt2u();}}
 $("g2s").addEventListener("pointerdown",e=>{const el=e.target;if(!el.classList.contains("c")||solved2||$("man2").hidden)return;e.preventDefault();startClock2();
   $("g2s").querySelectorAll(".wrong").forEach(x=>x.classList.remove("wrong"));
-  const k=+el.dataset.k;pval2=(brush2&&s2[k]===brush2)?0:brush2;paint2=true;paintAt2(el);});
-$("g2s").addEventListener("pointermove",e=>{if(!paint2)return;paintAt2(document.elementFromPoint(e.clientX,e.clientY));});
-addEventListener("pointerup",()=>{paint2=false;});addEventListener("pointercancel",()=>{paint2=false;});
+  const k=+el.dataset.k,v=(brush2&&s2[k]===brush2)?0:brush2;strokeStart(pv2,e,el,v);paintAt2(el,v);});
+$("g2s").addEventListener("pointermove",e=>{strokeTo(pv2,e,paintAt2);});
 $("pal2").onclick=e=>{const b=e.target.closest(".sw");if(!b)return;brush2=+b.dataset.v;$("pal2").querySelectorAll(".sw").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));};
 $("clear2").onclick=()=>{if(solved2)return;s2.fill(0);draw2s();$("toast2").textContent="";};
 function done05(byHand,adj=0){

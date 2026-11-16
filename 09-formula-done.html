@@ -257,18 +257,22 @@ function drawTri(){
    +`<circle class="knob" cx="${apx}" cy="${ty}" r="36" fill="transparent"/><circle class="knob" cx="${apx}" cy="${ty}" r="14" fill="var(--band)" stroke="var(--ink)" stroke-width="1.5"/>`;
 }
 /* 한 손가락만: 이미 끄는 손가락이 있으면 다른 손가락은 무시해요. */
-let idT=null,idK=null;
-$("tri").addEventListener("pointerdown",e=>{if(dragT||!e.target.classList.contains("knob"))return;e.preventDefault();dragT=true;idT=e.pointerId;try{$("tri").setPointerCapture(e.pointerId);}catch(_){}});
+let idT=null,idK=null,tyT="",tyK="";
+/* 노란 점을 끄는 터치는 브라우저가 화면 넘기기 몸짓으로 보지 않게 해요.
+   (빠르게 끌고 손을 떼면, 바로 뒤에 누른 버튼이 한 번 안 눌리는 일을 막아요.) */
+for(const id of ["tri","kst"])$(id).addEventListener("touchstart",e=>{if(e.cancelable&&e.target.classList&&e.target.classList.contains("knob"))e.preventDefault();},{passive:false});
+/* 끌던 손가락의 '뗌' 신호를 놓친 채 남아 있으면, 새 첫 손가락이 닿을 때 정리해요. */
+$("tri").addEventListener("pointerdown",e=>{if(dragT&&e.isPrimary&&e.pointerType===tyT)dragT=false;if(dragT||!e.target.classList.contains("knob"))return;e.preventDefault();dragT=true;idT=e.pointerId;tyT=e.pointerType;try{$("tri").setPointerCapture(e.pointerId);}catch(_){}});
 $("tri").addEventListener("pointermove",e=>{if(!dragT||e.pointerId!==idT)return;apx=Math.max(40,Math.min(520,svgPt($("tri"),e).x));drawTri();});
 const endT=e=>{if(e&&e.pointerId!==idT)return;dragT=false;idT=null;};
-$("tri").addEventListener("pointerup",endT);$("tri").addEventListener("pointercancel",endT);
+$("tri").addEventListener("pointerup",endT);$("tri").addEventListener("pointercancel",endT);$("tri").addEventListener("lostpointercapture",endT);
 quiz("c3a","same",{up:"넓이는 밑변 × 높이 ÷ 2예요. 꼭짓점을 옮길 때 밑변이나 높이가 바뀌었나요?",down:"넓이는 밑변 × 높이 ÷ 2예요. 꼭짓점을 옮길 때 밑변이나 높이가 바뀌었나요?"},"toast3",
   ()=>{$("toast3").textContent="맞아요! 밑변과 높이가 같으면 모양이 달라도 넓이는 같아요. 유클리드가 정리해 둔 이 성질을 케플러는 원에 써먹었어요.";$("kep").hidden=false;});
 
 /* ---------- 3단계: 케플러 ---------- */
 const KR=80,KCX=280,KCY=100,KW=560,KYB=300;let kn=8,kt=0,kphase=0,push=0,kanim=0,dragK=false;
 function geo(){const h=Math.PI/kn,c=2*KR*Math.sin(h),ht=KR*Math.cos(h),x0=(KW-kn*c)/2;return {h,c,ht,x0};}
-function buildK(){cancelAnimationFrame(kanim);kphase=0;kt=0;push=0;$("push").value=0;$("pushBox").hidden=true;$("unroll").disabled=false;$("story3").hidden=true;drawK();}
+function buildK(){cancelAnimationFrame(kanim);dragK=false;idK=null;kphase=0;kt=0;push=0;$("push").value=0;$("pushBox").hidden=true;$("unroll").disabled=false;$("story3").hidden=true;drawK();}
 function drawK(){
   const {h,c,ht,x0}=geo();let g="";
   if(kphase<2){
@@ -301,10 +305,10 @@ $("unroll").onclick=()=>{if(kphase)return;kphase=1;$("unroll").disabled=true;con
 function setPush(v){push=Math.max(0,Math.min(1,v));if(push>.97)push=1;$("push").value=Math.round(push*100);drawK();
   if(push>=1&&$("story3").hidden){$("toast3").className="toast ok";$("toast3").textContent="꼭짓점을 모두 모았어요! 삼각형 하나하나는 밑변과 높이가 그대로라서 넓이도 그대로예요.";$("story3").hidden=false;$("next3").disabled=false;done.add(3);}}
 $("push").oninput=()=>setPush(+$("push").value/100);
-$("kst").addEventListener("pointerdown",e=>{if(dragK||kphase!==2||!e.target.classList.contains("knob"))return;e.preventDefault();dragK=true;idK=e.pointerId;try{$("kst").setPointerCapture(e.pointerId);}catch(_){}});
-$("kst").addEventListener("pointermove",e=>{if(!dragK||e.pointerId!==idK)return;const {c,x0}=geo(),start=x0+c/2+(kn-1)*c,x=svgPt($("kst"),e).x;setPush((start-x)/(start-x0));});
+$("kst").addEventListener("pointerdown",e=>{if(dragK&&e.isPrimary&&e.pointerType===tyK)dragK=false;if(dragK||kphase!==2||!e.target.classList.contains("knob"))return;e.preventDefault();dragK=true;idK=e.pointerId;tyK=e.pointerType;try{$("kst").setPointerCapture(e.pointerId);}catch(_){}});
+$("kst").addEventListener("pointermove",e=>{if(!dragK||kphase!==2||e.pointerId!==idK)return;const {c,x0}=geo(),start=x0+c/2+(kn-1)*c,x=svgPt($("kst"),e).x;setPush((start-x)/(start-x0));});
 const endK=e=>{if(e&&e.pointerId!==idK)return;dragK=false;idK=null;};
-$("kst").addEventListener("pointerup",endK);$("kst").addEventListener("pointercancel",endK);
+$("kst").addEventListener("pointerup",endK);$("kst").addEventListener("pointercancel",endK);$("kst").addEventListener("lostpointercapture",endK);
 $("next3").onclick=()=>{done.add(4);show(4);};
 
 /* ---------- 처음부터 ---------- */

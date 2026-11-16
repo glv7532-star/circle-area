@@ -221,13 +221,17 @@ function snapStage(){return {n,si,t,drag,showDims,hiTop,hiH,pst:pst.map(q=>({...
 function restoreStage(S){n=S.n;si=S.si;t=S.t;drag=S.drag;showDims=S.showDims;hiTop=S.hiTop;hiH=S.hiH;pst=S.pst.map(q=>({...q}));active=-1;
   build();$("stage").style.touchAction=S.touch||"manipulation";drawDims();}
 function show(k){
-  if(busy&&k!==cur)return;
+  /* 조각이 날아가는 중에는 단계를 바꾸지 않아요. 바꾸지 못했으면 false를 돌려줘요. */
+  if(busy&&k!==cur)return false;
   const prev=cur;
-  if(prev!==k)KEEP[prev]=snapStage();
+  if(prev!==k){cancelDrag();KEEP[prev]=snapStage();}
   cur=k;
   if(prev!==k){
     if(KEEP[k])restoreStage(KEEP[k]);
     else if(k===1){n=STAGES[si];drag=false;t=1;showDims=false;hiTop=false;hiH=false;active=-1;build();$("stage").style.touchAction="manipulation";drawDims();}
+    /* 2·3단계에 처음 들어갈 때는 어떤 길로 들어오든(다음 버튼, 단계 표시) 그 단계의 무대로 맞춰요. */
+    else if(k===2){stage2Start();update2();}
+    else if(k===3)stage3Start();
   }
   for(const i of [1,2,3,4,5])$("step"+i).hidden=i!==k;
   for(const i of [1,2,3,4,5]){const e=$("tab"+i);if(i===k)e.setAttribute("aria-current","step");else e.removeAttribute("aria-current");e.classList.toggle("done",i!==k&&done.has(i));}
@@ -311,19 +315,27 @@ function svgPt(e){const sv=$("stage"),p=sv.createSVGPoint();p.x=e.clientX;p.y=e.
 const slots=()=>L.P.map((p,j)=>({c:p.c,x:p.to[0],y:p.to[1],a:p.c==="a"?0:180,j}));
 /* 한 번에 한 조각만: 다른 손가락이 이미 조각을 끌고 있으면 새로 누른 것은 무시해요.
    조각은 무대(그림판) 밖으로 나가지 못해요. */
-let activeId=null;const EDGE=R*0.75,SH=320;
+let activeId=null,activeType="";const EDGE=R*0.75,SH=320;
+/* 끌던 조각이 있으면 제자리(원)로 돌려보내고 끌기를 끝내요. 단계를 옮기거나 조각이 날아가기 시작할 때 써요. */
+function cancelDrag(){if(active<0)return;const q=pst[active];if(q){q.x=q.home[0];q.y=q.home[1];q.a=q.home[2];q.slot=-1;}active=-1;activeId=null;if(drag){place();count1();}}
+/* 끄는 동안에는 브라우저가 이 터치를 화면 넘기기 몸짓으로 보지 않게 해요.
+   (빠르게 튕기듯 끌고 손을 떼면, 바로 뒤에 누른 버튼이 한 번 안 눌리는 일을 막아요.) */
+$("stage").addEventListener("touchstart",e=>{if(drag&&e.cancelable)e.preventDefault();},{passive:false});
 $("stage").addEventListener("pointerdown",e=>{
-  if(!drag||busy)return;if(active>=0){e.preventDefault();return;}const g=e.target.closest("#pcs > g");if(!g)return;
-  e.preventDefault();activeId=e.pointerId;active=+g.dataset.i;const q=pst[active];q.slot=-1;
+  if(!drag||busy)return;
+  /* 끌던 손가락의 '뗌' 신호를 놓친 채 남아 있으면, 새 첫 손가락이 닿을 때 정리해요. */
+  if(active>=0&&e.isPrimary&&e.pointerType===activeType)cancelDrag();
+  if(active>=0){e.preventDefault();return;}const g=e.target.closest("#pcs > g");if(!g)return;
+  e.preventDefault();activeId=e.pointerId;activeType=e.pointerType;active=+g.dataset.i;const q=pst[active];q.slot=-1;
   $("pcs").appendChild(g);try{$("stage").setPointerCapture(e.pointerId);}catch(_){}
   const f=svgPt(e),v=vec(q.a);grab=[q.x+v[0]-f.x,q.y+v[1]-f.y];g.style.cursor="grabbing";
 });
 $("stage").addEventListener("pointermove",e=>{
-  if(active<0||e.pointerId!==activeId)return;const q=pst[active],f=svgPt(e),cx=Math.min(W-EDGE,Math.max(EDGE,f.x+grab[0])),cy=Math.min(SH-EDGE,Math.max(EDGE,f.y+grab[1]));
+  if(!drag||active<0||e.pointerId!==activeId)return;const q=pst[active],f=svgPt(e),cx=Math.min(W-EDGE,Math.max(EDGE,f.x+grab[0])),cy=Math.min(SH-EDGE,Math.max(EDGE,f.y+grab[1]));
   q.a=cy>ZONE?(L.P[active].c==="a"?0:180):q.home[2];const v=vec(q.a);q.x=cx-v[0];q.y=cy-v[1];place();
 });
 function drop(e){
-  if(active<0||(e&&e.pointerId!==activeId))return;activeId=null;const i=active,q=pst[i],c=L.P[i].c;active=-1;
+  if(active<0||(e&&e.pointerId!==activeId))return;if(!drag){active=-1;activeId=null;return;}activeId=null;const i=active,q=pst[i],c=L.P[i].c;active=-1;
   const used=new Set(pst.filter(p=>p.slot>=0).map(p=>p.slot));
   let best=null,bd=1e9,other=false;
   slots().forEach(sl=>{if(used.has(sl.j))return;const d=Math.hypot(sl.x-q.x,sl.y-q.y);if(d<SNAP){if(sl.c===c){if(d<bd){bd=d;best=sl;}}else other=true;}});
@@ -334,8 +346,8 @@ function drop(e){
   place();
   if(count1()===pst.length)finishStage();
 }
-$("stage").addEventListener("pointerup",drop);$("stage").addEventListener("pointercancel",drop);
-$("move1").onclick=()=>{if(busy)return;$("move1").disabled=true;$("toast1").textContent="";drag=false;t=0;place();
+$("stage").addEventListener("pointerup",drop);$("stage").addEventListener("pointercancel",drop);$("stage").addEventListener("lostpointercapture",drop);
+$("move1").onclick=()=>{if(busy)return;cancelDrag();$("move1").disabled=true;$("toast1").textContent="";drag=false;t=0;place();
   animateTo(1,1600,finishStage);};
 $("more1").onclick=()=>{if(busy||si>=STAGES.length-1)return;si++;n=STAGES[si];build();startDrag();stageLabel();madeOnce=false;
   $("more1").hidden=true;$("move1").disabled=true;$("back1").disabled=true;$("toast1").className="toast";$("toast1").textContent=`이번에는 ${2*n}조각이에요. 조각을 끌어서 붙여 보세요.`;};
@@ -348,7 +360,7 @@ $("c1").onclick=e=>{const b=e.target.closest(".btn");if(!b||b.disabled)return;co
 };
 /* 2단계는 처음 들어갈 때 무대를 '조각을 모두 붙인 모습'으로 맞춰요(다시 원으로 되돌린 상태여도) */
 function stage2Start(){n=STAGES[si];drag=false;active=-1;t=1;build();$("stage").style.touchAction="manipulation";}
-$("next1").onclick=()=>{const first=!KEEP[2];show(2);if(first)stage2Start();update2();};
+$("next1").onclick=()=>{if(busy)return;show(2);update2();};
 
 /* ---------- 2단계 ---------- */
 const MAXN=256;
@@ -369,7 +381,7 @@ $("cut2").oninput=()=>{
 const MSG256="256조각! 이제 울퉁불퉁함이 거의 보이지 않아요. 조각을 더 잘게 자를수록 직사각형에 점점 가까워져요. 막대를 다시 움직여 비교해 봐도 좋아요.";
 /* 3단계는 처음 들어갈 때 256조각으로 맞춰요. 치수선은 2단계 무대에 남지 않도록 3단계에 들어간 뒤에 켜요. */
 function stage3Start(){n=MAXN;t=1;drag=false;active=-1;showDims=true;hiTop=false;hiH=false;build();$("stage").style.touchAction="manipulation";}
-$("next2").onclick=()=>{const first=!KEEP[3];show(3);if(first)stage3Start();};
+$("next2").onclick=()=>{if(busy)return;show(3);};
 
 /* ---------- 3단계 ---------- */
 function fillB(id,v){$(id).textContent=v;$(id).classList.add("fill");}
@@ -454,7 +466,7 @@ window.addEventListener("beforeunload",e=>{if(touched){e.preventDefault();e.retu
   function paint(){const c=cur();tabs.forEach((t,i)=>{const n=i+1,ok=reached.has(n)&&n!==c;t.classList.toggle("go",ok);t.tabIndex=ok?0:-1;
     if(ok){t.setAttribute("role","button");t.setAttribute("aria-label",`${n}단계로 가기`);}else{t.removeAttribute("role");t.removeAttribute("aria-label");}});
     hint.hidden=reached.size<2;}
-  const _show=show;show=function(k){reached.add(+k);const r=_show.apply(this,arguments);paint();return r;};
+  const _show=show;show=function(k){const r=_show.apply(this,arguments);if(r!==false)reached.add(+k);paint();return r;};
   for(const name of ["resetAll","resetSteps"]){if(typeof window[name]==="function"){const f=window[name];window[name]=function(){reached.clear();reached.add(1);const r=f.apply(this,arguments);paint();return r;};}}
   tabs.forEach((t,i)=>{const go=()=>{const n=i+1;if(reached.has(n)&&n!==cur())show(n);};
     t.addEventListener("click",go);t.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go();}});});

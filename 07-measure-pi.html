@@ -213,7 +213,7 @@ const done=new Set();
 let rows=[];
 const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function save(){try{localStorage.setItem(KEY,JSON.stringify(rows));}catch(_){}}
-function load(){try{const v=JSON.parse(localStorage.getItem(KEY)||"[]");if(Array.isArray(v))rows=v.filter(r=>r&&r.d>0&&r.c>0&&typeof r.name==="string");}catch(_){rows=[];}}
+function load(){try{const v=JSON.parse(localStorage.getItem(KEY)||"[]");if(Array.isArray(v))rows=v.filter(r=>r&&r.d>0&&r.c>r.d&&isFinite(r.c)&&typeof r.name==="string");}catch(_){rows=[];}}
 const ratio=r=>r.c/r.d;
 const f2=v=>(Math.round(v*100)/100).toFixed(2);
 const num=s=>{const v=parseFloat(String(s).replace(",",".").trim());return isFinite(v)?v:NaN;};
@@ -221,7 +221,8 @@ const num=s=>{const v=parseFloat(String(s).replace(",",".").trim());return isFin
 function show(k){
   for(const i of [1,2,3,4])$("step"+i).hidden=i!==k;
   for(const i of [1,2,3,4]){const e=$("tab"+i);if(i===k)e.setAttribute("aria-current","step");else e.removeAttribute("aria-current");e.classList.toggle("done",i!==k&&done.has(i));}
-  if(k===2)drawChart();if(k===3)renderStat();if(k===4)renderTbl4();
+  /* 2단계 정답 문장은 기록을 고친 뒤 돌아와도 지금 기록(가장 작은 것, 가장 큰 것)에 맞게 다시 써요. */
+  if(k===2){drawChart();if(done.has(2)&&rows.length)$("toast2").textContent=msg2();}if(k===3)renderStat();if(k===4)renderTbl4();
   window.scrollTo({top:0,behavior:"smooth"});
 }
 
@@ -246,13 +247,15 @@ function clearErr(){$("err").textContent="";["fName","fD","fC"].forEach(i=>$(i).
 ["fName","fD","fC"].forEach(i=>$(i).addEventListener("input",clearErr));
 $("form").addEventListener("submit",e=>{
   e.preventDefault();clearErr();
-  const name=$("fName").value.trim(),d=num($("fD").value),c=num($("fC").value),bad=(id,m)=>{$(id).classList.add("err");$("err").textContent=m;$(id).focus();};
+  /* 기록은 소수 둘째 자리까지 남기므로, 그렇게 맞춘 값으로 확인해요(0.004처럼 0이 되어 버리는 값을 받지 않도록). */
+  const r2=v=>isFinite(v)?+v.toFixed(2):v;
+  const name=$("fName").value.trim(),d=r2(num($("fD").value)),c=r2(num($("fC").value)),bad=(id,m)=>{$(id).classList.add("err");$("err").textContent=m;$(id).focus();};
   if(!name)return bad("fName","물건 이름을 적어 주세요.");
   if(!(d>0))return bad("fD","지름을 cm 단위의 수로 적어 주세요. 예: 6.6");
   if(!(c>0))return bad("fC","원주를 cm 단위의 수로 적어 주세요. 예: 20.9");
   if(c<=d)return bad("fC","원주는 지름보다 길어야 해요. 지름과 원주를 바꿔 적지 않았는지 확인해 보세요.");
   if(d>500||c>2000)return bad("fD","값이 너무 커요. cm 단위로 적었는지 확인해 보세요.");
-  rows.push({name,d:+d.toFixed(2),c:+c.toFixed(2)});save();
+  rows.push({name,d,c});save();
   $("fName").value="";$("fD").value="";$("fC").value="";$("fName").focus();renderLog();
 });
 /* 기록이 4개보다 적어지면 2단계부터 다시 잠가요(빈 기록으로 비교하지 않도록) */
@@ -269,7 +272,9 @@ function drawChart(){
   let g="",y=8;
   list.forEach((r,k)=>{const Lpx=same?SW:SW*r.c/maxC,dp=Lpx/ratio(r),rad=dp/2,full=Math.min(8,Math.floor(ratio(r)+1e-9));
     const top=y,rowH=Math.max(52,dp+28),cy=top+16+rad;
-    g+=`<text class="lbl" x="0" y="${top+16}">${esc(r.name)}</text><text x="0" y="${top+34}">지름 ${r.d}cm</text><text x="0" y="${top+50}">원주 ${r.c}cm</text>`;
+    /* 이름이 길면 보라색 선과 겹치지 않도록 글자 폭을 줄여 150 안에 넣어요. */
+    const nameW=[...r.name].reduce((w,ch)=>w+(ch.codePointAt(0)>0x2E7F?14:8),0);
+    g+=`<text class="lbl" x="0" y="${top+16}"${nameW>150?' textLength="150" lengthAdjust="spacingAndGlyphs"':""}>${esc(r.name)}</text><text x="0" y="${top+34}">지름 ${r.d}cm</text><text x="0" y="${top+50}">원주 ${r.c}cm</text>`;
     g+=`<rect x="${X0}" y="${top+4}" width="${Lpx.toFixed(2)}" height="6" rx="3" fill="var(--guide)"/>`;
     g+=`<clipPath id="cl${k}"><rect x="${X0}" y="${top}" width="${Lpx.toFixed(2)}" height="${rowH}"/></clipPath><g clip-path="url(#cl${k})">`;
     for(let i=0;i<=full;i++){const cx=X0+rad+i*dp;
@@ -287,12 +292,15 @@ function drawChart(){
 }
 function setSame(v){same=v;$("scaleBtn").textContent=same?"실제 크기로 돌아가기":"크기를 똑같이 맞춰 보기";drawChart();}
 $("scaleBtn").onclick=()=>setSame(!same);
+function msg2(){
+  const byD=rows.slice().sort((a,b)=>a.d-b.d),sm=byD[0],bg=byD[byD.length-1];
+  const who=sm.d<bg.d?`가장 작은 ${sm.name}(지름 ${sm.d}cm)도, 가장 큰 ${bg.name}(지름 ${bg.d}cm)도`:"우리가 잰 물건들은 모두";
+  return `맞아요! ${who} 원주는 지름 3개를 늘어놓은 것보다 조금 더 길어요. 지름의 약 3.14배예요. 원의 크기와 상관없이 원주÷지름은 언제나 일정해요. 지난 시간에 배운 원주율이 바로 이 수예요.`;
+}
 function ok2(){
   if(!rows.length)return;const tt=$("toast2");
   $("c2").querySelectorAll(".btn").forEach(x=>{x.disabled=true;if(x.dataset.v==="same")x.classList.add("yes");});tt.className="toast ok";
-  const byD=rows.slice().sort((a,b)=>a.d-b.d),sm=byD[0],bg=byD[byD.length-1];
-  const who=sm.d<bg.d?`가장 작은 ${sm.name}(지름 ${sm.d}cm)도, 가장 큰 ${bg.name}(지름 ${bg.d}cm)도`:"우리가 잰 물건들은 모두";
-  tt.textContent=`맞아요! ${who} 원주는 지름 3개를 늘어놓은 것보다 조금 더 길어요. 지름의 약 3.14배예요. 원의 크기와 상관없이 원주÷지름은 언제나 일정해요. 지난 시간에 배운 원주율이 바로 이 수예요.`;
+  tt.textContent=msg2();
   if(!same)setSame(true);$("next2").disabled=false;done.add(2);
 }
 $("c2").onclick=e=>{const b=e.target.closest(".btn");if(!b||b.disabled)return;const tt=$("toast2");
@@ -329,7 +337,7 @@ function renderTbl4(){
 
 /* ---------- 처음부터 ---------- */
 function resetSteps(){
-  done.clear();same=false;picks=new Set();$("scaleBtn").textContent="크기를 똑같이 맞춰 보기";
+  done.clear();for(const i of [1,2,3,4])$("tab"+i).classList.remove("done");same=false;picks=new Set();$("scaleBtn").textContent="크기를 똑같이 맞춰 보기";
   $("c2").querySelectorAll(".btn").forEach(b=>{b.disabled=false;b.classList.remove("yes","no");});
   $("o3").querySelectorAll(".opt").forEach(b=>{b.disabled=false;b.setAttribute("aria-pressed","false");b.classList.remove("wrongpick");});
   $("check3").disabled=true;$("fb3").innerHTML="";$("story3").hidden=true;$("next2").disabled=true;$("next3").disabled=true;
