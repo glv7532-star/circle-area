@@ -299,18 +299,21 @@ function finishStage(){
 function count1(){const k=pst.filter(q=>q.slot>=0).length;$("cnt1").textContent=`${k} / ${pst.length}`;return k;}
 function svgPt(e){const sv=$("stage"),p=sv.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(sv.getScreenCTM().inverse());}
 const slots=()=>L.P.map((p,j)=>({c:p.c,x:p.to[0],y:p.to[1],a:p.c==="a"?0:180,j}));
+/* 한 번에 한 조각만: 다른 손가락이 이미 조각을 끌고 있으면 새로 누른 것은 무시해요.
+   조각은 무대(그림판) 밖으로 나가지 못해요. */
+let activeId=null;const EDGE=R*0.75,SH=320;
 $("stage").addEventListener("pointerdown",e=>{
-  if(!drag||busy)return;const g=e.target.closest("#pcs > g");if(!g)return;
-  e.preventDefault();active=+g.dataset.i;const q=pst[active];q.slot=-1;
+  if(!drag||busy)return;if(active>=0){e.preventDefault();return;}const g=e.target.closest("#pcs > g");if(!g)return;
+  e.preventDefault();activeId=e.pointerId;active=+g.dataset.i;const q=pst[active];q.slot=-1;
   $("pcs").appendChild(g);try{$("stage").setPointerCapture(e.pointerId);}catch(_){}
   const f=svgPt(e),v=vec(q.a);grab=[q.x+v[0]-f.x,q.y+v[1]-f.y];g.style.cursor="grabbing";
 });
 $("stage").addEventListener("pointermove",e=>{
-  if(active<0)return;const q=pst[active],f=svgPt(e),cx=f.x+grab[0],cy=f.y+grab[1];
+  if(active<0||e.pointerId!==activeId)return;const q=pst[active],f=svgPt(e),cx=Math.min(W-EDGE,Math.max(EDGE,f.x+grab[0])),cy=Math.min(SH-EDGE,Math.max(EDGE,f.y+grab[1]));
   q.a=cy>ZONE?(L.P[active].c==="a"?0:180):q.home[2];const v=vec(q.a);q.x=cx-v[0];q.y=cy-v[1];place();
 });
 function drop(e){
-  if(active<0)return;const i=active,q=pst[i],c=L.P[i].c;active=-1;
+  if(active<0||(e&&e.pointerId!==activeId))return;activeId=null;const i=active,q=pst[i],c=L.P[i].c;active=-1;
   const used=new Set(pst.filter(p=>p.slot>=0).map(p=>p.slot));
   let best=null,bd=1e9,other=false;
   slots().forEach(sl=>{if(used.has(sl.j))return;const d=Math.hypot(sl.x-q.x,sl.y-q.y);if(d<SNAP){if(sl.c===c){if(d<bd){bd=d;best=sl;}}else other=true;}});
