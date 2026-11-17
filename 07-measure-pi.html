@@ -10,6 +10,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&display=swap">
+<script src="teacher-lock.js"></script>
 <style>
 /* Layout: same notebook page as the other circle-unit tools; step strip on top, one card per step. The measurement log is the centre of the page. */
 :root{
@@ -411,7 +412,7 @@ $("reset").onclick=()=>{
 };
 
 /* 선생님 바로가기: 학생용 주소(github.io)에서는 ?teacher 를 붙였을 때만 보여요. */
-if(!/github\.io$/.test(location.hostname)||/teacher/.test(location.search))$("tbar").hidden=false;
+if(window.CA_TEACHER)$("tbar").hidden=false;
 const EX=[["500원 동전",2.65,8.3],["음료 캔",6.6,20.9],["머그컵",8.2,25.6],["테이프",11,34.8],["접시",21,66.5],["벽시계",30,94.6]];
 $("tbar").onclick=e=>{const b=e.target.closest("button");if(!b)return;const j=b.dataset.j;
   if(j==="ex"||rows.length<4){rows=EX.map(([name,d,c])=>({name,d,c,ex:true}));save();renderLog();}

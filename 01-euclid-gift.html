@@ -10,6 +10,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&display=swap">
+<script src="teacher-lock.js"></script>
 <style>
 /* Layout: same notebook page as the other circle-unit tools; step strip on top, one card per step. Shapes sit on a 1cm grid so every length can be counted. */
 :root{
@@ -363,7 +364,7 @@ $("reset").onclick=()=>{
   resetArm=0;$("reset").textContent="처음부터 다시";resetAll();
 };
 /* 선생님 바로가기: 학생용 주소(github.io)에서는 ?teacher 를 붙였을 때만 보여요. 버튼을 대신 누르지 않고 상태를 바로 맞춰요. */
-if(!/github\.io$/.test(location.hostname)||/teacher/.test(location.search))$("tbar").hidden=false;
+if(window.CA_TEACHER)$("tbar").hidden=false;
 function openWho(){$("who").open=true;$("who").scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"});}
 $("whoAgain").onclick=openWho;
 $("tbar").onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.who){openWho();return;}const j=b.dataset.j;resetAll();

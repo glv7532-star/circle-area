@@ -10,6 +10,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&display=swap">
+<script src="teacher-lock.js"></script>
 <style>
 /* Layout: same notebook page as 원 둘레 가두기 작전 and 피자 조각 마법; step strip on top, figure left and panel right on a tablet, stacked on a phone. */
 :root{
@@ -323,7 +324,7 @@ $("g1").addEventListener("pointerdown",e=>{const el=e.target;if(!el.classList.co
   const k=+el.dataset.k,v=(brush&&s1[k]===brush)?0:brush;strokeStart(pv1,e,el,v);paintAt(el,v);});
 /* 1cm 모눈은 학생 화면에서는 한 칸씩 눌러서만 칠해요(쓸어서 칠하면 세는 수고로움을 겪지 못해서).
    선생님 화면(?teacher)에서는 설명할 때 수업이 늘어지지 않도록 쓸어서 칠할 수 있어요. */
-const TEACHER=/teacher/.test(location.search);
+const TEACHER=window.CA_TEACHER;
 $("g1").addEventListener("pointermove",e=>{if(!TEACHER)return;strokeTo(pv1,e,paintAt);});
 for(const ty of ["pointerup","pointercancel"])addEventListener(ty,e=>{pv1.delete(e.pointerId);pv2.delete(e.pointerId);});
 /* 칸을 칠하는 터치는 브라우저가 화면 넘기기 몸짓으로 보지 않게 해요.
@@ -511,7 +512,7 @@ $("reset").onclick=()=>{
 
 /* 선생님 바로가기: 학생용 주소(github.io)에서는 ?teacher 를 붙였을 때만 보여요.
    버튼을 대신 누르지 않고 상태를 바로 맞춰요. */
-if(!/github\.io$/.test(location.hostname)||/teacher/.test(location.search))$("tbar").hidden=false;
+if(window.CA_TEACHER)$("tbar").hidden=false;
 $("tbar").onclick=e=>{const b=e.target.closest("button");if(!b)return;const j=b.dataset.j;resetAll();
   if(j==="1")return;
   draw3(2);$("b3a").textContent="32";$("b3b").textContent="64";["b3a","b3b"].forEach(id=>$(id).classList.add("fill"));$("q3b").hidden=false;$("ratio3").hidden=false;ratioDone();

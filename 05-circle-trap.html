@@ -10,6 +10,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&display=swap">
+<script src="teacher-lock.js"></script>
 <style>
 /* Layout: notebook page like the 어린 왕자 series; step strip on top, one card per step. On a tablet the figure sits left and the numbers right; on a phone they stack. */
 :root{
@@ -324,7 +325,7 @@ html,body{overscroll-behavior-y:contain}
 
 <script>
 /* 선생님 화면: 학생용 주소(github.io)에서는 ?teacher 를 붙였을 때만 */
-const TEACHER=!/github\.io$/.test(location.hostname)||/teacher/.test(location.search);
+const TEACHER=window.CA_TEACHER;
 /* 아르키메데스 영상: 선생님 화면에만 보이고, '영상 보기'를 눌러야 불러와요(학생 태블릿에서는 소리가 나지 않아요). */
 function stopVideos(){document.querySelectorAll(".vidframe").forEach(f=>f.innerHTML="");document.querySelectorAll(".vidplay").forEach(b=>b.textContent="영상 보기");}
 document.addEventListener("click",e=>{const b=e.target.closest(".vidplay");if(!b)return;const box=b.closest(".vidbox"),f=box.querySelector(".vidframe");
