@@ -131,13 +131,13 @@ html,body{overscroll-behavior-y:contain}
     <h2>둥근 물건의 지름과 원주를 재어요</h2>
     <p class="note"><b>준비물</b>: 수학 교과서 부록 '준비물 10', '준비물 11'(삼각자, 직각자, 눈금자)</p>
     <ol class="tips">
-      <li><b>원주</b>: 종이띠 눈금자를 물건 둘레에 한 바퀴 팽팽하게 감고, 0과 다시 만나는 곳의 눈금을 읽어요.</li>
+      <li><b>원주</b>: 종이띠 눈금자를 물건 둘레에 한 바퀴 팽팽하게 감고, 0 눈금과 다시 만나는 곳의 눈금을 읽어요. 0 눈금은 띠 끝에서 조금 떨어져 있어요. <b>띠 끝이 아니라 0 눈금</b>에 맞춰 읽어요.</li>
       <li><b>지름</b>: 물건 양쪽에 삼각자와 직각자를 세워 물건에 꼭 붙이고, 두 자 사이의 거리를 재어요. 이렇게 하면 가장 긴 곳(중심을 지나는 곳)을 잴 수 있어요.</li>
       <li>동전처럼 <b>작은 것</b>부터 접시처럼 <b>큰 것</b>까지, 크기가 다른 물건을 4개 이상 재어 보세요.</li>
     </ol>
     <div class="mfigs" aria-label="재는 방법 그림">
       <figure class="mfig">
-        <svg viewBox="0 0 300 210" role="img" aria-label="종이띠 눈금자를 원통 둘레에 한 바퀴 감고, 0과 다시 만나는 곳의 눈금 20.9cm를 읽는 그림">
+        <svg viewBox="0 0 300 210" role="img" aria-label="종이띠 눈금자를 원통 둘레에 한 바퀴 감고, 띠 끝이 아니라 0 눈금과 다시 만나는 곳의 눈금 20.9cm를 읽는 그림">
           <path d="M40,30 L40,150 A55,12 0 0 0 150,150 L150,30" style="fill:var(--paper);stroke:var(--ink);stroke-width:1.5"/>
           <ellipse cx="95" cy="30" rx="55" ry="12" style="fill:var(--bg);stroke:var(--ink);stroke-width:1.5"/>
           <path d="M40,78 A55,12 0 0 0 150,78 L150,98 A55,12 0 0 1 40,98 Z" style="fill:var(--band);stroke:var(--ink);stroke-width:1.2"/>
@@ -150,14 +150,15 @@ html,body{overscroll-behavior-y:contain}
           <g style="stroke:#2a2210;stroke-width:1"><line x1="180" y1="118" x2="180" y2="114"/><line x1="185" y1="118" x2="185" y2="114"/><line x1="190" y1="118" x2="190" y2="114"/><line x1="195" y1="118" x2="195" y2="114"/><line x1="200" y1="118" x2="200" y2="108"/><line x1="205" y1="118" x2="205" y2="114"/><line x1="210" y1="118" x2="210" y2="114"/><line x1="215" y1="118" x2="215" y2="114"/><line x1="220" y1="118" x2="220" y2="114"/><line x1="225" y1="118" x2="225" y2="111"/><line x1="230" y1="118" x2="230" y2="114"/><line x1="235" y1="118" x2="235" y2="114"/><line x1="240" y1="118" x2="240" y2="114"/><line x1="245" y1="118" x2="245" y2="114"/><line x1="250" y1="118" x2="250" y2="108"/><line x1="255" y1="118" x2="255" y2="114"/><line x1="260" y1="118" x2="260" y2="114"/><line x1="265" y1="118" x2="265" y2="114"/><line x1="270" y1="118" x2="270" y2="114"/><line x1="275" y1="118" x2="275" y2="111"/><line x1="280" y1="118" x2="280" y2="114"/><line x1="285" y1="118" x2="285" y2="114"/><line x1="290" y1="118" x2="290" y2="114"/></g>
           <text x="200" y="134" text-anchor="middle" style="font-family:var(--body);fill:var(--ink);font-size:11px">20</text>
           <text x="250" y="134" text-anchor="middle" style="font-family:var(--body);fill:var(--ink);font-size:11px">21</text>
-          <rect x="180" y="88" width="65" height="14" style="fill:var(--band);stroke:#2a2210;stroke-width:1;opacity:.95"/>
+          <rect x="180" y="88" width="76" height="14" style="fill:var(--band);stroke:#2a2210;stroke-width:1;opacity:.95"/>
           <line x1="245" y1="86" x2="245" y2="120" style="stroke:var(--bad);stroke-width:3"/>
           <text x="238" y="98" text-anchor="end" style="font-family:var(--body);fill:var(--ink);font-size:10px">0</text>
-          <text x="245" y="80" text-anchor="middle" style="font-family:var(--body);fill:var(--ink);font-size:12px;font-weight:700">20.9cm</text>
+          <path d="M256,86 L264,76" style="stroke:var(--muted);stroke-width:1"/><text x="268" y="73" text-anchor="middle" style="fill:var(--muted);font-family:var(--body);font-size:10px">띠 끝</text>
+          <text x="222" y="78" text-anchor="middle" style="font-family:var(--body);fill:var(--ink);font-size:12px;font-weight:700">20.9cm</text>
           <text x="95" y="178" text-anchor="middle" style="font-family:var(--body);fill:var(--ink);font-size:12.5px">① 한 바퀴 팽팽하게 감아요</text>
-          <text x="235" y="160" text-anchor="middle" style="font-family:var(--body);fill:var(--ink);font-size:12.5px">② 0과 만나는 곳을</text>
-          <text x="235" y="176" text-anchor="middle" style="font-family:var(--body);fill:var(--ink);font-size:12.5px">읽어요</text>
-          <text x="95" y="198" text-anchor="middle" style="fill:var(--muted);font-family:var(--body);font-size:11px">빨간 선: 눈금자의 0</text>
+          <text x="235" y="160" text-anchor="middle" style="font-family:var(--body);fill:var(--ink);font-size:12.5px">② 0 눈금과 만나는</text>
+          <text x="235" y="176" text-anchor="middle" style="font-family:var(--body);fill:var(--ink);font-size:12.5px">곳을 읽어요</text>
+          <text x="95" y="198" text-anchor="middle" style="fill:var(--muted);font-family:var(--body);font-size:11px">빨간 선: 0 눈금 (띠 끝이 아니에요)</text>
         </svg>
         <figcaption><b>원주</b> 재기: 종이띠 눈금자로 한 바퀴</figcaption>
       </figure>
