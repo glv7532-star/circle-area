@@ -34,7 +34,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16p
 .wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
 h1{font-family:var(--display);font-weight:700;font-size:2.1rem;line-height:1.1;margin:0}
 .lead{margin:4px 0 0;color:var(--muted);font-size:.95rem;word-break:keep-all}
-.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.promise{margin:0;padding:14px 16px;border-radius:12px;background:var(--accent-bg);font-family:var(--display);font-size:1.4rem;line-height:1.4;text-align:center;word-break:keep-all}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
 .stepi{font-size:.9rem;padding:8px 6px;border:1px solid var(--line);background:var(--paper);color:var(--muted);border-radius:8px;text-align:center;word-break:keep-all;line-height:1.25}
 .stepi b{font-family:var(--display);font-size:1.15rem;display:block;line-height:1}
 .stepi[aria-current="step"]{border-color:var(--accent);background:var(--accent-bg);color:var(--ink)}
@@ -114,21 +115,36 @@ html,body{overscroll-behavior-y:contain}
 </style>
 
 <div class="wrap">
-  <div class="tbar" id="tbar" hidden><b>선생님 바로가기</b><button data-j="ex">예시 기록 넣기</button><button data-j="1">1단계</button><button data-j="2">2단계</button><button data-j="3">3단계</button><button data-j="4">마무리</button><a class="tbar-home" href="https://glv7532-star.github.io/circle-area/?teacher" style="margin-left:auto;font-size:.85rem;padding:5px 12px;border-radius:8px;border:1.5px solid var(--accent);background:var(--accent);color:var(--paper);text-decoration:none;white-space:nowrap">차시 목록으로</a></div>
+  <div class="tbar" id="tbar" hidden><b>선생님 바로가기</b><button data-j="ex">예시 기록 넣기</button><button data-j="0">1단계 약속</button><button data-j="1">2단계</button><button data-j="2">3단계</button><button data-j="3">4단계</button><button data-j="4">마무리</button><a class="tbar-home" href="https://glv7532-star.github.io/circle-area/?teacher" style="margin-left:auto;font-size:.85rem;padding:5px 12px;border-radius:8px;border:1.5px solid var(--accent);background:var(--accent);color:var(--paper);text-decoration:none;white-space:nowrap">차시 목록으로</a></div>
   <header>
     <h1>정말 3.14일까?</h1>
     <p class="lead">아르키메데스는 계산으로 원주가 지름의 약 3.14배라는 것을 밝혔어요. 정말 그런지, 우리 주변의 둥근 물건을 직접 재어 확인해 봐요.</p>
   </header>
 
   <nav class="steps" aria-label="단계">
-    <div class="stepi" id="tab1" aria-current="step"><b>1</b>재고 기록하기</div>
-    <div class="stepi" id="tab2"><b>2</b>크기가 달라도?</div>
-    <div class="stepi" id="tab3"><b>3</b>왜 딱 3.14가 아닐까?</div>
-    <div class="stepi" id="tab4"><b>4</b>마무리</div>
+    <div class="stepi" id="tab0" aria-current="step"><b>1</b>약속하기</div>
+    <div class="stepi" id="tab1"><b>2</b>재고 기록하기</div>
+    <div class="stepi" id="tab2"><b>3</b>크기가 달라도?</div>
+    <div class="stepi" id="tab3"><b>4</b>왜 딱 3.14가 아닐까?</div>
+    <div class="stepi" id="tab4"><b>5</b>마무리</div>
   </nav>
 
-  <!-- 1단계 -->
-  <section class="card" id="step1">
+  <!-- 1단계: 약속 (화면 번호 1, 코드에서는 step0) -->
+  <section class="card" id="step0">
+    <h2>재기 전에 약속해요</h2>
+    <p class="note">오늘은 둥근 물건을 직접 재어 기록해요. 재기 전에 수학자와 과학자가 꼭 지키는 약속이 있어요.</p>
+    <ol class="tips">
+      <li><b>잰 그대로 적어요.</b> 3.14가 나오지 않아도 괜찮아요. 3.14에 맞추려고 값을 고치지 않아요.</li>
+      <li><b>내가 잰 값은 내가 잰 그대로, 친구가 잰 값은 친구가 잰 그대로 적어요.</b></li>
+      <li><b>값이 이상해 보이면 숫자를 바꾸지 말고 다시 재어요.</b></li>
+    </ol>
+    <p class="note">다르게 나온 값이 있어야 왜 다르게 나왔는지 생각해 볼 수 있어요. 그래서 다르게 나온 값도 소중한 기록이에요.</p>
+    <p class="promise">다르게 나와도 그대로 적는 것이<br>진짜 수학자의 태도예요.</p>
+    <div class="row"><button class="btn primary" id="next0">약속해요</button></div>
+  </section>
+
+  <!-- 2단계: 기록 (코드에서는 step1) -->
+  <section class="card" id="step1" hidden>
     <h2>둥근 물건의 지름과 원주를 재어요</h2>
     <p class="note"><b>준비물</b>: 수학 교과서 부록 '준비물 10', '준비물 11'(삼각자, 직각자, 눈금자)</p>
     <ol class="tips">
@@ -227,6 +243,7 @@ html,body{overscroll-behavior-y:contain}
       <div class="opts" id="o3" role="group" aria-label="까닭 고르기">
         <button class="opt" data-k="string" aria-pressed="false">종이띠가 느슨하거나 비뚤게 감겼다</button>
         <button class="opt" data-k="zero" aria-pressed="false">0 눈금이 아니라 종이띠 끝에 맞춰 읽었다</button>
+        <button class="opt" data-k="soft" aria-pressed="false">종이로 된 자(종이띠 눈금자, 삼각자, 직각자)가 흐물흐물해서 휘거나 똑바로 서지 않았다</button>
         <button class="opt" data-k="dia" aria-pressed="false">지름을 가장 긴 곳(중심을 지나는 곳)에서 재지 못했다</button>
         <button class="opt" data-k="ruler" aria-pressed="false">자의 눈금 사이를 어림해서 읽었다</button>
         <button class="opt" data-k="shape" aria-pressed="false">물건이 완전히 동그랗지 않다</button>
@@ -273,7 +290,7 @@ html,body{overscroll-behavior-y:contain}
 const $=id=>document.getElementById(id);
 const PI=3.14,KEY="circle-measure-v1";
 const done=new Set();
-let rows=[];
+let rows=[],promised=false;
 const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function save(){try{localStorage.setItem(KEY,JSON.stringify(rows));}catch(_){}}
 function load(){try{const v=JSON.parse(localStorage.getItem(KEY)||"[]");if(Array.isArray(v))rows=v.filter(r=>r&&r.d>0&&r.c>r.d&&isFinite(r.c)&&typeof r.name==="string");}catch(_){rows=[];}}
@@ -282,8 +299,8 @@ const f2=v=>(Math.round(v*100)/100).toFixed(2);
 const num=s=>{const v=parseFloat(String(s).replace(",",".").trim());return isFinite(v)?v:NaN;};
 
 function show(k){
-  for(const i of [1,2,3,4])$("step"+i).hidden=i!==k;
-  for(const i of [1,2,3,4]){const e=$("tab"+i);if(i===k)e.setAttribute("aria-current","step");else e.removeAttribute("aria-current");e.classList.toggle("done",i!==k&&done.has(i));}
+  for(const i of [0,1,2,3,4])$("step"+i).hidden=i!==k;
+  for(const i of [0,1,2,3,4]){const e=$("tab"+i);if(i===k)e.setAttribute("aria-current","step");else e.removeAttribute("aria-current");e.classList.toggle("done",i!==k&&done.has(i));}
   /* 2단계 정답 문장은 기록을 고친 뒤 돌아와도 지금 기록(가장 작은 것, 가장 큰 것)에 맞게 다시 써요. */
   if(k===2){drawChart();if(done.has(2)&&rows.length)$("toast2").textContent=msg2();}if(k===3)renderStat();if(k===4)renderTbl4();
   window.scrollTo({top:0,behavior:"smooth"});
@@ -323,6 +340,7 @@ $("form").addEventListener("submit",e=>{
 });
 /* 기록이 4개보다 적어지면 2단계부터 다시 잠가요(빈 기록으로 비교하지 않도록) */
 $("logBox").addEventListener("click",e=>{const b=e.target.closest(".del");if(!b)return;const was=rows.length>=4;rows.splice(+b.dataset.i,1);save();if(was&&rows.length<4)resetSteps();renderLog();});
+$("next0").onclick=()=>{promised=true;done.add(0);show(1);};
 $("next1").onclick=()=>{done.add(1);show(2);};
 
 /* ---------- 2단계: 그래프 ---------- */
@@ -377,10 +395,10 @@ function renderStat(){
   const qs=rows.map(ratio),avg=qs.reduce((a,b)=>a+b,0)/qs.length;
   $("stat3").innerHTML=`<div class="st"><span>가장 작은 값</span><b>${f2(Math.min(...qs))}</b></div><div class="st"><span>가장 큰 값</span><b>${f2(Math.max(...qs))}</b></div><div class="st"><span>모두의 평균</span><b>${f2(avg)}</b></div>`;
 }
-const FB={string:"맞아요. 종이띠가 느슨하거나 비뚤게 감기면 값이 달라져요.",zero:"맞아요. 0 눈금은 띠 끝에서 조금 떨어져 있어서, 띠 끝에 맞춰 읽으면 그만큼 길이가 달라져요.",dia:"맞아요. 중심을 지나지 않으면 지름이 실제보다 짧게 재어져서 원주÷지름이 커져요.",ruler:"맞아요. 눈금 사이를 어림하면 0.1cm쯤은 쉽게 달라져요.",shape:"맞아요. 컵이나 테이프처럼 실제 물건은 완전한 원이 아닐 때가 많아요.",diff:"이건 아니에요. 2단계에서 보았듯 크기가 달라도 원주÷지름은 거의 같았어요. 모든 원의 원주율은 똑같아요."};
+const FB={string:"맞아요. 종이띠가 느슨하거나 비뚤게 감기면 값이 달라져요.",zero:"맞아요. 0 눈금은 띠 끝에서 조금 떨어져 있어서, 띠 끝에 맞춰 읽으면 그만큼 길이가 달라져요.",soft:"맞아요. 종이 자는 휘기 쉬워서, 삼각자와 직각자가 기울면 지름이 실제와 다르게 재어지고 종이띠가 구겨지거나 휘면 길이도 달라질 수 있어요.",dia:"맞아요. 중심을 지나지 않으면 지름이 실제보다 짧게 재어져서 원주÷지름이 커져요.",ruler:"맞아요. 눈금 사이를 어림하면 0.1cm쯤은 쉽게 달라져요.",shape:"맞아요. 컵이나 테이프처럼 실제 물건은 완전한 원이 아닐 때가 많아요.",diff:"이건 아니에요. 3단계에서 보았듯 크기가 달라도 원주÷지름은 거의 같았어요. 모든 원의 원주율은 똑같아요."};
 let picks=new Set();
 /* 맞는 까닭 4개를 모두 고르고 오답은 고르지 않아야 통과해요. 그 전까지는 다시 고를 수 있어요. */
-const RIGHT3=["string","zero","dia","ruler","shape"];
+const RIGHT3=["string","zero","soft","dia","ruler","shape"];
 $("o3").onclick=e=>{const b=e.target.closest(".opt");if(!b||b.disabled)return;const k=b.dataset.k;picks.has(k)?picks.delete(k):picks.add(k);b.setAttribute("aria-pressed",picks.has(k)?"true":"false");
   if(!picks.has(k))b.classList.remove("wrongpick");$("check3").disabled=!picks.size;};
 function judge3(){
@@ -400,7 +418,7 @@ function renderTbl4(){
 
 /* ---------- 처음부터 ---------- */
 function resetSteps(){
-  done.clear();for(const i of [1,2,3,4])$("tab"+i).classList.remove("done");same=false;picks=new Set();$("scaleBtn").textContent="크기를 똑같이 맞춰 보기";
+  done.clear();if(promised)done.add(0);for(const i of [0,1,2,3,4])$("tab"+i).classList.remove("done");same=false;picks=new Set();$("scaleBtn").textContent="크기를 똑같이 맞춰 보기";
   $("c2").querySelectorAll(".btn").forEach(b=>{b.disabled=false;b.classList.remove("yes","no");});
   $("o3").querySelectorAll(".opt").forEach(b=>{b.disabled=false;b.setAttribute("aria-pressed","false");b.classList.remove("wrongpick");});
   $("check3").disabled=true;$("fb3").innerHTML="";$("story3").hidden=true;$("next2").disabled=true;$("next3").disabled=true;
@@ -409,24 +427,26 @@ function resetSteps(){
 let resetArm=0;
 $("reset").onclick=()=>{
   if(Date.now()-resetArm>4000){resetArm=Date.now();$("reset").textContent="기록도 모두 지워져요. 정말 처음부터 할까요? 한 번 더 누르세요";setTimeout(()=>{$("reset").textContent="처음부터 다시";},4000);return;}
-  resetArm=0;$("reset").textContent="처음부터 다시";rows=[];save();clearErr();["fName","fD","fC"].forEach(i=>{$(i).value="";});resetSteps();renderLog();show(1);
+  resetArm=0;$("reset").textContent="처음부터 다시";rows=[];save();clearErr();["fName","fD","fC"].forEach(i=>{$(i).value="";});promised=false;resetSteps();renderLog();show(0);
 };
 
 /* 선생님 바로가기: 학생용 주소(github.io)에서는 ?teacher 를 붙였을 때만 보여요. */
 if(window.CA_TEACHER)$("tbar").hidden=false;
 const EX=[["500원 동전",2.65,8.3],["음료 캔",6.6,20.9],["머그컵",8.2,25.6],["테이프",11,34.8],["접시",21,66.5],["벽시계",30,94.6]];
 $("tbar").onclick=e=>{const b=e.target.closest("button");if(!b)return;const j=b.dataset.j;
-  if(j==="ex"||rows.length<4){rows=EX.map(([name,d,c])=>({name,d,c,ex:true}));save();renderLog();}
-  if(j==="ex"){show(1);return;}
+  if(j!=="0"&&(j==="ex"||rows.length<4)){rows=EX.map(([name,d,c])=>({name,d,c,ex:true}));save();renderLog();}
+  if(j==="0"){show(0);return;}
+  promised=true;
+  if(j==="ex"){done.add(0);show(1);return;}
   resetSteps();if(j==="1"){show(1);return;}
   done.add(1);show(2);if(j==="2")return;
   ok2();show(3);if(j==="3")return;
-  /* 3단계를 끝낸 모습: 맞는 까닭 4개를 고른 상태 (버튼을 대신 누르지 않아요) */
+  /* 4단계(오차)를 끝낸 모습: 맞는 까닭을 모두 고른 상태 (버튼을 대신 누르지 않아요) */
   picks=new Set(RIGHT3);$("o3").querySelectorAll(".opt").forEach(b=>b.setAttribute("aria-pressed",picks.has(b.dataset.k)?"true":"false"));judge3();
   done.add(4);show(4);
 };
 
-load();renderLog();show(1);
+load();renderLog();show(0);
 /* 수업 중 실수로 새로 고침하거나 나가지 않도록 (기록은 이 태블릿에 저장되지만, 그래도 조심해요) */
 let touched=false;document.addEventListener("pointerdown",()=>{touched=true;},{once:true,capture:true});
 window.addEventListener("beforeunload",e=>{if(touched){e.preventDefault();e.returnValue="";}});
@@ -435,18 +455,18 @@ window.addEventListener("beforeunload",e=>{if(touched){e.preventDefault();e.retu
    한 번 열린(해금된) 단계는 위의 단계 표시를 눌러 다시 갈 수 있어요. 진행 상태는 그대로 남아요. */
 (()=>{
   const nav=document.querySelector("nav.steps");if(!nav||typeof show!=="function")return;
-  const tabs=[...nav.querySelectorAll(".stepi")],reached=new Set([1]);
+  const tabs=[...nav.querySelectorAll(".stepi")],reached=new Set([0]);const idOf=t=>+t.id.replace("tab","");
   const st=document.createElement("style");
   st.textContent=".stepi.go{cursor:pointer;border-style:dashed;color:var(--ink)}.stepi.go:hover{border-color:var(--accent)}.stepi:focus-visible{outline:3px solid var(--accent);outline-offset:2px}.navhint{margin:-4px 0 0;font-size:.82rem;color:var(--muted);text-align:center;word-break:keep-all}";
   document.head.appendChild(st);
   const hint=document.createElement("p");hint.className="navhint";hint.hidden=true;hint.textContent="지나온 단계는 위의 단계 표시를 눌러 다시 볼 수 있어요.";nav.after(hint);
-  const cur=()=>tabs.findIndex(t=>t.getAttribute("aria-current")==="step")+1;
-  function paint(){const c=cur();tabs.forEach((t,i)=>{const n=i+1,ok=reached.has(n)&&n!==c;t.classList.toggle("go",ok);t.tabIndex=ok?0:-1;
-    if(ok){t.setAttribute("role","button");t.setAttribute("aria-label",`${n}단계로 가기`);}else{t.removeAttribute("role");t.removeAttribute("aria-label");}});
+  const cur=()=>{const t=tabs.find(t=>t.getAttribute("aria-current")==="step");return t?idOf(t):0;};
+  function paint(){const c=cur();tabs.forEach((t,i)=>{const n=idOf(t),ok=reached.has(n)&&n!==c;t.classList.toggle("go",ok);t.tabIndex=ok?0:-1;
+    if(ok){t.setAttribute("role","button");t.setAttribute("aria-label",`${n+1}단계로 가기`);}else{t.removeAttribute("role");t.removeAttribute("aria-label");}});
     hint.hidden=reached.size<2;}
   const _show=show;show=function(k){reached.add(+k);const r=_show.apply(this,arguments);paint();return r;};
-  for(const name of ["resetAll","resetSteps"]){if(typeof window[name]==="function"){const f=window[name];window[name]=function(){reached.clear();reached.add(1);const r=f.apply(this,arguments);paint();return r;};}}
-  tabs.forEach((t,i)=>{const go=()=>{const n=i+1;if(reached.has(n)&&n!==cur())show(n);};
+  for(const name of ["resetAll","resetSteps"]){if(typeof window[name]==="function"){const f=window[name];window[name]=function(){reached.clear();reached.add(0);if(promised)reached.add(1);const r=f.apply(this,arguments);paint();return r;};}}
+  tabs.forEach((t,i)=>{const go=()=>{const n=idOf(t);if(reached.has(n)&&n!==cur())show(n);};
     t.addEventListener("click",go);t.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go();}});});
   paint();
 })();
