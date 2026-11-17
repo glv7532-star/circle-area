@@ -2,7 +2,7 @@
    맞힌 기기는 계속 기억해요(첫 화면의 '이 기기 선생님 모드 잠그기'로 지울 수 있어요).
    비밀번호는 그대로 적지 않고, 바꾼 값(SHA-256)만 적어 둬요. */
 (function(){
-  var KEY="ca-teacher", H="5938e6ed45f1992334c61190d3e65aa1ee743a5dce7baf2dac790c9a7b04597b";
+  var KEY="ca-teacher", H="be180d34dddf670bded23c372ef94f41d135935bf9ddeaca77d11c1ac53a6bf3";
   var local=!/github\.io$/.test(location.hostname);
   var asked=/teacher/.test(location.search);
   var ok=false; try{ok=localStorage.getItem(KEY)===H;}catch(e){}
