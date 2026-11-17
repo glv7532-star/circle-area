@@ -90,6 +90,11 @@ h1{font-family:var(--display);font-weight:700;font-size:2.1rem;line-height:1.1;m
 html,body{overscroll-behavior-y:contain}
 /* 가로 화면에서는 그림 높이를 줄여 아래 질문과 막대가 한 화면에 더 많이 보이게 해요 */
 @media (orientation:landscape){#tri{height:34vh;width:auto;max-width:100%;aspect-ratio:560/210;margin:0 auto}#kst{height:46vh;width:auto;max-width:100%;aspect-ratio:560/340;margin:0 auto}}
+.tref{border:2px dashed var(--accent);border-radius:12px;background:var(--paper);padding:10px 14px}
+.tref summary{cursor:pointer;font-weight:700;word-break:keep-all}
+.tref h3{margin:12px 0 6px;font-size:1rem}
+.tref ol,.tref ul{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:4px;word-break:keep-all}
+.tref p{margin:4px 0;word-break:keep-all}
 </style>
 
 <div class="wrap">
@@ -143,6 +148,23 @@ html,body{overscroll-behavior-y:contain}
         <strong>13,149칸을 세는 대신, 곱셈 세 번으로</strong>
         <p>가장 작은 칸으로 세려면 13,149칸을 세어야 했어요. 그래도 원의 넓이를 딱 하나로 정하지 못했지요. 공식은 반지름만 재면 곱셈 세 번으로 끝나요. 아르키메데스부터 2000년 넘게 이어진 수학자들의 노력 덕분에, 우리는 이 긴 일을 한 줄로 끝낼 수 있어요.</p>
       </div>
+      <details class="tref" id="tref9" hidden>
+        <summary>선생님 참고 · 범위가 좁아진 길과 피자 질문</summary>
+        <h3>범위가 좁아진 길 (반지름 4cm 원, 반지름 × 반지름 = 16cm²)</h3>
+        <ol>
+          <li><b>2·3차시</b> 정사각형 두 개로 가두기: 반지름 × 반지름의 <b>2배 ~ 4배</b> (32 ~ 64cm²)</li>
+          <li><b>5·6차시</b> 원주는 지름의 3배 ~ 4배 → 4차시 공식(원주 × 반지름 ÷ 2)에 넣으면: 반지름 × 반지름의 <b>3배 ~ 4배</b> (48 ~ 64cm²)</li>
+          <li><b>9차시</b> 공식: 반지름 × 반지름의 <b>3.14배</b> (50.24cm²)</li>
+        </ol>
+        <h3>피자 질문 (5·6차시에 쓰지 못한 것)</h3>
+        <p>"지름 20cm 피자 2판과 지름 40cm 피자 1판, 어느 쪽 양이 더 많을까?" 예상을 먼저 듣고(같다는 답이 많을 거예요) 공식으로 계산해요.</p>
+        <ul>
+          <li>지름 20cm: 10 × 10 × 3.14 = 314cm², 2판이면 628cm²</li>
+          <li>지름 40cm: 20 × 20 × 3.14 = 1256cm² → 40cm 1판이 2배</li>
+          <li>지름이 2배면 넓이는 4배예요. 2·3차시 "칸은 몇 배?"('2배' 오답)와 10차시 도전 미션 11(반지름이 2배가 되면?)으로 이어져요.</li>
+          <li>"넓이를 알면 남의 말을 그냥 믿지 않고 직접 따져 볼 수 있어. 피자를 잘라 보지 않고도."</li>
+        </ul>
+      </details>
       <div class="row"><button class="btn" id="go3">선택활동: 케플러의 방법</button><button class="btn primary" id="next2">마무리하기</button></div>
     </div>
   </section>
@@ -327,7 +349,7 @@ $("reset").onclick=()=>{
 };
 
 /* 선생님 바로가기: 학생용 주소(github.io)에서는 ?teacher 를 붙였을 때만 보여요. 버튼을 대신 누르지 않고 상태를 바로 맞춰요. */
-if(window.CA_TEACHER)$("tbar").hidden=false;
+if(window.CA_TEACHER){$("tbar").hidden=false;$("tref9").hidden=false;}
 $("tbar").onclick=e=>{const b=e.target.closest("button");if(!b)return;const j=b.dataset.j;resetAll();
   if(j==="1")return;
   setLines(6);$("half1").hidden=false;["ca","cb","cc"].forEach(id=>$(id).querySelectorAll(".btn").forEach(x=>x.disabled=true));$("qb").hidden=false;$("qc").hidden=false;$("next1").disabled=false;done.add(1);
