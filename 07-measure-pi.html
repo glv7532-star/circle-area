@@ -34,6 +34,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16p
 .wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
 h1{font-family:var(--display);font-weight:700;font-size:2.1rem;line-height:1.1;margin:0}
 .lead{margin:4px 0 0;color:var(--muted);font-size:.95rem;word-break:keep-all}
+.lead2{margin:0;word-break:keep-all;font-size:1rem}
 .promise{margin:0;padding:14px 16px;border-radius:12px;background:var(--accent-bg);font-family:var(--display);font-size:1.4rem;line-height:1.4;text-align:center;word-break:keep-all}
 .steps{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
 .stepi{font-size:.9rem;padding:8px 6px;border:1px solid var(--line);background:var(--paper);color:var(--muted);border-radius:8px;text-align:center;word-break:keep-all;line-height:1.25}
@@ -147,11 +148,7 @@ html,body{overscroll-behavior-y:contain}
   <section class="card" id="step1" hidden>
     <h2>둥근 물건의 지름과 원주를 재어요</h2>
     <p class="note"><b>준비물</b>: 수학 교과서 부록 '준비물 10', '준비물 11'(삼각자, 직각자, 눈금자)</p>
-    <ol class="tips">
-      <li><b>원주</b>: 종이띠 눈금자를 물건 둘레에 한 바퀴 팽팽하게 감고, 0 눈금과 다시 만나는 곳의 눈금을 읽어요. 0 눈금은 띠 끝에서 조금 떨어져 있어요. <b>띠 끝이 아니라 0 눈금</b>에 맞춰 읽어요.</li>
-      <li><b>지름</b>: 물건 양쪽에 삼각자와 직각자를 세워 물건에 꼭 붙이고, 두 자 사이의 거리를 재어요. 이렇게 하면 가장 긴 곳(중심을 지나는 곳)을 잴 수 있어요.</li>
-      <li>동전처럼 <b>작은 것</b>부터 접시처럼 <b>큰 것</b>까지, 크기가 다른 물건을 4개 이상 재어 보세요.</li>
-    </ol>
+    <p class="lead2">동전처럼 <b>작은 것</b>부터 접시처럼 <b>큰 것</b>까지, 크기가 서로 다른 물건을 <b>4개 이상</b> 재어 기록해 보세요.</p>
     <div class="mfigs" aria-label="재는 방법 그림">
       <figure class="mfig">
         <svg viewBox="0 0 300 210" role="img" aria-label="종이띠 눈금자를 원통 둘레에 한 바퀴 감고, 띠 끝이 아니라 0 눈금과 다시 만나는 곳의 눈금 20.9cm를 읽는 그림">
@@ -177,7 +174,7 @@ html,body{overscroll-behavior-y:contain}
           <text x="235" y="176" text-anchor="middle" style="font-family:var(--body);fill:var(--ink);font-size:12.5px">곳을 읽어요</text>
           <text x="95" y="198" text-anchor="middle" style="fill:var(--muted);font-family:var(--body);font-size:11px">빨간 선: 0 눈금 (띠 끝이 아니에요)</text>
         </svg>
-        <figcaption><b>원주</b> 재기: 종이띠 눈금자로 한 바퀴</figcaption>
+        <figcaption><b>원주</b> 재기: 한 바퀴 감고, 띠 끝이 아닌 0 눈금에서 읽어요</figcaption>
       </figure>
       <figure class="mfig">
         <svg viewBox="0 0 300 230" role="img" aria-label="원통 양쪽에 삼각자와 직각자를 세워 붙이고, 두 자 사이의 거리를 눈금자로 재는 그림">
@@ -204,7 +201,7 @@ html,body{overscroll-behavior-y:contain}
             <marker id="mArrR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" style="fill:var(--bad)"/></marker>
           </defs>
         </svg>
-        <figcaption><b>지름</b> 재기: 두 자 사이의 거리</figcaption>
+        <figcaption><b>지름</b> 재기: 두 자 사이의 거리(가장 긴 곳)</figcaption>
       </figure>
     </div>
     <form class="form" id="form" novalidate>
