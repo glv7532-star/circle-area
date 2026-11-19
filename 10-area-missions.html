@@ -11,6 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&display=swap">
 <script src="teacher-lock.js"></script>
+<script src="my-record.js"></script>
 <style>
 /* Layout: same notebook page as the other circle-unit tools; a board of six mission cards, one mission panel open below, and a reveal when all keys are collected. */
 :root{
@@ -127,6 +128,7 @@ html,body{overscroll-behavior-y:contain}
       <p class="closing">유클리드의 직선 도형에서 출발해 아르키메데스의 원까지,<br>수학자들이 걸어간 길을 우리도 끝까지 걸어왔어요!</p>
       <p class="note" style="text-align:center">이 차시와 이어지는 수학익힘책: 88~89쪽 · 단원 마무리: 수학익힘책 90~91쪽, 수학책 126~128쪽</p>
       <p class="note">아직 시간이 남았나요? 아래에 <b>도전 미션</b> 12개가 열렸어요.</p>
+      <div id="recbox" style="display:flex;justify-content:center"></div>
     </div>
   </section>
 
@@ -273,7 +275,7 @@ function renderBoard(){
   if(open){$("stars").innerHTML=`<span>받은 별 ${bsolved.size} / ${BONUS.length}</span>`+BONUS.map((_,i)=>starSVG(bsolved.has(i))).join("");$("bboard").innerHTML=BONUS.map((m,i)=>card("b",m,i)).join("");$("bdone").hidden=bsolved.size<BONUS.length;}
 }
 function openM(s,i){
-  cur={set:s,i};hintN=0;const m=list(s)[i],isDone=doneSet(s).has(i);
+  cur={set:s,i};hintN=0;REC.focus(s+i);const m=list(s)[i],isDone=doneSet(s).has(i);
   $("mtitle").textContent=`${s==="m"?"미션":"도전 미션"} ${i+1}. ${m.title}`;$("mfig").innerHTML=FIG[m.id]();$("mtxt").textContent=m.txt;$("munit").textContent=m.unit||"cm²";
   $("min").value="";$("min").disabled=isDone;$("min").classList.remove("err");$("merr").textContent="";$("hints").innerHTML="";$("hintBtn").hidden=isDone;$("hintBtn").disabled=false;$("hintBtn").textContent="힌트 보기";
   const tt=$("mtoast");if(isDone){tt.className="toast ok";tt.textContent=`해결한 미션이에요. ${m.ok}`;}else{tt.className="toast";tt.textContent="";}
@@ -285,14 +287,24 @@ document.addEventListener("click",e=>{const b=e.target.closest(".mc");if(!b)retu
 $("min").addEventListener("input",()=>{$("merr").textContent="";$("min").classList.remove("err");});
 $("mform").addEventListener("submit",e=>{e.preventDefault();if($("min").disabled)return;const s=cur.set,m=list(s)[cur.i],v=num($("min").value),tt=$("mtoast");
   if(isNaN(v)){$("min").classList.add("err");$("merr").textContent="답을 수로 적어 주세요.";$("min").focus();return;}
+  const w0=m.wrong.find(([x])=>Math.abs(v-x)<0.02);
+  REC.attempt(s+cur.i,near(v,m.ans),`${v}${m.unit||"cm²"}`+(w0?" · "+w0[1].split(/(?<=[.?!])\s/)[0]:""));
   if(near(v,m.ans)){doneSet(s).add(cur.i);save();tt.className="toast ok";tt.textContent=`정답! ${m.ok} ${s==="m"?"열쇠를":"별을"} 하나 얻었어요.`;$("min").disabled=true;$("hintBtn").hidden=true;
     const wasOpen=solved.size===MAIN.length&&s==="m";renderBoard();
     if(s==="m"&&solved.size===MAIN.length){setTimeout(()=>$("final").scrollIntoView({behavior:"smooth",block:"start"}),600);}
     $("nextM").hidden=!nextIdx();$("nextM").textContent=s==="m"&&solved.size===MAIN.length?"도전 미션 시작하기":"다음 미션으로";return;}
   const w=m.wrong.find(([x])=>Math.abs(v-x)<0.02);tt.className="toast bad";tt.textContent=w?w[1]:"다시 계산해 보세요. 막히면 '힌트 보기'를 눌러요.";});
-$("hintBtn").onclick=()=>{const m=list(cur.set)[cur.i];if(hintN<m.hints.length){$("hints").insertAdjacentHTML("beforeend",`<li>${m.hints[hintN]}</li>`);hintN++;}
+$("hintBtn").onclick=()=>{const m=list(cur.set)[cur.i];if(hintN<m.hints.length){REC.hint(cur.set+cur.i);$("hints").insertAdjacentHTML("beforeend",`<li>${m.hints[hintN]}</li>`);hintN++;}
   $("hintBtn").textContent=hintN<m.hints.length?"힌트 하나 더 보기":"힌트를 모두 보았어요";$("hintBtn").disabled=hintN>=m.hints.length;};
 $("nextM").onclick=()=>{const n=nextIdx();if(n){openM(n[0],n[1]);$("mpanel").scrollIntoView({behavior:"smooth",block:"start"});}};
+
+/* ---------- 내 기록 (비밀 상자 아래 '내 기록 확인하기') ----------
+   미션마다 걸린 시간, 시도 횟수, 본 힌트 수, 처음에 쓴 틀린 답을 이 태블릿에만 남겨요.
+   푸는 동안에는 시간을 보여 주지 않아요. '처음부터 다시'를 누르면 진행 상황과 함께 지워져요. */
+const REC=CARec.create({key:"circle-rec-10",hints:true,items:[
+  ...MAIN.map((m,i)=>({id:"m"+i,g:"기본 미션",label:`미션 ${i+1} · ${m.title}`})),
+  ...BONUS.map((m,i)=>({id:"b"+i,g:"도전 미션",label:`도전 ${i+1} · ${m.title}`}))]});
+REC.mount($("recbox"));
 
 /* ---------- 처음부터 ---------- */
 /* 진행 상황(푼 미션)은 이 태블릿에 저장해요. '처음부터 다시'를 누르면 저장한 것도 지워요. */
@@ -300,7 +312,7 @@ const KEY="circle-missions-v1";
 function save(){try{localStorage.setItem(KEY,JSON.stringify({m:[...solved],b:[...bsolved]}));}catch(_){}}
 function load(){try{const v=JSON.parse(localStorage.getItem(KEY)||"{}"),ok=(a,L)=>Array.isArray(a)?a.filter(i=>Number.isInteger(i)&&i>=0&&i<L):[];
   solved=new Set(ok(v.m,MAIN.length));bsolved=new Set(ok(v.b,BONUS.length));}catch(_){solved=new Set();bsolved=new Set();}}
-function resetAll(){solved=new Set();bsolved=new Set();save();openM("m",0);}
+function resetAll(){solved=new Set();bsolved=new Set();save();REC.clear();openM("m",0);}
 let resetArm=0;
 $("reset").onclick=()=>{
   if(Date.now()-resetArm>4000){resetArm=Date.now();$("reset").textContent="정말 처음부터 할까요? 한 번 더 누르세요";setTimeout(()=>{$("reset").textContent="처음부터 다시";},4000);return;}
