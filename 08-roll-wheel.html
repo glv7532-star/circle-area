@@ -17,16 +17,17 @@
   --bg:#efe8d8; --paper:#fbf7ee; --ink:#2f3a2c; --muted:#6c7462; --line:#d8ceb6;
   --accent:#2d5d7b; --accent-bg:#dde8ef; --ok:#2f7a3d; --bad:#b23a48;
   --wheel:#f2c26b; --wheel-edge:#b06a1f; --rim:#7a3fa0; --flag:#b23a48; --band:#e9b44c;
+  --pa:#f2c26b; --pa-edge:#b06a1f; --pb:#a9cbe3; --pb-edge:#2d5d7b;
   --display:"Gaegu","Gowun Dodum",cursive; --body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#141b26; --paper:#1f2836; --ink:#ece6d6; --muted:#a3a99c; --line:#334156;
   --accent:#8cc0e0; --accent-bg:#1e3446; --ok:#7fd08c; --bad:#f08b97;
-  --wheel:#8a6a2e; --wheel-edge:#e6a65a; --rim:#c9a0ef; --flag:#f08b97; --band:#c99a3c; color-scheme:dark}}
+  --wheel:#8a6a2e; --wheel-edge:#e6a65a; --rim:#c9a0ef; --flag:#f08b97; --band:#c99a3c; --pa:#8a6a2e; --pa-edge:#e6a65a; --pb:#2a4a63; --pb-edge:#8cc0e0; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#141b26; --paper:#1f2836; --ink:#ece6d6; --muted:#a3a99c; --line:#334156;
   --accent:#8cc0e0; --accent-bg:#1e3446; --ok:#7fd08c; --bad:#f08b97;
-  --wheel:#8a6a2e; --wheel-edge:#e6a65a; --rim:#c9a0ef; --flag:#f08b97; --band:#c99a3c; color-scheme:dark}
+  --wheel:#8a6a2e; --wheel-edge:#e6a65a; --rim:#c9a0ef; --flag:#f08b97; --band:#c99a3c; --pa:#8a6a2e; --pa-edge:#e6a65a; --pb:#2a4a63; --pb-edge:#8cc0e0; color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;margin:0;
@@ -85,6 +86,28 @@ h1{font-family:var(--display);font-weight:700;font-size:2.1rem;line-height:1.1;m
 .tbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;border:1.5px dashed var(--accent);border-radius:10px;font-size:.85rem;color:var(--muted)}
 .tbar button{font:inherit;font-size:.85rem;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
 .link{background:none;border:none;color:var(--muted);text-decoration:underline;font:inherit;font-size:.88rem;cursor:pointer;padding:0;align-self:flex-start}
+/* 마무리 끝 '넓이 공식의 원주 자리': 다음 차시(원의 넓이 공식 완성)로 이어지는 빈칸 채우기 */
+.bridge{display:flex;flex-direction:column;gap:12px;padding-top:14px;border-top:2px dashed var(--line)}
+.bridge h3{font-family:var(--display);font-size:1.35rem;margin:0;line-height:1.2;word-break:keep-all}
+.bfig{width:100%;max-width:600px;height:auto;display:block;margin:0 auto;border-radius:12px;background:var(--bg)}
+.bfig text{font-family:var(--body);fill:var(--ink);font-size:15px}
+.bfig .sm{fill:var(--muted);font-size:12.5px}
+.bfig .unk{fill:var(--bad);font-weight:700}
+.bfig .got{fill:var(--accent);font-weight:700}
+.lines{display:flex;flex-direction:column;gap:8px}
+.fl{margin:0;padding:10px 14px;border-radius:12px;background:var(--bg);font-family:var(--display);font-size:1.55rem;line-height:1.5;word-break:keep-all}
+@media (max-width:480px){.fl{font-size:1.25rem}}
+.fl small{display:block;font-family:var(--body);font-size:.82rem;color:var(--muted);line-height:1.4}
+.tk{display:inline-block;padding:0 4px;border-radius:6px}
+.tk.qm{border:2.5px dashed var(--bad);color:var(--bad);padding:0 8px}
+.tk.got{color:var(--accent)}
+.tk.new{background:var(--band);color:#2a2210}
+.story{display:flex;flex-direction:column;gap:6px;padding:14px;border-radius:12px;background:var(--accent-bg)}
+.story strong{font-family:var(--display);font-size:1.35rem;line-height:1.2;word-break:keep-all}
+.story p{margin:0;word-break:keep-all}
+.tref{border:2px dashed var(--accent);border-radius:12px;background:var(--paper);padding:10px 14px}
+.tref summary{cursor:pointer;font-weight:700;word-break:keep-all}
+.tref ul{margin:8px 0 0;padding-left:1.3em;display:flex;flex-direction:column;gap:4px;word-break:keep-all;font-size:.92rem}
 html,body{overscroll-behavior-y:contain}
 /* 가로 화면에서는 무대 높이를 줄여 아래 문제와 입력 칸이 한 화면에 보이게 해요 */
 @media (orientation:landscape){#stage{height:38vh;width:auto;max-width:100%;aspect-ratio:560/230;margin:0 auto}}
@@ -158,6 +181,28 @@ html,body{overscroll-behavior-y:contain}
       <li>우리 주변에서 원주를 구해 보고 싶은 물건을 하나 찾아보세요.</li>
     </ol>
     <p class="closing">원주를 직접 재지 않아도,<br>지름만 알면 계산으로 구할 수 있어요!</p>
+    <div class="bridge" id="bridge">
+      <h3>한 걸음 더: 넓이 공식의 '원주' 자리</h3>
+      <p class="note">피자 조각 마법에서 원 2개를 잘게 잘라 엇갈려 붙였더니 직사각형에 가까워졌지요. 그림과 식의 빈칸을 채워 그때 만든 넓이 공식을 떠올려 보고, 오늘 배운 원주를 넣어 봐요.</p>
+      <svg class="bfig" id="bfig" viewBox="0 0 600 172" role="img" aria-label="노란 원과 파란 원을 잘게 잘라 엇갈려 붙인 직사각형 모양이에요. 가로와 세로가 원의 어느 부분인지 빈칸으로 남아 있어요."></svg>
+      <div class="lines">
+        <p class="fl"><small>오늘 배운 식</small>원주 = 지름 × 원주율</p>
+        <p class="fl"><small>피자 조각 마법에서 만든 공식</small>원의 넓이 = <span class="tk qm" id="bt1">?</span> × <span class="tk qm" id="bt2">?</span> ÷ <span class="tk qm" id="bt3">?</span></p>
+        <p class="fl" id="bl3" hidden><small>원주 자리에 지름 × 원주율을 넣으면</small>원의 넓이 = <span class="tk new">지름 × 원주율</span> × 반지름 ÷ 2</p>
+      </div>
+      <div class="q" id="bq1"><p>직사각형의 세로는 원의 어느 부분이었나요?</p><div class="choices" id="bc1"><button class="btn" data-v="d">지름</button><button class="btn" data-v="r">반지름</button><button class="btn" data-v="c">원주</button></div></div>
+      <div class="q" id="bq2" hidden><p>직사각형의 가로는 원의 어느 부분이었나요?</p><div class="choices" id="bc2"><button class="btn" data-v="h">원주의 절반</button><button class="btn" data-v="d">지름</button><button class="btn" data-v="c">원주</button></div></div>
+      <div class="q" id="bq3" hidden><p>이 직사각형은 원 몇 개로 만들었나요? 원 하나의 넓이를 구하려면 직사각형의 넓이를 어떻게 해야 할까요?</p><div class="choices" id="bc3"><button class="btn" data-v="x2">× 2</button><button class="btn" data-v="d2">÷ 2</button><button class="btn" data-v="d4">÷ 4</button></div></div>
+      <div class="q" id="bq4" hidden><p>오늘 배운 식을 써서, 넓이 공식의 '원주' 자리에 무엇을 넣을 수 있을까요?</p><div class="choices" id="bc4"><button class="btn" data-v="r">반지름 × 원주율</button><button class="btn" data-v="cd">원주 ÷ 원주율</button><button class="btn" data-v="d">지름 × 원주율</button></div></div>
+      <p class="toast" id="btoast" role="status"></p>
+      <div class="story" id="bstory" hidden><strong>그런데 식이 꽤 길어졌어요</strong><p>이제 원주를 직접 재지 않아도 원의 넓이를 구할 수 있어요. 그런데 식에 지름도 있고 반지름도 있어서 꽤 길어졌지요? 수학자들은 긴 것과 복잡한 것을 싫어한다고 했어요. 이 식을 더 짧게 만들 수는 없을까요? 다음 시간에 알아봐요.</p></div>
+      <details class="tref" id="tref8" hidden><summary>선생님 참고 · 넓이 공식으로 이어지는 빈칸</summary><ul>
+        <li>식을 짧게 정리하는 것(반지름 × 반지름 × 원주율)은 다음 차시(원의 넓이 공식 완성) 1단계에서 해요. 여기서는 일부러 긴 식으로 끝내 궁금증을 남겨요.</li>
+        <li>학생이 먼저 "지름 ÷ 2가 반지름이니까…"라고 말하면 "좋은 생각! 다음 시간에 친구들에게 설명해 줘"로 받아 주세요.</li>
+        <li>다음 차시 프로그램은 '지름을 반지름 × 2로 바꿔 × 2와 ÷ 2를 없애는' 방법으로 정리해요. '지름과 ÷ 2를 묶어 반지름'으로 정리하는 학생이 있어도 같은 결과예요.</li>
+        <li>'원주의 절반'은 교과서처럼 원 1개로 만든 직사각형의 가로예요. 고르는 학생이 있으면 "원 하나로 만들면 맞아. 여기서는 원 몇 개로 만들었지?"로 이어 갈 수 있어요.</li>
+      </ul></details>
+    </div>
     <p class="note" style="text-align:center">이 차시와 이어지는 수학익힘책: 82~83쪽</p>
   </section>
 
@@ -291,6 +336,56 @@ $("f3").addEventListener("submit",e=>{e.preventDefault();if($("in3").disabled)re
 $("nextp").onclick=()=>setup3(pi3+1);
 $("next3").onclick=()=>{done.add(4);show(4);};
 
+/* ---------- 마무리 끝: 넓이 공식의 '원주' 자리 (다음 차시로 잇기) ----------
+   피자 조각 마법의 그림과 공식을 빈칸으로 다시 보고, 오늘 배운 원주 = 지름 × 원주율을 넣어 봐요.
+   식을 짧게 정리하는 것은 다음 차시(원의 넓이 공식 완성) 1단계에서 해요. */
+function drawBridge(wTxt,hTxt){
+  const R=46,n=8,c=2*R*Math.sin(Math.PI/n),h=R*Math.cos(Math.PI/n),x0=140,yt=58,yb=yt+h,f=v=>v.toFixed(1);
+  let g="";
+  /* 왼쪽: 노란 원과 파란 원 */
+  for(const [cy,fill,edge] of [[46,"var(--pa)","var(--pa-edge)"],[122,"var(--pb)","var(--pb-edge)"]]){
+    g+=`<circle cx="52" cy="${cy}" r="30" fill="${fill}" stroke="${edge}" stroke-width="1.5"/>`;
+    for(let k=0;k<n;k++){const a=k*2*Math.PI/n;g+=`<line x1="52" y1="${cy}" x2="${f(52+30*Math.cos(a))}" y2="${f(cy+30*Math.sin(a))}" stroke="${edge}" stroke-width="1"/>`;}
+  }
+  g+=`<text class="sm" x="52" y="166" text-anchor="middle">원 2개</text>`;
+  const my=(yt+yb)/2;
+  g+=`<path d="M92 ${f(my)}h26" stroke="var(--muted)" stroke-width="2"/><path d="M118 ${f(my-5)}l9 5-9 5z" fill="var(--muted)"/>`;
+  /* 오른쪽: 노란 조각(굽은 쪽이 위)과 파란 조각(굽은 쪽이 아래)을 엇갈려 붙인 모양 */
+  for(let i=0;i<n;i++){
+    const l=x0+i*c;
+    g+=`<path d="M${f(l+c/2)} ${f(yb)}L${f(l)} ${f(yt)}A${R} ${R} 0 0 1 ${f(l+c)} ${f(yt)}Z" fill="var(--pa)" stroke="var(--pa-edge)" stroke-width="1"/>`;
+    g+=`<path d="M${f(l+c)} ${f(yt)}L${f(l+c/2)} ${f(yb)}A${R} ${R} 0 0 0 ${f(l+c*1.5)} ${f(yb)}Z" fill="var(--pb)" stroke="var(--pb-edge)" stroke-width="1"/>`;
+  }
+  const xr=x0+c*(n+.5),wx=x0+c*n/2;
+  g+=`<path d="M${f(x0)} ${yt-10}V${yt-17}H${f(x0+c*n)}V${yt-10}" fill="none" stroke="var(--ink)" stroke-width="1.5"/>`;
+  g+=`<text x="${f(wx)}" y="${yt-24}" text-anchor="middle">가로 = <tspan class="${wTxt?"got":"unk"}">${wTxt||"?"}</tspan></text>`;
+  g+=`<path d="M${f(xr+6)} ${f(yt)}H${f(xr+13)}V${f(yb)}H${f(xr+6)}" fill="none" stroke="var(--ink)" stroke-width="1.5"/>`;
+  g+=`<text x="${f(xr+20)}" y="${f(my+5)}">세로 = <tspan class="${hTxt?"got":"unk"}">${hTxt||"?"}</tspan></text>`;
+  g+=`<text class="sm" x="${f(wx)}" y="${f(yb+30)}" text-anchor="middle">원 2개를 잘게 잘라 엇갈려 붙인 모양</text>`;
+  $("bfig").innerHTML=g;
+}
+let bW="",bH="";
+const BQ=[
+  {id:"bc1",ok:"r",hints:{d:"지름은 원의 중심을 지나 끝에서 끝까지예요. 조각 하나의 곧은 변은 중심에서 둘레까지였지요?",c:"원주(둘레)는 조각의 굽은 쪽이에요. 세로는 조각의 곧은 변이에요."},
+   done:()=>{bH="반지름";$("bt2").textContent="반지름";$("bt2").className="tk got";drawBridge(bW,bH);return "맞아요! 세로는 조각의 곧은 변, 반지름이에요.";}},
+  {id:"bc2",ok:"c",hints:{h:"원 하나로 만들면 절반이 맞아요. 그런데 이 직사각형은 원 2개로 만들었어요. 노란 원의 둘레가 모두 어디에 모였나요?",d:"가로에는 조각의 굽은 쪽(둘레)이 모였어요."},
+   done:()=>{bW="원주";$("bt1").textContent="원주";$("bt1").className="tk got";drawBridge(bW,bH);return "맞아요! 노란 원의 둘레가 위쪽에 모두 모여서 가로가 되었어요.";}},
+  {id:"bc3",ok:"d2",hints:{x2:"직사각형은 원 2개로 만들었어요. 원 하나의 넓이는 직사각형보다 작아요.",d4:"그림에서 원이 몇 개인지 세어 보세요."},
+   done:()=>{$("bt3").textContent="2";$("bt3").className="tk got";$("bt1").className="tk qm";return "맞아요! 원 2개로 만들었으니 ÷ 2를 해요. 이것이 피자 조각 마법에서 만든 공식이에요. 그런데 빨간 점선 안의 '원주'는 굽은 선이라 자로 바로 잴 수 없었지요?";}},
+  {id:"bc4",ok:"d",hints:{r:"원주는 반지름이 아니라 지름의 약 3.14배였어요. 1단계에서 바퀴를 굴린 것을 떠올려 보세요.",cd:"원주 ÷ 원주율은 지름을 구하는 식이었어요. 2단계 깃발을 떠올려 보세요."},
+   done:()=>{$("bt1").className="tk got";$("bl3").hidden=false;$("bstory").hidden=false;return "맞아요! 원주 = 지름 × 원주율이니까, 원주 자리에 지름 × 원주율을 넣을 수 있어요.";}}
+];
+BQ.forEach((q,k)=>{$(q.id).onclick=e=>{const b=e.target.closest(".btn");if(!b||b.disabled)return;const tt=$("btoast");
+  if(b.dataset.v===q.ok){b.classList.add("yes");$(q.id).querySelectorAll(".btn").forEach(x=>x.disabled=true);tt.className="toast ok";tt.textContent=q.done();
+    const nx=$("bq"+(k+2))||$("bstory");nx.hidden=false;nx.scrollIntoView({block:"nearest",behavior:reduce?"auto":"smooth"});}
+  else{b.classList.add("no");b.disabled=true;tt.className="toast bad";tt.textContent=q.hints[b.dataset.v];}};});
+function resetBridge(){
+  bW="";bH="";drawBridge("","");
+  ["bt1","bt2","bt3"].forEach(id=>{$(id).textContent="?";$(id).className="tk qm";});
+  BQ.forEach((q,k)=>{$("bq"+(k+1)).hidden=k>0;$(q.id).querySelectorAll(".btn").forEach(x=>{x.disabled=false;x.classList.remove("yes","no");});});
+  $("bl3").hidden=true;$("bstory").hidden=true;$("btoast").textContent="";$("btoast").className="toast";
+}
+
 /* ---------- 처음부터 ---------- */
 function resetAll(){
   cancelAnimationFrame(anim);rolling=false;done.clear();flag=null;d1=10;ok1=new Set();mark1();open2=false;open3=false;
@@ -298,6 +393,7 @@ function resetAll(){
   $("p1").innerHTML=`지름이 <b>10cm</b>인 바퀴가 한 바퀴 굴러가면 몇 cm를 갈지 먼저 계산해 보세요.`;
   $("in1").value="";$("err1").textContent="";$("rec1").innerHTML="";$("next1").disabled=true;$("next2").disabled=true;
   ["toast1","toast2","toast3"].forEach(id=>{$(id).textContent="";$(id).className="toast";});
+  resetBridge();
   wheelSVG(10,0,[],null);show(1);
 }
 let resetArm=0;
@@ -307,7 +403,7 @@ $("reset").onclick=()=>{
 };
 
 /* 선생님 바로가기: 학생용 주소(github.io)에서는 ?teacher 를 붙였을 때만 보여요. 버튼을 대신 누르지 않고 상태를 바로 맞춰요. */
-if(window.CA_TEACHER)$("tbar").hidden=false;
+if(window.CA_TEACHER){$("tbar").hidden=false;$("tref8").hidden=false;}
 $("tbar").onclick=e=>{const b=e.target.closest("button");if(!b)return;const j=b.dataset.j;resetAll();
   if(j==="1")return;
   ok1=new Set(DS);mark1();$("rec1").innerHTML=`<li>지름 10cm: 예상 31.4cm → 실제 31.4cm ✓ (예시)</li><li>지름 20cm: 예상 62.8cm → 실제 62.8cm ✓ (예시)</li><li>지름 30cm: 예상 94.2cm → 실제 94.2cm ✓ (예시)</li>`;$("next1").disabled=false;done.add(1);
