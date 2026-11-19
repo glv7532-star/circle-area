@@ -58,6 +58,11 @@ h1{font-family:var(--display);font-weight:700;font-size:2.1rem;line-height:1.1;m
 .toast.bad{color:var(--bad)} .toast.ok{color:var(--ok)}
 .tips{margin:0;padding:12px 14px 12px 2.2em;border-radius:12px;background:var(--bg);display:flex;flex-direction:column;gap:4px;word-break:keep-all;font-size:.95rem}
 .form{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr) auto;gap:8px;align-items:end}
+.tref{border:2px dashed var(--accent);border-radius:12px;background:var(--paper);padding:10px 14px;margin-top:12px}
+.tref summary{cursor:pointer;font-weight:700;word-break:keep-all}
+.tref h3{margin:14px 0 6px;font-size:1rem}
+.tref ol,.tref ul{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:4px;word-break:keep-all}
+.tref p{margin:4px 0;word-break:keep-all}
 .mfigs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media (max-width:560px){.mfigs{grid-template-columns:1fr}}
 .mfig{margin:0;padding:8px 8px 10px;border:1px solid var(--line);border-radius:12px;background:var(--paper);display:flex;flex-direction:column;gap:4px}
@@ -201,7 +206,7 @@ html,body{overscroll-behavior-y:contain}
             <marker id="mArrR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" style="fill:var(--bad)"/></marker>
           </defs>
         </svg>
-        <figcaption><b>지름</b> 재기: 두 자 사이의 거리(가장 긴 곳)</figcaption>
+        <figcaption><b>지름</b> 재기: 두 자 사이의 거리(가장 긴 곳)<br>펜처럼 작은 물건은 자 위에 눕혀 재어도 돼요</figcaption>
       </figure>
     </div>
     <form class="form" id="form" novalidate>
@@ -254,6 +259,25 @@ html,body{overscroll-behavior-y:contain}
       <p>자로 재면 아무리 조심해도 조금씩 어긋나요. 이것을 <b>오차</b>라고 해요. 아르키메데스는 오차 없이 원주율을 알아내려고, 원을 정다각형 사이에 가두고 계산으로 범위를 좁혀 갔어요. 우리가 잰 값들이 3.14 근처에 모여 있는 것은, 아르키메데스가 계산한 값이 실제 물건에서도 맞는다는 뜻이에요.</p>
       <p>기억나지요? 수학자들은 긴 것과 복잡한 것을 싫어하지만, 틀리는 건 더 싫어해요.</p>
     </div>
+    <details class="tref" id="tref7" hidden>
+      <summary>선생님 참고 · 값이 모두 3.14보다 크게(또는 작게) 나왔을 때</summary>
+      <p>여러 모둠이 같은 물건을 재었는데 값이 한쪽으로 쏠렸다면, 까닭을 '어느 쪽으로 틀렸나'로 좁혀 볼 수 있어요.</p>
+      <h3>원주 ÷ 지름을 분수로 보기</h3>
+      <ul>
+        <li>원주 ÷ 지름 = 원주/지름 (분자: 원주, 분모: 지름)</li>
+        <li><b>지름을 짧게</b> 재면 분모가 작아져 값이 커져요. 두 자가 기울거나 물건에 꼭 붙지 않을 때, 중심을 지나지 않는 곳을 잴 때.</li>
+        <li><b>원주를 길게</b> 재면 분자가 커져 값이 커져요. 종이띠를 느슨하거나 비스듬히 감을 때, 0 눈금 대신 띠 끝에 맞춰 읽을 때.</li>
+        <li>모두 3.14보다 <b>작게</b> 나왔다면 거꾸로 지름을 길게, 원주를 짧게 잰 쪽을 의심해 보세요.</li>
+      </ul>
+      <h3>지름이 더 중요한 까닭</h3>
+      <p>지름은 원주보다 작은 수라서, 같은 0.1cm라도 값을 더 크게 흔들어요. 예: 지름 5cm, 원주 15.7cm인 캔(딱 3.14)에서 지름을 4.9cm로 재면 3.20, 원주를 15.8cm로 재면 3.16.</p>
+      <h3>함께 쓸 만한 질문</h3>
+      <ul>
+        <li>"같은 캔인데 왜 모둠마다 다를까?" → 까닭을 모두 판서 → "이 중 무엇이 차이를 만들었을까?" (원인이 여러 개일 수 있어요)</li>
+        <li>"그런데 모두 3.14보다 크다. 왜 다 같은 쪽일까?" → 분모·분자로 따지기</li>
+        <li>"캔이 부풀었다"는 답이 나오면: 부풀면 원주와 지름이 함께 커지니 원주 ÷ 지름은 거의 그대로예요. 마무리 질문 2(원이 커져도 원주 ÷ 지름은 그대로)의 예로 쓸 수 있어요.</li>
+      </ul>
+    </details>
     <div class="row"><button class="btn primary" id="next3" disabled>원주를 구하는 방법 정리하기</button></div>
   </section>
 
@@ -269,8 +293,8 @@ html,body{overscroll-behavior-y:contain}
     <ol class="ask">
       <li>잰 원주와 지름 × 3.14는 얼마나 차이 났나요? 차이가 가장 큰 물건은 무엇이고, 왜 그랬을까요?</li>
       <li>원이 2배, 10배로 커지면 원주도 길어지는데, 왜 원주 ÷ 지름은 그대로일까요?</li>
-      <li>원주를 직접 재기 어려운 물건(운동장 트랙, 대관람차)은 어떻게 원주를 구할 수 있을까요?</li>
       <li>피자 조각 마법에서 빈칸으로 남았던 '원주' 자리에 이제 무엇을 넣을 수 있을까요?</li>
+      <li>원주를 직접 재기 어려운 물건(운동장 트랙, 대관람차)은 어떻게 원주를 구할 수 있을까요?</li>
     </ol>
     <p class="closing">아르키메데스가 계산으로 찾은 수,<br>우리 손으로 재어 봐도 3.14 근처였어요!</p>
     <p class="note" style="text-align:center">이 차시와 이어지는 수학익힘책: 80~81쪽</p>
@@ -315,7 +339,7 @@ function renderLog(){
   const tt=$("toast1");
   if(!rows.length){tt.textContent="";return;}
   const odd=rows.filter(r=>ratio(r)<2.8||ratio(r)>3.5).length;
-  if(odd){tt.className="toast bad";tt.textContent=`'?' 표시가 있는 물건은 원주÷지름이 다른 물건과 많이 달라요. 다시 재어 볼까요? 지름은 가장 긴 곳, 원주는 딱 한 바퀴만 재어요.`;}
+  if(odd){tt.className="toast bad";tt.textContent=`'?' 표시가 있는 물건은 원주÷지름이 다른 물건과 많이 달라요. 기록은 지우지 말고, 다시 재어 한 줄 더 기록해요. 지름은 가장 긴 곳, 원주는 딱 한 바퀴만 재어요. ${ok?"기록이 4개 이상이라 다음으로 넘어갈 수 있어요.":`기록이 4개 이상이면 다음으로 넘어갈 수 있어요(${4-rows.length}개 더).`}`;}
   else if(!ok){tt.className="toast";tt.textContent=`${rows.length}개를 기록했어요. ${4-rows.length}개 더 재어 보세요.`;}
   else if(spread<3){tt.className="toast";tt.textContent=`${rows.length}개를 기록했어요. 크기 차이가 더 나는 물건(아주 작은 것이나 아주 큰 것)도 재면 비교하기 좋아요.`;}
   else{tt.className="toast ok";tt.textContent=`${rows.length}개를 기록했어요. 원주÷지름을 쭉 살펴보세요. 무엇을 발견했나요?`;}
@@ -428,7 +452,7 @@ $("reset").onclick=()=>{
 };
 
 /* 선생님 바로가기: 학생용 주소(github.io)에서는 ?teacher 를 붙였을 때만 보여요. */
-if(window.CA_TEACHER)$("tbar").hidden=false;
+if(window.CA_TEACHER){$("tbar").hidden=false;$("tref7").hidden=false;}
 const EX=[["500원 동전",2.65,8.3],["음료 캔",6.6,20.9],["머그컵",8.2,25.6],["테이프",11,34.8],["접시",21,66.5],["벽시계",30,94.6]];
 $("tbar").onclick=e=>{const b=e.target.closest("button");if(!b)return;const j=b.dataset.j;
   if(j!=="0"&&(j==="ex"||rows.length<4)){rows=EX.map(([name,d,c])=>({name,d,c,ex:true}));save();renderLog();}
